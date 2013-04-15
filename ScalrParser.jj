@@ -1,0 +1,9 @@
+PARSER_BEGIN(ScalrParser)
+
+PARSER_END(ScalrParser)
+
+TOKEN: {
+	"note" | "pitch" | "volume" | 
+       	"duration" | "end" | "func" |
+	"while" | "foreach" | "in" |
+	"if" | "else" | "track" | }
