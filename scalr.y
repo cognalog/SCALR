@@ -20,7 +20,7 @@ line: loop
 ;
 
 loop: while ( boolean-expr ) block end
-| foreach ( identifier in identifier ) block end
+| foreach ( identifier in return ) block end
 ;
 
 boolean-expr: boolean-expr and b-e’
