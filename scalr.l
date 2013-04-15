@@ -1,10 +1,6 @@
-%{
-#include <stdio.h>
-#include "y.tab.h"
-%}
 whitespace [ \t\n]
 letter [A-Za-z]
-digit [1-9]
+digit [0-9]
 int {digit}+
 id {letter}({letter}|{int})*
 %%
