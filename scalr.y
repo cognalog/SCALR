@@ -36,7 +36,7 @@ b-e’: not boolean-expr
 | operand <= operand
 ;
 
-conditional: if ( boolean-expr ) block end \n conditional’;
+conditional: if ( boolean-expr ) block end \n conditional’
 
 conditional': else conditional
 | else block end
