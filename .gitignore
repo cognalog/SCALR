@@ -1,14 +1,13 @@
-ParseException.class
-SyntaxCheckerTokenManager.class
+# class files are just not cool
+*.class
+
+# temp files are also just not cool
+*~
+
 ParseException.java
 SyntaxCheckerTokenManager.java
-Token.class
-SimpleCharStream.class
 Token.java
 SimpleCharStream.java
-TokenMgrError.class
-SyntaxChecker.class
 TokenMgrError.java
 SyntaxChecker.java
-SyntaxCheckerConstants.class
 SyntaxCheckerConstants.java
