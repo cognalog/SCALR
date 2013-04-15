@@ -5,7 +5,7 @@
 
 parameters: identifier parameters’;
 
-parameters’: , parameters
+parameters’: ',' parameters
 | /*empty */
 ;
 

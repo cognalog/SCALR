@@ -1,8 +1,8 @@
-whitespace [ \t\n]
-letter [A-Za-z]
-digit [0-9]
-int {digit}+
-id {letter}({letter}|{int})*
+whitespace = [ \t\n]
+letter = [A-Za-z]
+digit = [0-9]
+int = {digit}+
+id = {letter}({letter}|{digit})*
 %%
 {whitespace} { }
 note return NOTE;
