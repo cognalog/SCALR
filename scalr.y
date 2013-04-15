@@ -95,4 +95,6 @@ note-list’: , note-list
 return: identifier
 | sequence
 ;
+
+track: track '->' return;
 %%

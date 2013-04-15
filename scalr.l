@@ -16,6 +16,7 @@ foreach return FOREACH;
 in return IN;
 if return IF;
 else return ELSE;
+track return TRACK;
 {id} {yylval = (int) installID(); return(ID)};
 {int} {yylval = (int) installInt(); return(INT)};
 %%
