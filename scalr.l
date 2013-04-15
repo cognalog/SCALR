@@ -13,6 +13,7 @@ end return END;
 func return FUNC;
 while return WHILE;
 foreach return FOREACH;
+in return IN;
 if return IF;
 else return ELSE;
 {id} {yylval = (int) installID(); return(ID)};
