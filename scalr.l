@@ -16,5 +16,5 @@ foreach return FOREACH;
 if return IF;
 else return ELSE;
 {id} {yylval = (int) installID(); return(ID)};
-{int} {yylval = (int) installInt(); return(INT);
+{int} {yylval = (int) installInt(); return(INT)};
 %%
