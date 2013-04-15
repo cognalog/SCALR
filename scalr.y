@@ -95,16 +95,3 @@ return: identifier
 | sequence
 ;
 %%
-#include "lex.yy.c"
-
-yyerror(char *error){
-  printf("%s\n", error);
-}
-
-/*
-**OUTPUT**
-  (true nor false) nor (true nor false)
-  true
-  true nor true nor (false nor false)
-  false
- */
