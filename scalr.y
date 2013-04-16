@@ -76,9 +76,16 @@ operand: identifier
 ;
 
 note: note 
-| note . pitch ( int )
-| note . volume ( int )
-| note . duration ( int )
+| note . pitch ( expression )
+| note . pitch ( degree )
+| note . pitch ( + expression )
+| note . pitch ( - expression )
+| note . volume ( expression )
+| note . volume ( + expression )
+| note . volume ( - expression )
+| note . duration ( expression )
+| note . duration ( + expression )
+| note . duration ( - expression )
 ;
 
 return: identifier
