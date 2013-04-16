@@ -37,9 +37,9 @@ TOKEN: {
     <DEGREE: ["A"-"G"]("b" | "s")?["0"-"10"]>
 	}
 
-void parameters(): {} {<ID> parameters’()}
+void parameters(): {} {<ID> parameters1()}
 
-void parameters’(): {} {"," parameters() 
+void parameters1(): {} {"," parameters() 
 | ""}
 
 void block(): {} {block() "\n" line() 
@@ -54,20 +54,20 @@ void line(): {} {loop()
 void loop(): {} {"while" "(" boolean-expr() ")" block() "end" 
 | "foreach" "(" <ID> "in" return() ")" block() "end"}
 
-void boolean-expr(): {} {boolean-expr() "and" b-e'() 
-| boolean-expr() "or" b-e'() 
-| b-e'()}
+void boolean-expr(): {} {boolean-expr() "and" b-e1() 
+| boolean-expr() "or" b-e1() 
+| b-e1()}
 
-void b-e'(): {} {"not" boolean-expr() 
+void b-e1(): {} {"not" boolean-expr() 
 | operand() "==" operand() 
 | operand() ">" operand() 
 | operand() "<" operand() 
 | operand() "<=" operand() 
 | operand() ">=" operand()}
 
-void conditional(): {} {"if" "(" boolean-expr() ")" block() "end" "\n" conditional'()}
+void conditional(): {} {"if" "(" boolean-expr() ")" block() "end" "\n" conditional1()}
 
-void conditional'(): {} {"else" conditional() 
+void conditional1(): {} {"else" conditional() 
 | "else" block() "end" 
 | ""}
 
@@ -77,18 +77,18 @@ void assignment(): {} {<ID> "=" expression()
 | <ID> "/=" expression() 
 | <ID> "%=" expression()}
 
-void expression(): {} {expression() "+" expr'() 
-| expression() "-" expr'() 
-| expr'()}
+void expression(): {} {expression() "+" expr1() 
+| expression() "-" expr1() 
+| expr1()}
 
-void expr'(): {} {expr'() "*" expr''() 
-| expr'() "/" expr''() 
-| expr''()}
+void expr1(): {} {expr1() "*" expr2() 
+| expr1() "/" expr2() 
+| expr2()}
 
-void expr''(): {} {expr''() "%" expr'''() 
-| expr'''()}
+void expr2(): {} {expr2() "%" expr3() 
+| expr3()}
 
-void expr'''(): {} {"(" expression() ")" 
+void expr3(): {} {"(" expression() ")" 
 | operand()} 
 
 void operand(): {} {<ID> 
