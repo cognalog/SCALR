@@ -25,7 +25,7 @@ PARSER_END(ScalrParser)
 SKIP : { " " | "\t" }
 TOKEN: {
     "and" | "or" | "not" | "->" | "." |
-    "" | "," | "+" | "-" | "(" | ")" | "[" | "]" |
+    "" | "," | "+" | "-" | "%" | "(" | ")" | "[" | "]" |
 	"note" | "pitch" | "volume" | 
        	"duration" | "end" | "func" |
 	"while" | "foreach" | "in" |
@@ -77,16 +77,9 @@ expression: expression + expr’
 | expr’
 ;
 
-expr’: expr’ * expr’’
-| expr’ / expr’’
-| expr’’
-;
 
-expr’’: expr’’ % expr’’’
-| expr’’’
-;
-
-
+void expr'(): {} {expr'() "*" expr''() | expr'() "/" expr''() | expr''()}
+void expr''(): {} {expr''() "%" expr'''() | expr'''()}
 void expr'''(): {} {"(" expression() ")" | operand()} 
 void operand(): {} {<ID> | <INT> | note() | sequence()}
 void note(): {} {note() | note() "." "pitch" "(" expression() ")" | note() "." "pitch" "(" <DEGREE> ")" | note() "." "pitch" "(" "+" expression() ")" | note() "." "pitch" "(" "-" expression() ")" | note() "." "pitch" "(" expression() ")" | note() "." "volume" "(" expression() ")" | note() "." "volume" "(" "+" expression() ")" | note() "." "volume" "(" "-" expression() ")" | note() "." "duration" "(" expression() ")" | note() "." "duration" "(" "+" expression() ")" | note() "." "duration" "(" "-" expression() ")"}
