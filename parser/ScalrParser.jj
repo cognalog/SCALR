@@ -82,16 +82,18 @@ void assignment(): {} {<ID> "=" expression()
 | <ID> "/=" expression() 
 | <ID> "%=" expression()}
 
-void expression(): {} {expression() "+" expr1() 
-| expression() "-" expr1() 
-| expr1()}
+void expression(): {} {expr1() expr0()}
 
-void expr1(): {} {expr1() "*" expr2() 
-| expr1() "/" expr2() 
-| expr2()}
+void expr0(): {} { "+" expr1() expr0()
+| "-" expr1() expr0()
+| ""}
 
-void expr2(): {} {expr2() "%" expr3() 
-| expr3()}
+void expr1(): {} {"*" expr2() expr1()
+| "/" expr2() expr1() 
+| ""}
+
+void expr2(): {} {"%" expr3() expr2()
+| ""}
 
 void expr3(): {} {"(" expression() ")" 
 | operand()} 
@@ -101,18 +103,20 @@ void operand(): {} {<ID>
 | note() 
 | sequence()}
 
-void note(): {} {note() 
-| note() "." "pitch" "(" expression() ")" 
-| note() "." "pitch" "(" <DEGREE> ")" 
-| note() "." "pitch" "(" "+" expression() ")" 
-| note() "." "pitch" "(" "-" expression() ")" 
-| note() "." "pitch" "(" expression() ")" 
-| note() "." "volume" "(" expression() ")" 
-| note() "." "volume" "(" "+" expression() ")" 
-| note() "." "volume" "(" "-" expression() ")" 
-| note() "." "duration" "(" expression() ")" 
-| note() "." "duration" "(" "+" expression() ")" 
-| note() "." "duration" "(" "-" expression() ")"}
+void note(): {} {"note" note1() note()}
+
+void note1(): {} {"." "pitch" "(" expression() ")" note1()
+| "." "pitch" "(" <DEGREE> ")" note1()
+| "." "pitch" "(" "+" expression() ")" note1()
+| "." "pitch" "(" "-" expression() ")" note1()
+| "." "pitch" "(" expression() ")" note1()
+| "." "volume" "(" expression() ")" note1()
+| "." "volume" "(" "+" expression() ")" note1()
+| "." "volume" "(" "-" expression() ")" note1()
+| "." "duration" "(" expression() ")" note1()
+| "." "duration" "(" "+" expression() ")" note1()
+| "." "duration" "(" "-" expression() ")"note1()
+| ""}
 
 void ret(): {} {<ID>
 | sequence()}
@@ -124,4 +128,4 @@ void noteList(): {} {note() noteList1()}
 void noteList1(): {} {"," noteList() 
 | ""}
 
-void track(): {} {track() "->" ret()}
+void track(): {} {"track" "->" ret()}

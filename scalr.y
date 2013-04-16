@@ -3,6 +3,8 @@
   #include <stdio.h>
   %}
 
+function: func identifier ( parameters )block \n return \n end;
+
 parameters: identifier parameters’;
 
 parameters’: ',' parameters
@@ -70,7 +72,7 @@ expr’’’: ( expression )
 ;
 
 operand: identifier
-| constant
+| int
 | note
 | sequence
 ;
