@@ -16,7 +16,7 @@ public class ScalrParser {
             while ((line = br.readLine()) != null) {
                 text += line + "\n";
             }
-            new ScalrParser(new java.io.StringReader(text)).S();
+            new ScalrParser(new java.io.StringReader(text)).function();
             System.out.println("Syntax is okay");
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
@@ -41,7 +41,7 @@ TOKEN: {
     <DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")>
 	}
 
-void function(): {} {"func" <ID> "(" parameters() ")" block() "\n" ret() "\n" "end"}
+void function(): {} {"func" <ID> "(" parameters() ")" "\n "block() "\n" ret() "\n" "end"}
 
 void parameters(): {} {<ID> parameters1()}
 
