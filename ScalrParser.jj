@@ -42,8 +42,11 @@ void parameters(): {} {<ID> parameters1()}
 void parameters1(): {} {"," parameters() 
 | ""}
 
-void block(): {} {block() "\n" line() 
+void block(): {} {line() block1()
 | line()}
+
+void block1(): {} {"\n" line() block1()
+| ""}
 
 void line(): {} {loop() 
 | conditional() 
@@ -54,9 +57,11 @@ void line(): {} {loop()
 void loop(): {} {"while" "(" booleanExpr() ")" block() "end" 
 | "foreach" "(" <ID> "in" ret() ")" block() "end"}
 
-void booleanExpr(): {} {booleanExpr() "and" bE1() 
-| booleanExpr() "or" bE1()
-| bE1()}
+void booleanExpr(): {} {bE1() booleanExpr1()}
+
+void booleanExpr1(): {} {"and" bE1() booleanExpr1()
+| "or" bE1() booleanExpr1()
+| ""}
 
 void bE1(): {} {"not" booleanExpr() 
 | operand() "==" operand() 
