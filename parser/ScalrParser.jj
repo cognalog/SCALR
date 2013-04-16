@@ -29,8 +29,8 @@ PARSER_END(ScalrParser)
 SKIP : { " " | "\t" }
 TOKEN: {
     "==" | ">" | "<" | "<=" | ">=" |
-    "and" | "or" | "not" | "->" | "." | "\n" |
-    "" | "," | "+" | "-" | "%" | "(" | ")" | "[" | "]" |
+    "and" | "or" | "not" | "->" | "." | "\n" | 
+    "," | "+" | "-" | "%" | "(" | ")" | "[" | "]" |
 	"note" | "pitch" | "volume" | 
        	"duration" | "end" | "func" |
 	"while" | "foreach" | "in" |
@@ -40,6 +40,8 @@ TOKEN: {
 	<ID: <LETTER>(<LETTER> | <INT>)*> |
     <DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")>
 	}
+
+void function(): {} {"func" <ID> "(" parameters() ")" block() "\n" ret() "\n" "end"}
 
 void parameters(): {} {<ID> parameters1()}
 
