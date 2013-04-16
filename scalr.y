@@ -16,6 +16,7 @@ block: block ‘\n’ line
 line: loop
 | conditional
 | assignment
+| "\n"
 | /* empty */
 ;
 
