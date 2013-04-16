@@ -41,8 +41,10 @@ TOKEN: {
 	<ID: <LETTER>(<LETTER> | <INT>)*> |
     <DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")>
 	}
-
-void function(): {} {"func" <ID> "("parameters()")" "\n" block() "\n" ret() "\n" "end"}
+/* for some reason, both parameters() 
+and block() nonterminals are producing
+mysterious syntax check failures */
+void function(): {} {"func" <ID> "("/*parameters()*/")"/*"\n"block()*/"\n" ret() "\n" "end"}
 
 void parameters(): {} {<ID>parameters1()
 | ""}
