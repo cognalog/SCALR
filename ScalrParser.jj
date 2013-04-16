@@ -24,7 +24,8 @@ PARSER_END(ScalrParser)
 
 SKIP : { " " | "\t" }
 TOKEN: {
-    "and" | "or" | "not" | "->" | "." |
+    "==" | ">" | "<" | "<=" | ">=" |
+    "and" | "or" | "not" | "->" | "." | "\n" |
     "" | "," | "+" | "-" | "%" | "(" | ")" | "[" | "]" |
 	"note" | "pitch" | "volume" | 
        	"duration" | "end" | "func" |
@@ -41,43 +42,12 @@ void parameters’(): {} {"," parameters() | ""}
 void block(): {} {block() "\n" line() | line()}
 void line(): {} {loop() | conditional() | assignment() | "\n" | ""}
 void loop(): {} {"while" "(" boolean-expr() ")" block() "end" | "foreach" "(" <ID> "in" return() ")" block() "end"}
-
-
-
-
-boolean-expr: boolean-expr and b-e’
-| boolean-expr or b-e’
-| b-e’
-;
-
-b-e’: not boolean-expr
-| operand == operand
-| operand > operand
-| operand < operand
-| operand <= operand
-| operand <= operand
-;
-
-conditional: if ( boolean-expr ) block end \n conditional’
-
-conditional': else conditional
-| else block end
-| /* empty */
-;
-
-assignment: identifier = expression
-| identifier += expression
-| identifier *= expression
-| identifier /= expression
-| identifier %= expression
-;
-
-expression: expression + expr’
-| expression - expr’
-| expr’
-;
-
-
+void boolean-expr(): {} {boolean-expr() "and" b-e'() | boolean-expr() "or" b-e'() | b-e'()}
+void b-e'(): {} {"not" boolean-expr() | operand() "==" operand() | operand() ">" operand() | operand() "<" operand() | operand() "<=" operand() | operand() ">=" operand()}
+void conditional(): {} {"if" "(" boolean-expr() ")" block() "end" "\n" conditional'()}
+void conditional'(): {} {"else" conditional() | "else" block() "end" | ""}
+void assignment(): {} {<ID> "=" expression() | <ID> "+=" expression() | <ID> "*=" expression() | <ID> "/=" expression() | <ID> "%=" expression()}
+void expression(): {} {expression() "+" expr'() | expression() "-" expr'() | expr'()}
 void expr'(): {} {expr'() "*" expr''() | expr'() "/" expr''() | expr''()}
 void expr''(): {} {expr''() "%" expr'''() | expr'''()}
 void expr'''(): {} {"(" expression() ")" | operand()} 
