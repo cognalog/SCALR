@@ -42,8 +42,7 @@ void parameters(): {} {<ID> parameters1()}
 void parameters1(): {} {"," parameters() 
 | ""}
 
-void block(): {} {line() block1()
-| line()}
+void block(): {} {line() block1()}
 
 void block1(): {} {"\n" line() block1()
 | ""}
@@ -63,9 +62,9 @@ void booleanExpr1(): {} {"and" bE1() booleanExpr1()
 | "or" bE1() booleanExpr1()
 | ""}
 
-void bE1(): {} {"not" booleanExpr() 
-| operand() "==" operand() 
-| operand() ">" operand() 
+void bE1(): {} {"not" booleanExpr()
+| operand() "==" operand()
+| operand() ">" operand()
 | operand() "<" operand() 
 | operand() "<=" operand() 
 | operand() ">=" operand()}

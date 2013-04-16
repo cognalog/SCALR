@@ -42,23 +42,8 @@ public class ScalrParser implements ScalrParserConstants {
   }
 
   static final public void block() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 13:
-    case 14:
-    case 29:
-    case 30:
-    case 32:
-    case ID:
-      line();
-      block1();
-      break;
-      line();
-      break;
-    default:
-      jj_la1[1] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
+    line();
+    block1();
   }
 
   static final public void block1() throws ParseException {
@@ -72,7 +57,7 @@ public class ScalrParser implements ScalrParserConstants {
       jj_consume_token(14);
       break;
     default:
-      jj_la1[2] = jj_gen;
+      jj_la1[1] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -97,7 +82,7 @@ public class ScalrParser implements ScalrParserConstants {
       jj_consume_token(14);
       break;
     default:
-      jj_la1[3] = jj_gen;
+      jj_la1[2] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -124,7 +109,7 @@ public class ScalrParser implements ScalrParserConstants {
       jj_consume_token(27);
       break;
     default:
-      jj_la1[4] = jj_gen;
+      jj_la1[3] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -151,7 +136,7 @@ public class ScalrParser implements ScalrParserConstants {
       jj_consume_token(14);
       break;
     default:
-      jj_la1[5] = jj_gen;
+      jj_la1[4] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -188,7 +173,7 @@ public class ScalrParser implements ScalrParserConstants {
       operand();
       break;
     default:
-      jj_la1[6] = jj_gen;
+      jj_la1[5] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -219,7 +204,7 @@ public class ScalrParser implements ScalrParserConstants {
       jj_consume_token(14);
       break;
     default:
-      jj_la1[7] = jj_gen;
+      jj_la1[6] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -249,7 +234,7 @@ public class ScalrParser implements ScalrParserConstants {
       expression();
       break;
     default:
-      jj_la1[8] = jj_gen;
+      jj_la1[7] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -276,7 +261,7 @@ public class ScalrParser implements ScalrParserConstants {
       jj_consume_token(14);
       break;
     default:
-      jj_la1[9] = jj_gen;
+      jj_la1[8] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -298,7 +283,7 @@ public class ScalrParser implements ScalrParserConstants {
       jj_consume_token(14);
       break;
     default:
-      jj_la1[10] = jj_gen;
+      jj_la1[9] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -315,7 +300,7 @@ public class ScalrParser implements ScalrParserConstants {
       jj_consume_token(14);
       break;
     default:
-      jj_la1[11] = jj_gen;
+      jj_la1[10] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -335,7 +320,7 @@ public class ScalrParser implements ScalrParserConstants {
       operand();
       break;
     default:
-      jj_la1[12] = jj_gen;
+      jj_la1[11] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -356,7 +341,7 @@ public class ScalrParser implements ScalrParserConstants {
       sequence();
       break;
     default:
-      jj_la1[13] = jj_gen;
+      jj_la1[12] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -458,7 +443,7 @@ public class ScalrParser implements ScalrParserConstants {
       jj_consume_token(14);
       break;
     default:
-      jj_la1[14] = jj_gen;
+      jj_la1[13] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -473,7 +458,7 @@ public class ScalrParser implements ScalrParserConstants {
       sequence();
       break;
     default:
-      jj_la1[15] = jj_gen;
+      jj_la1[14] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -500,7 +485,7 @@ public class ScalrParser implements ScalrParserConstants {
       jj_consume_token(14);
       break;
     default:
-      jj_la1[16] = jj_gen;
+      jj_la1[15] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -522,7 +507,7 @@ public class ScalrParser implements ScalrParserConstants {
   static public Token jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[17];
+  static final private int[] jj_la1 = new int[16];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -530,10 +515,10 @@ public class ScalrParser implements ScalrParserConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0xc000,0x60006000,0x6000,0x60006000,0x60000000,0x4300,0xa00400,0x4000,0x0,0x34000,0x4000,0x44000,0xa80000,0xa00000,0x5000,0x200000,0xc000,};
+      jj_la1_0 = new int[] {0xc000,0x6000,0x60006000,0x60000000,0x4300,0xa00400,0x4000,0x0,0x34000,0x4000,0x44000,0xa80000,0xa00000,0x5000,0x200000,0xc000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x21,0x0,0x21,0x0,0x0,0x30,0x2,0x20,0x0,0x3000,0x0,0x30,0x30,0x0,0x20,0x0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x21,0x0,0x0,0x30,0x2,0x20,0x0,0x3000,0x0,0x30,0x30,0x0,0x20,0x0,};
    }
 
   /** Constructor with InputStream. */
@@ -554,7 +539,7 @@ public class ScalrParser implements ScalrParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -568,7 +553,7 @@ public class ScalrParser implements ScalrParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -585,7 +570,7 @@ public class ScalrParser implements ScalrParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -595,7 +580,7 @@ public class ScalrParser implements ScalrParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -611,7 +596,7 @@ public class ScalrParser implements ScalrParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -620,7 +605,7 @@ public class ScalrParser implements ScalrParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
   }
 
   static private Token jj_consume_token(int kind) throws ParseException {
@@ -676,7 +661,7 @@ public class ScalrParser implements ScalrParserConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 17; i++) {
+    for (int i = 0; i < 16; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
