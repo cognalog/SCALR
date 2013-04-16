@@ -51,21 +51,21 @@ void line(): {} {loop()
 | "\n" 
 | ""}
 
-void loop(): {} {"while" "(" boolean-expr() ")" block() "end" 
-| "foreach" "(" <ID> "in" return() ")" block() "end"}
+void loop(): {} {"while" "(" booleanExpr() ")" block() "end" 
+| "foreach" "(" <ID> "in" ret() ")" block() "end"}
 
-void boolean-expr(): {} {boolean-expr() "and" b-e1() 
-| boolean-expr() "or" b-e1() 
-| b-e1()}
+void booleanExpr(): {} {booleanExpr() "and" bE1() 
+| booleanExpr() "or" bE1()
+| bE1()}
 
-void b-e1(): {} {"not" boolean-expr() 
+void bE1(): {} {"not" booleanExpr() 
 | operand() "==" operand() 
 | operand() ">" operand() 
 | operand() "<" operand() 
 | operand() "<=" operand() 
 | operand() ">=" operand()}
 
-void conditional(): {} {"if" "(" boolean-expr() ")" block() "end" "\n" conditional1()}
+void conditional(): {} {"if" "(" booleanExpr() ")" block() "end" "\n" conditional1()}
 
 void conditional1(): {} {"else" conditional() 
 | "else" block() "end" 
@@ -109,17 +109,17 @@ void note(): {} {note()
 | note() "." "duration" "(" "+" expression() ")" 
 | note() "." "duration" "(" "-" expression() ")"}
 
-void return(): {} {identifier() 
+void ret(): {} {identifier() 
 | sequence()}
 
-void sequence(): {} {"[" note-list() "]"}
+void sequence(): {} {"[" noteList() "]"}
 
-void note-list(): {} {note() note-list'()}
+void noteList(): {} {note() noteList1()}
 
-void note-list'(): {} {"," note-list() 
+void noteList1(): {} {"," noteList() 
 | ""}
 
-void return(): {} {identifier() 
+void ret(): {} {identifier() 
 | sequence()}
 
-void track(): {} {track() "->" return()}
+void track(): {} {track() "->" ret()}
