@@ -1,3 +1,7 @@
+options
+{
+  LOOKAHEAD=3;
+}
 PARSER_BEGIN(ScalrParser)
 import java.io.*;
 
