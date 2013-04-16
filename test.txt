@@ -1,3 +1,4 @@
 func tester ()
+	kdjfkljasklfjsdlkf
 	n = note.pitch(A3)
 end

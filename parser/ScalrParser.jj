@@ -7,6 +7,7 @@ import java.io.*;
 
 public class ScalrParser {
     public static void main(String[] args) {
+<<<<<<< HEAD
 	BufferedReader br;
 	String line;
         try {
@@ -17,6 +18,19 @@ public class ScalrParser {
             	      }
             	new ScalrParser(new java.io.StringReader(text)).function();
             	System.out.println("Syntax is okay");
+=======
+		BufferedReader br = null;
+        String text = "";
+        try {
+			br = new BufferedReader(new FileReader(args[0]));
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                text += line + "\n";
+            }
+            System.out.println(text);
+            //new ScalrParser(new java.io.StringReader(text)).function();
+            System.out.println("Syntax is okay");
+>>>>>>> Reading file isn't working
         } catch (Throwable e) {
             System.out.println("Syntax check failed: " + e.getMessage());
         }
