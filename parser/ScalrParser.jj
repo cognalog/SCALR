@@ -7,19 +7,17 @@ import java.io.*;
 
 public class ScalrParser {
     public static void main(String[] args) {
-    	FileReader fis;
-		BufferedReader br;
-		String line;
+	BufferedReader br;
+	String line;
         try {
-			br = new BufferedReader(new FileReader(args[0]));
-            String text = "";
-            while ((line = br.readLine()) != null) {
-                text += line + "\n";
-            }
-            new ScalrParser(new java.io.StringReader(text)).function();
-            System.out.println("Syntax is okay");
+		br = new BufferedReader(new FileReader(args[0]));
+            	String text = "";
+            	while ((line = br.readLine()) != null) {
+                      text += line + "\n";
+            	      }
+            	new ScalrParser(new java.io.StringReader(text)).function();
+            	System.out.println("Syntax is okay");
         } catch (Throwable e) {
-            // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: " + e.getMessage());
         }
     }
