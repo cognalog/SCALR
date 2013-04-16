@@ -1,7 +1,7 @@
 PARSER_BEGIN(ScalrParser)
 import java.io.*;
 
-public class SyntaxChecker {
+public class ScalrParser {
     public static void main(String[] args) {
     	FileReader fis;
 		BufferedReader br;
@@ -12,7 +12,7 @@ public class SyntaxChecker {
             while ((line = br.readLine()) != null) {
                 text += line + "\n";
             }
-            new SyntaxChecker(new java.io.StringReader(text)).S();
+            new ScalrParser(new java.io.StringReader(text)).S();
             System.out.println("Syntax is okay");
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
@@ -24,11 +24,75 @@ PARSER_END(ScalrParser)
 
 SKIP : { " " | "\t" }
 TOKEN: {
+    "and" | "or" | "not" | "->" | "." |
+    "" | "," | "+" | "-" | "(" | ")" | "[" | "]" |
 	"note" | "pitch" | "volume" | 
        	"duration" | "end" | "func" |
 	"while" | "foreach" | "in" |
 	"if" | "else" | "track" |
 	<LETTER: ["A"-"Z"] | ["a"-"z"]> |
 	<INT: "0" | ["1"-"9"](["0"-"9"])+> |
-	<ID: <LETTER>(<LETTER> | <INT>)*>
+	<ID: <LETTER>(<LETTER> | <INT>)*> |
+    <DEGREE: >
 	}
+
+void parameters(): {} {<ID> parameters’()}
+void parameters’(): {} {"," parameters() | ""}
+void block(): {} {block() "\n" line() | line()}
+void line(): {} {loop() | conditional() | assignment() | "\n" | ""}
+void loop(): {} {"while" "(" boolean-expr() ")" block() "end" | "foreach" "(" <ID> "in" return() ")" block() "end"}
+
+
+
+
+boolean-expr: boolean-expr and b-e’
+| boolean-expr or b-e’
+| b-e’
+;
+
+b-e’: not boolean-expr
+| operand == operand
+| operand > operand
+| operand < operand
+| operand <= operand
+| operand <= operand
+;
+
+conditional: if ( boolean-expr ) block end \n conditional’
+
+conditional': else conditional
+| else block end
+| /* empty */
+;
+
+assignment: identifier = expression
+| identifier += expression
+| identifier *= expression
+| identifier /= expression
+| identifier %= expression
+;
+
+expression: expression + expr’
+| expression - expr’
+| expr’
+;
+
+expr’: expr’ * expr’’
+| expr’ / expr’’
+| expr’’
+;
+
+expr’’: expr’’ % expr’’’
+| expr’’’
+;
+
+
+void expr'''(): {} {"(" expression() ")" | operand()} 
+void operand(): {} {<ID> | <INT> | note() | sequence()}
+void note(): {} {note() | note() "." "pitch" "(" expression() ")" | note() "." "pitch" "(" <DEGREE> ")" | note() "." "pitch" "(" "+" expression() ")" | note() "." "pitch" "(" "-" expression() ")" | note() "." "pitch" "(" expression() ")" | note() "." "volume" "(" expression() ")" | note() "." "volume" "(" "+" expression() ")" | note() "." "volume" "(" "-" expression() ")" | note() "." "duration" "(" expression() ")" | note() "." "duration" "(" "+" expression() ")" | note() "." "duration" "(" "-" expression() ")"}
+void return(): {} {identifier() | sequence()}
+void sequence(): {} {"[" note-list() "]"}
+void note-list(): {} {note() note-list'()}
+void note-list'(): {} {"," note-list() | ""}
+void return(): {} {identifier() | sequence()}
+void track(): {} {track() "->" return()}
