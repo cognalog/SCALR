@@ -21,7 +21,7 @@ public class ScalrParser {
             System.out.println("Syntax is okay");
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
-            System.out.println("Syntax check failed: " + e.getMessage());
+            System.out.println("Syntax check failed: " + e.getMessage() + "~");
         }
     }
 }
@@ -42,9 +42,9 @@ TOKEN: {
     <DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")>
 	}
 
-void function(): {} {"func" <ID> "(" parameters() ")" "\n" block() "\n" ret() "\n" "end"}
+void function(): {} {"func" <ID> "("parameters()")" "\n" block() "\n" ret() "\n" "end"}
 
-void parameters(): {} {<ID> parameters1()
+void parameters(): {} {<ID>parameters1()
 | ""}
 
 void parameters1(): {} {"," parameters() 
