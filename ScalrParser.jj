@@ -34,7 +34,7 @@ TOKEN: {
 	<LETTER: ["A"-"Z"] | ["a"-"z"]> |
 	<INT: "0" | ["1"-"9"](["0"-"9"])+> |
 	<ID: <LETTER>(<LETTER> | <INT>)*> |
-    <DEGREE: ["A"-"G"]("b" | "s")?["0"-"10"]>
+    <DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")>
 	}
 
 void parameters(): {} {<ID> parameters1()}
@@ -109,7 +109,7 @@ void note(): {} {note()
 | note() "." "duration" "(" "+" expression() ")" 
 | note() "." "duration" "(" "-" expression() ")"}
 
-void ret(): {} {identifier() 
+void ret(): {} {<ID>
 | sequence()}
 
 void sequence(): {} {"[" noteList() "]"}
@@ -118,8 +118,5 @@ void noteList(): {} {note() noteList1()}
 
 void noteList1(): {} {"," noteList() 
 | ""}
-
-void ret(): {} {identifier() 
-| sequence()}
 
 void track(): {} {track() "->" ret()}
