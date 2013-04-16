@@ -1,5 +1,25 @@
 PARSER_BEGIN(ScalrParser)
+import java.io.*;
 
+public class SyntaxChecker {
+    public static void main(String[] args) {
+    	FileReader fis;
+		BufferedReader br;
+		String line;
+        try {
+			br = new BufferedReader(new FileReader(args[0]));
+            String text = "";
+            while ((line = br.readLine()) != null) {
+                text += line + "\n";
+            }
+            new SyntaxChecker(new java.io.StringReader(text)).S();
+            System.out.println("Syntax is okay");
+        } catch (Throwable e) {
+            // Catching Throwable is ugly but JavaCC throws Error objects!
+            System.out.println("Syntax check failed: " + e.getMessage());
+        }
+    }
+}
 PARSER_END(ScalrParser)
 
 SKIP : { " " | "\t" }
@@ -8,5 +28,7 @@ TOKEN: {
        	"duration" | "end" | "func" |
 	"while" | "foreach" | "in" |
 	"if" | "else" | "track" |
-	<INT: "0" | ["1"-"9"](["0"-"9"])+>
+	<LETTER: ["A"-"Z"] | ["a"-"z"]> |
+	<INT: "0" | ["1"-"9"](["0"-"9"])+> |
+	<ID: <LETTER>(<LETTER> | <INT>)*>
 	}
