@@ -13,7 +13,7 @@ public class DegreeGenerator
 		String[] letter = {"C", "D", "E", "F", "G", "A", "B"};
 		String[] mid = {"s", "b"};
 		int count = 0;
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i <= 10; i++)
 			for (int j = 0; j < letter.length; j++) {
 				if (count == 127)
 					break;
