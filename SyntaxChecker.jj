@@ -8,10 +8,12 @@ public class SyntaxChecker {
 		String line;
         try {
 			br = new BufferedReader(new FileReader(args[0]));
-			while ((line = br.readLine()) != null) {
-			    new SyntaxChecker(new java.io.StringReader(line)).S();
-            	System.out.println("Syntax is okay");
-			}    
+            String text = "";
+            while ((line = br.readLine()) != null) {
+                text += line + "\n";
+            }
+            new SyntaxChecker(new java.io.StringReader(text)).S();
+            System.out.println("Syntax is okay");
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: " + e.getMessage());
