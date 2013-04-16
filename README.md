@@ -8,3 +8,7 @@ Testing SyntaxChecker.jj:
 1. ./javacc/javacc SyntaxChecker.jj
 2. javac *.java
 3. java SyntaxChecker test.txt
+
+Installing midiutil:
+
+`python python-midiutil/setup.py`
