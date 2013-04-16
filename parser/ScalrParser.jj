@@ -43,7 +43,8 @@ TOKEN: {
 
 void function(): {} {"func" <ID> "(" parameters() ")" "\n "block() "\n" ret() "\n" "end"}
 
-void parameters(): {} {<ID> parameters1()}
+void parameters(): {} {<ID> parameters1()
+| ""}
 
 void parameters1(): {} {"," parameters() 
 | ""}
