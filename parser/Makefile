@@ -5,7 +5,7 @@ classes = $(sources:.java=.class)
 all: ScalrParser.java $(classes)
 
 ScalrParser.java: ScalrParser.jj
-	javacc ScalrParser.jj
+	../javacc/javacc ScalrParser.jj
 
 clean :
 	rm -f *.class *.java
