@@ -11,7 +11,7 @@ public class VariableTester
 	{
 		Note note = Note.note();
 		System.out.println(note);
-		note.modVolume(5);
+		System.out.println(note.modPitch(127).modPitch(-5).modPitch(5000));
 	}
 	
 }

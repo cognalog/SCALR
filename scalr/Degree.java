@@ -1,6 +1,7 @@
 
 package scalr;
 
+
 public enum Degree {
 	C0(0), Cs0(1), Db0(1), D0(2), Ds0(3), Eb0(3), E0(4), F0(5), Fs0(6), Gb0(6), G0(7), Gs0(8), Ab0(
 	        8), A0(9), As0(10), Bb0(10), B0(11), C1(12), Cs1(13), Db1(13), D1(14), Ds1(15),
@@ -20,10 +21,15 @@ public enum Degree {
 	G9(115), Gs9(116), Ab9(116), A9(117), As9(118), Bb9(118), B9(119), C10(120), Cs10(121), Db10(
 	        121), D10(122), Ds10(123), Eb10(123), E10(124), F10(125), Fs10(126), Gb10(126),
 	G10(127);
-	public final int	value;
+	private final int	value;
 	
 	private Degree(int value)
 	{
 		this.value = value;
+	}
+	
+	public int getMidi()
+	{
+		return value;
 	}
 }
