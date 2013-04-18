@@ -55,11 +55,11 @@ public class Note implements Variable
 	}
 	
 	/**
-	 * Unconditionally sets the length of this note to newLength and returns a reference to this
-	 * same note.
-	 * @param newLength
-	 *            - The length to set the note to.
-	 * @return This note with length = newLength
+	 * Unconditionally sets the {@linkplain Degree} of this {@linkplain Note} to newPitch and
+	 * returns a reference to this same note.
+	 * @param newPitch
+	 *            - The {@linkplain Degree} to set the note to.
+	 * @return This {@linkplain Note} with pitch = newPitch
 	 */
 	public Note setPitch(Degree newPitch)
 	{
@@ -67,9 +67,16 @@ public class Note implements Variable
 		return this;
 	}
 	
+	/**
+	 * Unconditionally sets the {@linkplain Integer} of this {@linkplain Note} to newVolume and
+	 * returns a reference to this same note.
+	 * @param newVolume
+	 *            - The {@linkplain Integer} to set the note to.
+	 * @return This {@linkplain Note} with volume = newVolume
+	 */
 	public Note setVolume(int newVolume)
 	{
-		volume = newVolume;
+		volume = Math.max(Math.min(newVolume, 127), 0);
 		return this;
 	}
 	
