@@ -4,6 +4,10 @@
 # temp files are also just not cool
 *~
 
+# eclipse files
+.gitignore
+.project
+
 ParseException.java
 SyntaxCheckerTokenManager.java
 Token.java
