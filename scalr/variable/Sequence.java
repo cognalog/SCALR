@@ -54,4 +54,10 @@ public class Sequence implements Variable
 		return ExpressionType.SEQUENCE;
 	}
 	
+	@Override
+	public String toString()
+	{
+		// TODO
+		return null;
+	}
 }
