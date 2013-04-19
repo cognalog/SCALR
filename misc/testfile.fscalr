@@ -1,3 +1,3 @@
-func tester ()
-     wuddup
+func tester (hi, yhid, test)
+	wuddup
 end

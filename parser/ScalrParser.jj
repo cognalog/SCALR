@@ -44,13 +44,11 @@ TOKEN: {
 /* for some reason, both parameters() 
 and block() nonterminals are producing
 mysterious syntax check failures */
-void function(): {} {"func" <ID> "("/*parameters()*/")"/*"\n"block()*/"\n" ret() "\n" "end"}
+void function(): {} {"func" <ID> "("(parameters())?")"/*"\n"block()*/"\n" ret() "\n" "end" | ""}
 
-void parameters(): {} {<ID>parameters1()
-| ""}
+void parameters(): {} { <ID> (parameters1())*}
 
-void parameters1(): {} {"," parameters() 
-| ""}
+void parameters1(): {} {"," parameters()}
 
 void block(): {} {line() block1()}
 
@@ -128,7 +126,7 @@ void note1(): {} {"." "pitch" "(" expression() ")" note1()
 | ""}
 
 void ret(): {} {<ID>
-| sequence()}
+| sequence() | ""}
 
 void sequence(): {} {"[" noteList() "]"}
 
