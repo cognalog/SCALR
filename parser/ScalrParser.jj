@@ -75,11 +75,10 @@ void bE1(): {} {"not" booleanExpr()
 | operand() "<=" operand() 
 | operand() ">=" operand()}
 
-void conditional(): {} {"if" "(" booleanExpr() ")" block() "end" "\n" conditional1()}
+void conditional(): {} {"if" "(" booleanExpr() ")" block() "end" "\n" (else())?}
 
-void conditional1(): {} {"else" conditional() 
-| "else" block() "end" 
-| ""}
+void else(): {} {"else" conditional() 
+| "else" block() "end"}
 
 void assignment(): {} {<ID> "=" expression() 
 | <ID> "+=" expression() 
