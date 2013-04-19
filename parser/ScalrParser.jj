@@ -116,13 +116,10 @@ void note1(): {} {"." "pitch" "(" [expression(), "+" expression(), "-" expressio
 
 
 void ret(): {} {<ID>
-| sequence() | ""}
+| sequence()}
 
-void sequence(): {} {"[" noteList() "]"}
+void sequence(): {} {"[" note() (sequence1())* "]"}
 
-void noteList(): {} {note() noteList1()}
-
-void noteList1(): {} {"," noteList() 
-| ""}
+void sequence1(): {} {"," note()}
 
 void track(): {} {"track" "->" ret()}
