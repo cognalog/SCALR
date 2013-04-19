@@ -44,22 +44,20 @@ TOKEN: {
 /* for some reason, both parameters() 
 and block() nonterminals are producing
 mysterious syntax check failures */
-void function(): {} {"func" <ID> "("(parameters())?")"/*"\n"block()*/"\n" ret() "\n" "end" | ""}
+void function(): {} {"func" <ID> "("(parameters())?")" (block())? ret() "\n" "end" | ""}
 
 void parameters(): {} { <ID> (parameters1())*}
 
 void parameters1(): {} {"," parameters()}
 
-void block(): {} {line() block1()}
+void block(): {} {line() (block1())*}
 
-void block1(): {} {"\n" line() block1()
-| ""}
+void block1(): {} {"\n" line()}
 
 void line(): {} {loop() 
 | conditional() 
 | assignment() 
-| "\n" 
-| ""}
+| "\n" }
 
 void loop(): {} {"while" "(" booleanExpr() ")" block() "end" 
 | "foreach" "(" <ID> "in" ret() ")" block() "end"}
