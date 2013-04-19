@@ -1,5 +1,7 @@
 
-package scalr.variable;
+package scalr.misc;
+
+import scalr.variable.Note;
 
 public class VariableTester
 {
