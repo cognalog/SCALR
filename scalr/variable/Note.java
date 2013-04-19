@@ -3,6 +3,8 @@ package scalr.variable;
 
 import scalr.Degree;
 import scalr.Length;
+import scalr.expression.Expression;
+import scalr.expression.ExpressionType;
 
 public class Note implements Variable
 {
@@ -125,5 +127,17 @@ public class Note implements Variable
 	public String toString()
 	{
 		return "[" + pitch + "," + length + "," + volume + "]";
+	}
+	
+	@Override
+	public Expression getValue()
+	{
+		return this;
+	}
+	
+	@Override
+	public ExpressionType getType()
+	{
+		return ExpressionType.NOTE;
 	}
 }

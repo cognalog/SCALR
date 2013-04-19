@@ -27,12 +27,12 @@ public interface Expression
 	public Expression getValue();
 	
 	/**
-	 * Returns the {@linkplain ExpressionOperator} of this {@linkplain Expression}. If this returns
+	 * Returns the {@linkplain ExpressionType} of this {@linkplain Expression}. If this returns
 	 * null, then it should be assumed that the {@linkplain Expression} is simply a
 	 * {@linkplain Variable}
-	 * @return The {@linkplain Expression} operator associated with this {@linkplain Expression}. If
-	 *         this return is null, then this {@linkplain Expression} has a single child which is
-	 *         really a {@linkplain Variable}
+	 * @return The {@linkplain ExpressionType} associated with this {@linkplain Expression}. If this
+	 *         return is null, then this {@linkplain Expression} has a single child which is really
+	 *         a {@linkplain Variable}
 	 */
-	public ExpressionOperator getType();
+	public ExpressionType getType();
 }
