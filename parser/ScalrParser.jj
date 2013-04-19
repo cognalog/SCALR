@@ -108,20 +108,12 @@ void operand(): {} {<ID>
 | note() 
 | sequence()}
 
-void note(): {} {"note" note1() note()}
+void note(): {} {"note" (note1())+}
 
-void note1(): {} {"." "pitch" "(" expression() ")" note1()
-| "." "pitch" "(" <DEGREE> ")" note1()
-| "." "pitch" "(" "+" expression() ")" note1()
-| "." "pitch" "(" "-" expression() ")" note1()
-| "." "pitch" "(" expression() ")" note1()
-| "." "volume" "(" expression() ")" note1()
-| "." "volume" "(" "+" expression() ")" note1()
-| "." "volume" "(" "-" expression() ")" note1()
-| "." "duration" "(" expression() ")" note1()
-| "." "duration" "(" "+" expression() ")" note1()
-| "." "duration" "(" "-" expression() ")"note1()
-| ""}
+void note1(): {} {"." "pitch" "(" [expression(), "+" expression(), "-" expression(),<DEGREE>] ")"
+| "." "volume" "(" [expression(), "+" expression(), "-" expression()] ")"
+| "." "duration" "(" [expression(), "+" expression(), "-" expression()] ")"}
+
 
 void ret(): {} {<ID>
 | sequence() | ""}
