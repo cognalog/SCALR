@@ -44,7 +44,7 @@ TOKEN: {
 /* for some reason, both parameters() 
 and block() nonterminals are producing
 mysterious syntax check failures */
-void function(): {} {"func" <ID> "("(parameters())?")" (block())? ret() "\n" "end" | ""}
+void function(): {System.out.println("SUP PLAYA");} {"func" <ID> "("(parameters())?")" (block())? ret() "\n" "end" | ""}
 
 void parameters(): {} { <ID> (parameters1())*}
 
@@ -85,7 +85,14 @@ void assignment(): {} {<ID> "=" expression()
 | <ID> "+=" expression() 
 | <ID> "*=" expression() 
 | <ID> "/=" expression() 
-| <ID> "%=" expression()}
+| <ID> "%=" expression()
+
+
+
+
+/* FIX THIS NONSENSE */
+| <ID>
+}
 
 void expression(): {} {expr1() expr0()}
 
@@ -93,9 +100,20 @@ void expr0(): {} { "+" expr1() expr0()
 | "-" expr1() expr0()
 | ""}
 
+
+
+
+
+
+/* This is probably garbage Tyrone U SUCK!!!! */
 void expr1(): {} {"*" expr2() expr1()
 | "/" expr2() expr1() 
 | ""}
+
+
+
+
+
 
 void expr2(): {} {"%" expr3() expr2()
 | ""}
