@@ -3,6 +3,9 @@ package scalr.variable;
 
 import java.util.HashMap;
 
+import scalr.Exceptions.FunctionExistsError;
+import scalr.Exceptions.TypeError;
+
 /**
  * This utility class contains a mapping of all IDs ({@linkplain String}) to their
  * {@linkplain Variable} instance.
@@ -13,15 +16,15 @@ public class SymbolTable
 	private static final HashMap<String, HashMap<String, Variable>>	reference	=
 	                                                                                  new HashMap<String, HashMap<String, Variable>>();
 	
-	public SymbolTable()
-	{	
-		
+	private SymbolTable() throws AssertionError
+	{
+		throw new AssertionError();
 	}
 	
-	public void addFunc(String func) throws FunctionExists
+	public static void addFunc(String func) throws FunctionExistsError
 	{
 		if (reference.containsKey(func))
-			throw new FunctionExists(func);
+			throw new FunctionExistsError(func);
 		HashMap<String, Variable> funcTable = new HashMap<String, Variable>();
 		reference.put(func, funcTable);
 	}
@@ -34,7 +37,7 @@ public class SymbolTable
 	 * @return True if this variable doesn't exist in this table. in the table and the replacement
 	 *         variable is of the same type, false
 	 */
-	public boolean addReference(String func, String id, Variable var) throws TypeError
+	public static boolean addReference(String func, String id, Variable var) throws TypeError
 	{
 		HashMap<String, Variable> locRef = reference.get(func);
 		if (!locRef.containsKey(id)) {
