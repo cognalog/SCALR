@@ -86,18 +86,21 @@ void assignment(): {} {<ID> "=" expression()
 | <ID> "%=" expression()
 }
 
-void expression(): {} {expr3() (expr0())*}
+void expression(): {} {expr1() (expr0())*}
 
-void expr0(): {} { "+" expr3() (expr1())*
-| "-" expr3() (expr1())*}
+void expr0(): {} { "+" expr1()
+| "-" expr1()}
 
-void expr1(): {} {"*" expr2() expr1()
-| "/" expr2() expr1()}
+void expr1(): {} { expr3() (expr2())* }
 
-void expr2(): {} {"%" expr3() expr2()
-| ""}
+void expr2(): {} {"*" expr3()
+| "/" expr3()}
 
-void expr3(): {} {"(" expression() ")" 
+void expr3(): {} {expr5() (expr4())*}
+
+void expr4(): {} {"%" expr5()}
+
+void expr5(): {} {"(" expression() ")" 
 | operand()} 
 
 void operand(): {} {<ID> 
