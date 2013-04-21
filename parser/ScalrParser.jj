@@ -62,11 +62,10 @@ void line(): {} {loop()
 void loop(): {} {"while" "(" booleanExpr() ")" block() "end" 
 | "foreach" "(" <ID> "in" ret() ")" block() "end"}
 
-void booleanExpr(): {} {bE1() booleanExpr1()}
+void booleanExpr(): {} {bE1() (booleanExpr1())*}
 
-void booleanExpr1(): {} {"and" bE1() booleanExpr1()
-| "or" bE1() booleanExpr1()
-| ""}
+void booleanExpr1(): {} {"and" bE1()
+| "or" bE1()}
 
 void bE1(): {} {"not" booleanExpr()
 | operand() "==" operand()
@@ -75,9 +74,9 @@ void bE1(): {} {"not" booleanExpr()
 | operand() "<=" operand() 
 | operand() ">=" operand()}
 
-void conditional(): {} {"if" "(" booleanExpr() ")" block() "end" "\n" (else())?}
+void conditional(): {} {"if" "(" booleanExpr() ")" block() "end" "\n" (els3())?}
 
-void else(): {} {"else" conditional() 
+void els3(): {} {"else" conditional() 
 | "else" block() "end"}
 
 void assignment(): {} {<ID> "=" expression() 
@@ -85,34 +84,15 @@ void assignment(): {} {<ID> "=" expression()
 | <ID> "*=" expression() 
 | <ID> "/=" expression() 
 | <ID> "%=" expression()
-
-
-
-
-/* FIX THIS NONSENSE --I'll fix it tomorrow or Sunday homes*/
-| <ID>
 }
 
-void expression(): {} {expr1() expr0()}
+void expression(): {} {expr3() (expr0())*}
 
-void expr0(): {} { "+" expr1() expr0()
-| "-" expr1() expr0()
-| ""}
+void expr0(): {} { "+" expr3() (expr1())*
+| "-" expr3() (expr1())*}
 
-
-
-
-
-
-/* This is probably garbage Tyrone U SUCK!!!! */
 void expr1(): {} {"*" expr2() expr1()
-| "/" expr2() expr1() 
-| ""}
-
-
-
-
-
+| "/" expr2() expr1()}
 
 void expr2(): {} {"%" expr3() expr2()
 | ""}
@@ -127,9 +107,9 @@ void operand(): {} {<ID>
 
 void note(): {} {"note" (note1())+}
 
-void note1(): {} {"." "pitch" "(" [expression(), "+" expression(), "-" expression(),<DEGREE>] ")"
-| "." "volume" "(" [expression(), "+" expression(), "-" expression()] ")"
-| "." "duration" "(" [expression(), "+" expression(), "-" expression()] ")"}
+void note1(): {} {"." "pitch" "(" [expression() | "+" expression() | "-" expression() | <DEGREE>]")"
+| "." "volume" "(" [expression() | "+" expression() | "-" expression()] ")"
+| "." "duration" "(" [expression() | "+" expression() | "-" expression()] ")"}
 
 
 void ret(): {} {<ID>
