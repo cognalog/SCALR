@@ -16,12 +16,11 @@ public class ScalrParser {
                 text += line + "\n";
 
             }
-	    System.out.println(text);
             new ScalrParser(new java.io.StringReader(text)).function();
             System.out.println("Syntax is okay");
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
-            System.out.println("Syntax check failed: " + e.getMessage() + "~");
+            System.out.println("Syntax check failed: " + e.getMessage());
         }
     }
 }
@@ -33,53 +32,67 @@ TOKEN: {
     "and" | "or" | "not" | "->" | "." | "\n" | 
     "," | "+" | "-" | "%" | "(" | ")" | "[" | "]" |
 	"note" | "pitch" | "volume" | 
-       	"duration" | "end" | "func" |
-	"while" | "foreach" | "in" |
-	"if" | "else" | "track" |
+       	"duration" | "quarter" | "half" | "whole" |
+	"end" | "func" | "while" | "foreach" |
+	 "in" |	"if" | "else" | "track" |
 	<LETTER: ["A"-"Z"] | ["a"-"z"]> |
 	<INT: "0" | ["1"-"9"](["0"-"9"])+> |
-	<ID: <LETTER>(<LETTER> | <INT>)*> |
-    <DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")>
+	<ID: <LETTER>(<LETTER> | <INT> | "_")*> |
+    <DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")> |
+    <DUR: "1""/"("2" | "4" | "8" | "16" | "32")>
 	}
-/* for some reason, both parameters() 
-and block() nonterminals are producing
-mysterious syntax check failures */
-void function(): {System.out.println("SUP PLAYA");} {"func" <ID> "("(parameters())?")" (block())? ret() "\n" "end" | ""}
 
-void parameters(): {} { <ID> (parameters1())*}
+void fscalr(): {} { function() (fscalr2())* }
 
-void parameters1(): {} {"," parameters()}
+void fscalr2(): {} { ("\n")+ function() }
 
-void block(): {} {line() (block1())*}
+void function(): {} { "func" <ID> "("(parameters())?")" (block())? ret() "\n" "end" }
 
-void block1(): {} {"\n" line()}
+void parameters(): {} { <ID> (parameters1())* }
 
-void line(): {} {loop() 
+void parameters1(): {} { "," parameters() }
+
+void block(): {} { line() (block1())* }
+
+void block1(): {} { "\n" line() }
+
+void line(): {} {
+loop() 
 | conditional() 
 | assignment() 
-| "\n" }
+| "\n"
+}
 
-void loop(): {} {"while" "(" booleanExpr() ")" block() "end" 
-| "foreach" "(" <ID> "in" ret() ")" block() "end"}
+void loop(): {} {
+"while" "(" booleanExpr() ")" block() "end" 
+| "foreach" "(" <ID> "in" ret() ")" block() "end"
+}
 
 void booleanExpr(): {} {bE1() (booleanExpr1())*}
 
-void booleanExpr1(): {} {"and" bE1()
-| "or" bE1()}
+void booleanExpr1(): {} {
+"and" bE1()
+| "or" bE1()
+}
 
-void bE1(): {} {"not" booleanExpr()
+void bE1(): {} {
+"not" booleanExpr()
 | operand() "==" operand()
 | operand() ">" operand()
 | operand() "<" operand() 
 | operand() "<=" operand() 
-| operand() ">=" operand()}
+| operand() ">=" operand()
+}
 
 void conditional(): {} {"if" "(" booleanExpr() ")" block() "end" "\n" (els3())?}
 
-void els3(): {} {"else" conditional() 
-| "else" block() "end"}
+void els3(): {} {
+"else" conditional() 
+| "else" block() "end"
+}
 
-void assignment(): {} {<ID> "=" expression() 
+void assignment(): {} {
+<ID> "=" expression() 
 | <ID> "+=" expression() 
 | <ID> "*=" expression() 
 | <ID> "/=" expression() 
@@ -88,37 +101,54 @@ void assignment(): {} {<ID> "=" expression()
 
 void expression(): {} {expr1() (expr0())*}
 
-void expr0(): {} { "+" expr1()
-| "-" expr1()}
+void expr0(): {} {
+"+" expr1()
+| "-" expr1()
+}
 
 void expr1(): {} { expr3() (expr2())* }
 
-void expr2(): {} {"*" expr3()
-| "/" expr3()}
+void expr2(): {} {
+"*" expr3()
+| "/" expr3()
+}
 
 void expr3(): {} {expr5() (expr4())*}
 
 void expr4(): {} {"%" expr5()}
 
-void expr5(): {} {"(" expression() ")" 
-| operand()} 
+void expr5(): {} {
+"(" expression() ")" 
+| operand()
+}
 
-void operand(): {} {<ID> 
+void operand(): {} {
+<ID> 
 | <INT> 
 | note() 
-| sequence()}
+| sequence()
+}
 
-void note(): {} {"note" (note1())+}
+void note(): {} {
+"note" (note1())+
+| sequence() "[" <INT> "]"
+| <ID>
+}
 
-void note1(): {} {"." "pitch" "(" [expression() | "+" expression() | "-" expression() | <DEGREE>]")"
-| "." "volume" "(" [expression() | "+" expression() | "-" expression()] ")"
-| "." "duration" "(" [expression() | "+" expression() | "-" expression()] ")"}
+void note1(): {} {
+"." "pitch" "(" /*(expression() | "+" expr5() | "-" expr5() | <DEGREE> | note())*/note() ")"
+| "." "volume" "(" (expression() | "+" expr5() | "-" expr5()) ")"
+| "." "duration" "(" (expression() | "+" expr5() | "-" expr5() | <DUR>) ")"
+| "." ("quarter" | "half" | "whole")
+}
 
 
-void ret(): {} {<ID>
-| sequence()}
+void ret(): {} {sequence()}
 
-void sequence(): {} {"[" note() (sequence1())* "]"}
+void sequence(): {} {
+"[" note() (sequence1())* "]"
+| <ID>
+}
 
 void sequence1(): {} {"," note()}
 
