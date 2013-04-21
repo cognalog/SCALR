@@ -57,7 +57,14 @@ public class Sequence implements Variable
 	@Override
 	public String toString()
 	{
-		// TODO
-		return null;
+		// A track opens with a bracket
+		String result = "[";
+		// Append each note to the string
+		for (Note n : theNotes)
+			result += n.toString() + "|";
+		// remove the last bar
+		result = result.substring(0, result.length() - 1);
+		// And it closes with a bracket
+		return result + "]";
 	}
 }

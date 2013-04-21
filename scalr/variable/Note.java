@@ -1,6 +1,9 @@
 
 package scalr.variable;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import scalr.Degree;
 import scalr.Length;
 import scalr.expression.Expression;
@@ -41,6 +44,18 @@ public class Note implements Variable
 		pitch = d;
 		volume = Math.max(Math.min(v, 127), 0);
 		length = l;
+	}
+	
+	public Note length(String len)
+	{
+		// Determine if they're modding the note length or setting it
+		Pattern modPat = Pattern.compile("^[\\+\\-]\\d$");
+		Matcher modMatch = modPat.matcher(len);
+		// They are trying to mod the number
+		if (modMatch.matches())
+			// Yes, parseInt does work for "+5"
+			modLength(Integer.parseInt(len));
+		return this;
 	}
 	
 	/**
@@ -126,7 +141,7 @@ public class Note implements Variable
 	@Override
 	public String toString()
 	{
-		return "[" + pitch + "," + length + "," + volume + "]";
+		return pitch + "," + length + "," + volume;
 	}
 	
 	@Override
