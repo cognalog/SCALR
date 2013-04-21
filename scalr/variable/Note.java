@@ -46,16 +46,65 @@ public class Note implements Variable
 		length = l;
 	}
 	
-	public Note length(String len)
+	public Note length(String len) throws IllegalArgumentException
 	{
+		// Remove all whitespace
+		len = len.replaceAll("\\s", "");
 		// Determine if they're modding the note length or setting it
-		Pattern modPat = Pattern.compile("^[\\+\\-]\\d$");
+		Pattern modPat = Pattern.compile("^[\\+\\-]\\d+$");
 		Matcher modMatch = modPat.matcher(len);
 		// They are trying to mod the number
 		if (modMatch.matches())
 			// Yes, parseInt does work for "+5"
-			modLength(Integer.parseInt(len));
-		return this;
+			return modLength(Integer.parseInt(len));
+		
+		// If we're here, then we have two more possibilities: they're setting the length via one of
+		// the words in Length or they're setting it by the value. Since checking if they're setting
+		// via a number is straightforward, let's do that first.
+		Pattern setPat = Pattern.compile("^1(/\\d+)?$");
+		Matcher setMatch = setPat.matcher(len);
+		if (setMatch.matches()) {
+			Length matLen = null;
+			// Check to see if the given duration is defined
+			Length[] lenArr = Length.values();
+			for (Length l : lenArr) {
+				if (l.duration.equals(len)) {
+					matLen = l;
+					break;
+				}
+			}
+			// If we have a match, set the length and return this note
+			if (matLen != null)
+				return setLength(matLen);
+			// Otherwise, throw an error as len can't be the following possibility.
+			String properLength = "";
+			for (Length l : lenArr)
+				properLength += l.toString() + ", ";
+			// Remove the last two characters ", "
+			properLength = properLength.substring(0, properLength.length() - 2);
+			throw new IllegalArgumentException(len
+			        + " is not a valid length fraction. These are valid length fractions: "
+			        + properLength + ".");
+		}
+		
+		// The last possibility, the given string is a word that refers to length. We're case
+		// insensitive.
+		try {
+			Length length = Length.valueOf(len.toLowerCase());
+			return setLength(length);
+		}
+		catch (IllegalArgumentException e) {
+			// lulz, we're catching an IllegalArgumentException just to throw our own, but it's the
+			// quickest way to check to see if they gave a correct length name, rather than using a
+			// for loop.
+			String properName = "";
+			for (Length l : Length.values())
+				properName += l.toString() + ", ";
+			// Remove the last two characters ", "
+			properName = properName.substring(0, properName.length() - 2);
+			throw new IllegalArgumentException(len + " is not a valid length name, fraction,"
+			        + " or mod value. These are valid length names: " + properName + ".");
+		}
 	}
 	
 	/**
