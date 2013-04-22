@@ -2,13 +2,26 @@
 package scalr;
 
 public enum Length {
-	whole(1), half(1 / 2), quarter(1 / 4), eighth(1 / 8), sixteenth(1 / 16), thirtysec(1 / 32),
-	eightT(1 / 8 * 2 / 3), sixteenthT(1 / 16 * 2 / 3), thirtysecT(1 / 32 * 2 / 3);
+	whole("1"), half("1/2"), quarter("1/4"), eighth("1/8"), sixteenth("1/16"), thirtysec("1/32"),
+	eightT("1/12"), sixteenthT("1/24"), thirtysecT("1/48");
 	
-	public final double	duration;
+	public final String	duration;
 	
-	private Length(double d)
+	private Length(String s)
 	{
-		duration = d;
+		duration = s;
+	}
+	
+	public double evaluateLength()
+	{
+		// Get the numerator
+		Double n = Double.parseDouble(duration.substring(0, duration.indexOf("/")));
+		// Get the denominator
+		Double d =
+		        Double.parseDouble(duration.substring(duration.indexOf("/") + 1, duration.length()));
+		// Divide
+		return n / d;
+		// Kind of pointless, but this function works on any arbitrary fraction with an integer
+		// represented numerator and denominator.
 	}
 }
