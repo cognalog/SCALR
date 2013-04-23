@@ -16,8 +16,8 @@ public class ScalrParser {
                 text += line + "\n";
 
             }
-            new ScalrParser(new java.io.StringReader(text)).fscalr();
-            System.out.println("Syntax is okay");
+            new ScalrParser(new java.io.StringReader(text)).operand();
+	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: " + e.getMessage());
@@ -26,32 +26,31 @@ public class ScalrParser {
 }
 PARSER_END(ScalrParser)
 
-SKIP : { " " | "\t" | <"/*" (~[])* "*/"> | "\n" }
+SKIP : { " " | "\t" | <"/*" (~[])* "*/"> | "\n"}
 TOKEN: {
     "==" | ">" | "<" | "<=" | ">=" |
-    "and" | "or" | "not" | "->" | "." | /*"\n" | */
+    "and" | "or" | "not" | "->" | "." | /*"\n" |*/
     "," | "+" | "-" | "%" | "(" | ")" | "[" | "]" |
 	"note" | "pitch" | "volume" | 
        	"duration" | "quarter" | "half" | "whole" |
 	"end" | "func" | "while" | "foreach" |
 	 "in" |	"if" | "else" | "import" | "track" |
-	<ASSIGN: "=" | "+=" | "-=" | "*=" | "/=" | "%="> |
+	/*<NL: ("\n")+>|*/ <ASSIGN: "=" | "+=" | "-=" | "*=" | "/=" | "%="> |
 	<RELN: "==" | "<" | ">" | "<=" | ">="> |
 	<LETTER: ["A"-"Z"] | ["a"-"z"]> |
 	<INT: "0" | ["1"-"9"](["0"-"9"])*> |
-	<ID: <LETTER>(<LETTER> | <INT> | "_")*> |
-    <DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")> |
-    <DUR: "1""/"("2" | "4" | "8" | "16" | "32")>
+	<ID: ["a"-"z"](<LETTER> | <INT> | "_")*> |
+    	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")>
 	}
 
-//void tscalr(): {} { imports()/* ("\n")+*/ function() ("\n")+ (track)+ }
+//void tscalr(): {} { imports() ("\n")+ function() ("\n")+ (track)+ }
 
 void fscalr(): {} { function() (fscalr2())* }
 
 void fscalr2(): {} { /*("\n")+*/ function() }
 
-void function(): {System.out.println("trying to match function:");} {
-"func" <ID> "(" (parameters())? ")" (/*("\n")+*/ block())? /*("\n")+*/ sequence() /*("\n")+*/ "end" {System.out.println("function matched");}
+void function(): {} {
+"func" <ID> "(" (parameters())? ")" (block())? sequence() "end" {System.out.println("function matched");}
 }
 
 void parameters(): {System.out.println("trying to match parameters:");} { 
@@ -64,19 +63,20 @@ void block(): {System.out.println("trying to match block:");} {
 (line())+ {System.out.println("block matched");}
 }
 
-void line(): {System.out.println("trying to match line:");} {
+void line(): {} {
 loop() {System.out.println("loop line matched");}
 | conditional() {System.out.println("conditional line matched");}
 | assignment() {System.out.println("assignment line matched");}
-//| "\n" {System.out.println("newline line matched");}
 }
 
-void loop(): {System.out.println("trying to match loop:");} {
-"while" "(" booleanExpr() ")" block() "end" 
+void loop(): {} {
+"while" "(" booleanExpr() ")" block() "end"
 | "foreach" "(" <ID> "in" sequence() ")" block() "end"
 }
 
-void booleanExpr(): {} {bE1() (booleanExpr1())*}
+void booleanExpr(): {} {
+bE1() (booleanExpr1())*
+}
 
 void booleanExpr1(): {} {
 "and" bE1()
@@ -89,7 +89,7 @@ void bE1(): {Token op;} {
 }
 
 void conditional (): {System.out.println("trying to match conditional:");} {
-"if" "(" booleanExpr() ")" block() "end" /*"\n"*/ (els3())?
+"if" "(" booleanExpr() ")" block() "end" (els3())?
 }
 
 void els3(): {} {
@@ -101,7 +101,10 @@ void assignment(): {Token op; System.out.println("trying to match assignment:");
 <ID> op=<ASSIGN> expression() {System.out.println(op + " assignment matched");}
 }
 
-void expression(): {} {expr1() (expr0())*}
+void expression(): {} {
+expr1() (expr0())*
+| {System.out.println("expression error");}
+}
 
 void expr0(): {} {
 "+" expr1()
@@ -124,24 +127,24 @@ void expr5(): {} {
 | operand()
 }
 
-void operand(): {} {
-<ID> 
-| <INT> 
-| note() 
-| sequence()
+void operand(): {Token t;} {
+note() {System.out.println("operand is note");}
+| sequence() {System.out.println("operand is sequence");}
+| t=<ID> {System.out.println("operand is id "+t);}
+| t=<INT> {System.out.println("operand is int "+t);} 
 }
 
 void note(): {Token n; System.out.println("Trying to match note");} {
 "note" (note1())+ {System.out.println("note is created here");}
-| sequence() "[" n=<INT> "]" {System.out.println("note is #" + n + " in a sequence");}
+| sequence() "[" expression() "]" {System.out.println("note is nth in a sequence");}
 | n=<ID> {System.out.println("note \"" + n + "\" is an ID");}
 }
 
 void note1(): {} {
-"." "pitch" "(" [expression() "+" expr5() | "-" expr5() | <DEGREE> | note()] ")" //{System.out.println("pitch is set");}
-| "." "volume" "(" [expression() | "+" expr5() | "-" expr5()] ")"
-| "." "duration" "(" [expression() | "+" expr5() | "-" expr5() | <DUR>] ")"
-| "." ["quarter" | "half" | "whole"]
+"." "pitch" "(" (expression() | "+" expr5() | "-" expr5() | <DEGREE> | note()) ")"
+| "." "volume" "(" (expression() | "+" expr5() | "-" expr5()) ")"
+| "." "duration" "(" (expression() | "+" expr5() | "-" expr5()) ")"
+| "." ("quarter" | "half" | "whole")
 }
 
 void sequence(): {Token s; System.out.println("trying to match sequence");} {
@@ -151,4 +154,6 @@ void sequence(): {Token s; System.out.println("trying to match sequence");} {
 
 void sequence1(): {} {"," /*("\n")**/ note()}
 
-void track(): {} {"track" "->" sequence()}
+void track(): {} {
+"track" "->" sequence()
+}
