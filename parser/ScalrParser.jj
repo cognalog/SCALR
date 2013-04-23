@@ -26,10 +26,10 @@ public class ScalrParser {
 }
 PARSER_END(ScalrParser)
 
-SKIP : { " " | "\t" | <"/*" (~[])* "*/"> }
+SKIP : { " " | "\t" | <"/*" (~[])* "*/"> | "\n" }
 TOKEN: {
     "==" | ">" | "<" | "<=" | ">=" |
-    "and" | "or" | "not" | "->" | "." | "\n" | 
+    "and" | "or" | "not" | "->" | "." | /*"\n" | */
     "," | "+" | "-" | "%" | "(" | ")" | "[" | "]" |
 	"note" | "pitch" | "volume" | 
        	"duration" | "quarter" | "half" | "whole" |
@@ -48,10 +48,10 @@ TOKEN: {
 
 void fscalr(): {} { function() (fscalr2())* }
 
-void fscalr2(): {} { ("\n")+ function() }
+void fscalr2(): {} { /*("\n")+*/ function() }
 
 void function(): {System.out.println("trying to match function:");} {
-"func" <ID> "(" (parameters())? ")" (("\n")+ block())? ("\n")+ sequence() ("\n")+ "end" {System.out.println("function matched");}
+"func" <ID> "(" (parameters())? ")" (/*("\n")+*/ block())? /*("\n")+*/ sequence() /*("\n")+*/ "end" {System.out.println("function matched");}
 }
 
 void parameters(): {System.out.println("trying to match parameters:");} { 
@@ -60,15 +60,15 @@ void parameters(): {System.out.println("trying to match parameters:");} {
 
 void parameters1(): {} { "," parameters() }
 
-void block(): {System.out.println("trying to match block:");} { (line())+ }
-
-//void block1(): {} { "\n" line() }
+void block(): {System.out.println("trying to match block:");} { 
+(line())+ {System.out.println("block matched");}
+}
 
 void line(): {System.out.println("trying to match line:");} {
 loop() {System.out.println("loop line matched");}
 | conditional() {System.out.println("conditional line matched");}
 | assignment() {System.out.println("assignment line matched");}
-| "\n" {System.out.println("newline line matched");}
+//| "\n" {System.out.println("newline line matched");}
 }
 
 void loop(): {System.out.println("trying to match loop:");} {
@@ -89,7 +89,7 @@ void bE1(): {Token op;} {
 }
 
 void conditional (): {System.out.println("trying to match conditional:");} {
-"if" "(" booleanExpr() ")" block() "end" "\n" (els3())?
+"if" "(" booleanExpr() ")" block() "end" /*"\n"*/ (els3())?
 }
 
 void els3(): {} {
@@ -149,6 +149,6 @@ void sequence(): {Token s; System.out.println("trying to match sequence");} {
 | s=<ID> {System.out.println("Sequence \"" + s + "\" corresponds to an ID");}
 }
 
-void sequence1(): {} {"," ("\n")* note()}
+void sequence1(): {} {"," /*("\n")**/ note()}
 
 void track(): {} {"track" "->" sequence()}
