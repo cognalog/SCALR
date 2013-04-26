@@ -1,0 +1,4 @@
+func first_half (scale)
+  [note.pitch(scale[1]).quarter note.pitch(scale[2]).quarter
+   note.pitch(scale[3]).quarter note.pitch(scale[4]).quarter]
+end

@@ -1,0 +1,12 @@
+func nth_different( nth)
+  myseq= []
+  i=1
+  while(i<nth*2)
+    if(i%nth==0)
+      myseq += note.pitch(A3).quarter
+    else
+      myseq += note.pitch(C3).quarter
+    end
+    i+=1
+  end
+end

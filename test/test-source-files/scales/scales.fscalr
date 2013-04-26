@@ -1,0 +1,7 @@
+func seq1 (scale)
+  myseq = []
+  myseq += note.pitch(scale[1]).quarter
+  myseq += note.pitch(scale[2]).quarter
+  myseq += note.pitch(scale[3]).quarter
+  myseq
+end

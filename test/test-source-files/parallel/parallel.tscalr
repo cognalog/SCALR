@@ -1,0 +1,10 @@
+import parallel
+
+main
+  c_scale = {C3 D3 E3 F3 G3 A3 B3 C4}
+  seq = first_ver(c_scale)
+  seq2 = second_ver(c_scale)
+end
+
+track -> [seq]
+track -> [seq2]

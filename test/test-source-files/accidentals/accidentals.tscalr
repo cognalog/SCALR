@@ -1,0 +1,7 @@
+import accidentals
+
+main
+  seq = hello()
+end
+
+track -> [seq]

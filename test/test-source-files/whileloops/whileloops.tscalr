@@ -1,0 +1,8 @@
+import whileloops
+
+main
+  scale1 = {C3 D3 E3 F3 G3 A3 B3}
+  something = seq1(scale1)
+end
+
+track -> [something something]

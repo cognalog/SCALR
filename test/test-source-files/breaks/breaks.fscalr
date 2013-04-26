@@ -1,0 +1,3 @@
+func seq1()
+  seq= [note.pitch(A3).quarter break.half note.pitch(A3).querter]
+end

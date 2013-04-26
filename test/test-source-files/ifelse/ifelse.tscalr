@@ -1,0 +1,7 @@
+import ifelse
+
+main
+  seq = nth_different(3)
+end
+
+track -> [seq]
