@@ -15,6 +15,13 @@ public class Sequence implements Variable
 		theNotes = new ArrayList<Note>();
 	}
 	
+	public Sequence(Note... notes)
+	{
+		theNotes = new ArrayList<Note>(notes.length + 10);
+		for (Note n : notes)
+			theNotes.add(n);
+	}
+	
 	public void addNoteToEnd(Note e)
 	{
 		theNotes.add(e);
