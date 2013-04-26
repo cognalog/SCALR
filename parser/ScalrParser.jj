@@ -16,7 +16,7 @@ public class ScalrParser {
                 text += line + "\n";
 
             }
-            new ScalrParser(new java.io.StringReader(text)).fscalr();
+            new ScalrParser(new java.io.StringReader(text)).bE1();
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
@@ -50,7 +50,7 @@ void fscalr(): {} { function() (fscalr2())* }
 void fscalr2(): {} { /*("\n")+*/ function() }
 
 void function(): {} {
-"func" <ID> "(" (parameters())? ")" (block())? sequence() "end" {System.out.println("function matched");}
+"func" <ID> "(" (parameters())? ")" fblock() {System.out.println("function matched");}
 }
 
 void parameters(): {System.out.println("trying to match parameters:");} { 
@@ -59,8 +59,12 @@ void parameters(): {System.out.println("trying to match parameters:");} {
 
 void parameters1(): {} { "," parameters() }
 
+void fblock(): {System.out.println("matching function block:");} {
+(line())* sequence() "end" {System.out.println("fblock matched");}
+}
+
 void block(): {System.out.println("matching block:");} { 
-(line())+ {System.out.println("block matched");}
+(line())+ "end" {System.out.println("block matched");}
 }
 
 void line(): {System.out.println("matching line:");} {
@@ -70,8 +74,8 @@ loop() {System.out.println("loop line matched");}
 }
 
 void loop(): {System.out.println("matching loop");} {
-"while" "(" booleanExpr() ")" block() "end"
-| "foreach" "(" <ID> "in" sequence() ")" block() "end"
+"while" "(" /*booleanExpr()*/ ")" block() "end"
+| "foreach" "(" <ID> "in" sequence() ")" block()
 }
 
 void booleanExpr(): {} {
@@ -83,18 +87,18 @@ void booleanExpr1(): {} {
 | "or" bE1()
 }
 
-void bE1(): {Token op;} {
+void bE1(): {Token op; System.out.println("matching bE1:");} {
 "not" "(" booleanExpr() ")"
 | expression() op=<RELN> expression() {System.out.println(op + " comparison matched");}
 }
 
 void conditional (): {System.out.println("trying to match conditional:");} {
-"if" "(" booleanExpr() ")" block() "end" (els3())?
+"if" "(" booleanExpr() ")" block() (els3())?
 }
 
 void els3(): {} {
 "else" conditional() 
-| "else" block() "end"
+| "else" block()
 }
 
 void assignment(): {Token op; System.out.println("matching assignment:");} {
