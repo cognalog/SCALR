@@ -46,6 +46,26 @@ public class Note implements Variable
 		length = l;
 	}
 	
+	public Note pitch(String pit)
+	{
+		// Remove all whitespace
+		pit = pit.replaceAll("\\s", "");
+		// Determine if they're modding the pitch or setting it
+		Pattern modPat = Pattern.compile("^[\\+\\-]\\d+$");
+		Matcher modMatch = modPat.matcher(pit);
+		if (modMatch.matches())
+			return modPitch(Integer.parseInt(pit));
+		
+		// If we're here, then that means that the pitch
+		return this;
+	}
+	
+	/**
+	 * Modifies the length of this note in accordance with
+	 * @param len
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
 	public Note length(String len) throws IllegalArgumentException
 	{
 		// Remove all whitespace
@@ -190,7 +210,7 @@ public class Note implements Variable
 	@Override
 	public String toString()
 	{
-		return pitch + "," + length + "," + volume;
+		return pitch + "," + length.duration + "," + volume;
 	}
 	
 	@Override
