@@ -16,7 +16,7 @@ public class ScalrParser {
                 text += line + "\n";
 
             }
-            new ScalrParser(new java.io.StringReader(text)).operand();
+            new ScalrParser(new java.io.StringReader(text)).fscalr();
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
@@ -59,17 +59,17 @@ void parameters(): {System.out.println("trying to match parameters:");} {
 
 void parameters1(): {} { "," parameters() }
 
-void block(): {System.out.println("trying to match block:");} { 
+void block(): {System.out.println("matching block:");} { 
 (line())+ {System.out.println("block matched");}
 }
 
-void line(): {} {
+void line(): {System.out.println("matching line:");} {
 loop() {System.out.println("loop line matched");}
 | conditional() {System.out.println("conditional line matched");}
 | assignment() {System.out.println("assignment line matched");}
 }
 
-void loop(): {} {
+void loop(): {System.out.println("matching loop");} {
 "while" "(" booleanExpr() ")" block() "end"
 | "foreach" "(" <ID> "in" sequence() ")" block() "end"
 }
@@ -84,8 +84,8 @@ void booleanExpr1(): {} {
 }
 
 void bE1(): {Token op;} {
-"not" booleanExpr()
-| operand() op=<RELN> operand() {System.out.println(op + " comparison matched");}
+"not" "(" booleanExpr() ")"
+| expression() op=<RELN> expression() {System.out.println(op + " comparison matched");}
 }
 
 void conditional (): {System.out.println("trying to match conditional:");} {
@@ -97,7 +97,7 @@ void els3(): {} {
 | "else" block() "end"
 }
 
-void assignment(): {Token op; System.out.println("trying to match assignment:");} {
+void assignment(): {Token op; System.out.println("matching assignment:");} {
 <ID> op=<ASSIGN> expression() {System.out.println(op + " assignment matched");}
 }
 
@@ -127,14 +127,14 @@ void expr5(): {} {
 | operand()
 }
 
-void operand(): {Token t;} {
+void operand(): {Token t; System.out.println("matching operand:");} {
 note() {System.out.println("operand is note");}
 | sequence() {System.out.println("operand is sequence");}
 | t=<ID> {System.out.println("operand is id "+t);}
 | t=<INT> {System.out.println("operand is int "+t);} 
 }
 
-void note(): {Token n; System.out.println("Trying to match note");} {
+void note(): {Token n; System.out.println("matching note");} {
 "note" (note1())+ {System.out.println("note is created here");}
 | sequence() "[" expression() "]" {System.out.println("note is nth in a sequence");}
 | n=<ID> {System.out.println("note \"" + n + "\" is an ID");}
@@ -147,7 +147,7 @@ void note1(): {} {
 | "." ("quarter" | "half" | "whole")
 }
 
-void sequence(): {Token s; System.out.println("trying to match sequence");} {
+void sequence(): {Token s; System.out.println("matching sequence:");} {
 "[" (note() (sequence1())*)? "]" {System.out.println("Sequence is created here");}
 | s=<ID> {System.out.println("Sequence \"" + s + "\" corresponds to an ID");}
 }
