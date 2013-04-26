@@ -16,7 +16,7 @@ public class ScalrParser {
                 text += line + "\n";
 
             }
-            new ScalrParser(new java.io.StringReader(text)).bE1();
+            new ScalrParser(new java.io.StringReader(text)).fscalr();
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
