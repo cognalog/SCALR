@@ -28,18 +28,17 @@ PARSER_END(ScalrParser)
 
 SKIP : { " " | "\t" | <"/*" (~[])* "*/"> | "\n"}
 TOKEN: {
-    "==" | ">" | "<" | "<=" | ">=" |
-    "and" | "or" | "not" | "->" | "." | /*"\n" |*/
-    "," | "+" | "-" | "%" | "(" | ")" | "[" | "]" |
+       "and" | "or" | "not" | "->" | "." | /*"\n" |*/
+        "," | "+" | "-" | "%" | "(" | ")" | "[" | "]" |
 	"note" | "pitch" | "volume" | 
        	"duration" | "quarter" | "half" | "whole" |
 	"end" | "func" | "while" | "foreach" |
 	 "in" |	"if" | "else" | "import" | "track" |
-	/*<NL: ("\n")+>|*/ <ASSIGN: "=" | "+=" | "-=" | "*=" | "/=" | "%="> |
-	<RELN: "==" | "<" | ">" | "<=" | ">="> |
-	<LETTER: ["A"-"Z"] | ["a"-"z"]> |
+	/*<NL: ("\n")+>|*/ 
+	<ASSIGN: "=" | "+=" | "-=" | "*=" | "/=" | "%="> |
+	<RELN: "==" | "<" | ">" | ">=" "<="> |
 	<INT: "0" | ["1"-"9"](["0"-"9"])*> |
-	<ID: ["a"-"z"](<LETTER> | <INT> | "_")*> |
+	<ID: ["a"-"z"](["A"-"Z"] | ["a"-"z"] | <INT> | "_")*> |
     	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")>
 	}
 
@@ -74,11 +73,11 @@ loop() {System.out.println("loop line matched");}
 }
 
 void loop(): {System.out.println("matching loop");} {
-"while" "(" /*booleanExpr()*/ ")" block()
+"while" "(" booleanExpr() ")" block()
 | "foreach" "(" <ID> "in" sequence() ")" block()
 }
 
-void booleanExpr(): {} {
+void booleanExpr(): {System.out.println("matching bool expr:");} {
 bE1() (booleanExpr1())*
 }
 
@@ -88,16 +87,17 @@ void booleanExpr1(): {} {
 }
 
 void bE1(): {Token op; System.out.println("matching bE1:");} {
-"not" "(" booleanExpr() ")"
+"not" booleanExpr()
+| "(" booleanExpr() ")"
 | expression() op=<RELN> expression() {System.out.println(op + " comparison matched");}
 }
 
-void conditional (): {System.out.println("trying to match conditional:");} {
-"if" "(" booleanExpr() ")" block()
-| "if" "(" booleanExpr() ")" (line())+ els3()
+void conditional (): {System.out.println("matching conditional:");} {
+"if" "(" booleanExpr() ")" (line())+ els3()
+| "if" "(" booleanExpr() ")" block()
 }
 
-void els3(): {} {
+void els3(): {System.out.println("matching else");} {
 "else" conditional() 
 | "else" block()
 }
@@ -106,7 +106,7 @@ void assignment(): {Token op; System.out.println("matching assignment:");} {
 <ID> op=<ASSIGN> expression() {System.out.println(op + " assignment matched");}
 }
 
-void expression(): {} {
+void expression(): {System.out.println("matching expr");} {
 expr1() (expr0())*
 | {System.out.println("expression error");}
 }
@@ -133,9 +133,9 @@ void expr5(): {} {
 }
 
 void operand(): {Token t; System.out.println("matching operand:");} {
-note() {System.out.println("operand is note");}
+t=<ID> {System.out.println("operand is id "+t);}
+| note() {System.out.println("operand is note");}
 | sequence() {System.out.println("operand is sequence");}
-| t=<ID> {System.out.println("operand is id "+t);}
 | t=<INT> {System.out.println("operand is int "+t);} 
 }
 
@@ -146,7 +146,7 @@ void note(): {Token n; System.out.println("matching note");} {
 }
 
 void note1(): {} {
-"." "pitch" "(" (expression() | "+" expr5() | "-" expr5() | <DEGREE> | note()) ")"
+"." "pitch" "(" ( <DEGREE> | "+" expr5() | "-" expr5() | expression()  | note()) ")"
 | "." "volume" "(" (expression() | "+" expr5() | "-" expr5()) ")"
 | "." "duration" "(" (expression() | "+" expr5() | "-" expr5()) ")"
 | "." ("quarter" | "half" | "whole")
