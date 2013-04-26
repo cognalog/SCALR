@@ -12,3 +12,11 @@ Testing SyntaxChecker.jj:
 Installing midiutil:
 
 `python python-midiutil/setup.py`
+
+Running string-to-midi converter:
+
+`python midi_generator.py "[60,1,100|64,1,100|65,1,100][64,1,100|67,2,100]"`
+
+Square braces denote a track, inside the square braces are notes delimited by |.
+
+The notes are specified by pitch, duration (in quarter notes), volume.

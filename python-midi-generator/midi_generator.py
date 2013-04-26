@@ -1,4 +1,5 @@
 import sys
+from decimal import Decimal
 from midiutil.MidiFile import MIDIFile
 
 class Track:
@@ -29,7 +30,7 @@ for trk in trks:
   temp = Track()
   for note in str(trk).strip('[]').split("|"):
     temp_note = str(note).split(",")
-    temp.notes.append(Note(int(temp_note[0]), int(temp_note[1]), int(temp_note[2])))
+    temp.notes.append(Note(int(temp_note[0]), Decimal(temp_note[1]), int(temp_note[2])))
   tracks.append(temp)
 
 
