@@ -36,7 +36,6 @@ TOKEN: {
        	"duration" | "quarter" | "half" | "whole" |
 	"end" | "func" | "while" | "foreach" |
 	 "in" |	"if" | "else" | "import" | "track" |
-	/*<NL: ("\n")+>|*/ 
 	<ASSIGN: "=" | "+=" | "-=" | "*=" | "/=" | "%="> |
 	<RELN: "==" | "<" | ">" | ">=" "<="> |
 	<INT: "0" | ["1"-"9"](["0"-"9"])*> |
@@ -51,11 +50,11 @@ SimpleNode fscalr(): {} { function() (fscalr2())* <EOF> {return jjtThis;}}
 void fscalr2(): {} { /*("\n")+*/ function() }
 
 void function(): {} {
-"func" <ID> "(" (parameters())? ")" fblock() {System.out.println("function matched");}
+"func" id() "(" (parameters())? ")" fblock() {System.out.println("function matched");}
 }
 
 void parameters(): {System.out.println("trying to match parameters:");} { 
-<ID> (parameters1())* {System.out.println("Parameters matched");}
+id() (parameters1())* {System.out.println("Parameters matched");}
 }
 
 void parameters1(): {} { "," parameters() }
@@ -76,7 +75,7 @@ loop() {System.out.println("loop line matched");}
 
 void loop(): {System.out.println("matching loop");} {
 "while" "(" booleanExpr() ")" block()
-| "foreach" "(" <ID> "in" sequence() ")" block()
+| "foreach" "(" id() "in" sequence() ")" block()
 }
 
 void booleanExpr(): {System.out.println("matching bool expr:");} {
@@ -88,10 +87,10 @@ void booleanExpr1(): {} {
 | "or" bE1()
 }
 
-void bE1(): {Token op; System.out.println("matching bE1:");} {
+void bE1(): {System.out.println("matching bE1:");} {
 "not" booleanExpr()
 | "(" booleanExpr() ")"
-| expression() op=<RELN> expression() {System.out.println(op + " comparison matched");}
+| expression() reln() expression() {System.out.println("comparison matched");}
 }
 
 void conditional (): {System.out.println("matching conditional:");} {
@@ -104,8 +103,8 @@ void els3(): {System.out.println("matching else");} {
 | "else" block()
 }
 
-void assignment(): {Token op; System.out.println("matching assignment:");} {
-<ID> op=<ASSIGN> expression() {System.out.println(op + " assignment matched");}
+void assignment(): {System.out.println("matching assignment:");} {
+id() assign() expression() {System.out.println("assignment matched");}
 }
 
 void expression(): {System.out.println("matching expr");} {
@@ -134,33 +133,63 @@ void expr5(): {} {
 | operand()
 }
 
-void operand(): {Token t; System.out.println("matching operand:");} {
-t=<ID> {System.out.println("operand is id "+t);}
+void operand(): {System.out.println("matching operand:");} {
+id() {System.out.println("operand is id ");}
 | note() {System.out.println("operand is note");}
 | sequence() {System.out.println("operand is sequence");}
-| t=<INT> {System.out.println("operand is int "+t);} 
+| num() {System.out.println("operand is int");}
 }
 
-void note(): {Token n; System.out.println("matching note");} {
+void note(): {System.out.println("matching note");} {
 "note" (note1())+ {System.out.println("note is created here");}
 | sequence() "[" expression() "]" {System.out.println("note is nth in a sequence");}
-| n=<ID> {System.out.println("note \"" + n + "\" is an ID");}
+| id() {System.out.println("note is an ID");}
 }
 
 void note1(): {} {
-"." "pitch" "(" ( <DEGREE> | "+" expr5() | "-" expr5() | note() | expression()) ")"
+"." "pitch" "(" ( degree() | "+" expr5() | "-" expr5() | note() | expression()) ")"
 | "." "volume" "(" ("+" expr5() | "-" expr5() | expression()) ")"
 | "." "duration" "(" ("+" expr5() | "-" expr5() | expression()) ")"
 | "." ("quarter" | "half" | "whole")
 }
 
-void sequence(): {Token s; System.out.println("matching sequence:");} {
+void sequence(): {System.out.println("matching sequence:");} {
 "[" (note() (sequence1())*)? "]" {System.out.println("Sequence is created here");}
-| s=<ID> {System.out.println("Sequence \"" + s + "\" corresponds to an ID");}
+| id() {System.out.println("Sequence corresponds to an ID");}
 }
 
 void sequence1(): {} {"," /*("\n")**/ note()}
 
 void track(): {} {
 "track" "->" sequence()
+}
+
+void id():
+{Token t;}
+{
+t=<ID> {jjtThis.value = t.image;}
+}
+
+void num():
+{Token t;}
+{
+t=<INT> {jjtThis.value = t.image;}
+}
+
+void degree():
+{Token t;}
+{
+t=<DEGREE> {jjtThis.value = t.image;}
+}
+
+void assign():
+{Token t;}
+{
+t=<ASSIGN> {jjtThis.value = t.image;}
+}
+
+void reln():
+{Token t;}
+{
+t=<RELN> {jjtThis.value = t.image;}
 }
