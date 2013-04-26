@@ -146,9 +146,9 @@ void note(): {Token n; System.out.println("matching note");} {
 }
 
 void note1(): {} {
-"." "pitch" "(" ( <DEGREE> | "+" expr5() | "-" expr5() | expression()  | note()) ")"
-| "." "volume" "(" (expression() | "+" expr5() | "-" expr5()) ")"
-| "." "duration" "(" (expression() | "+" expr5() | "-" expr5()) ")"
+"." "pitch" "(" ( <DEGREE> | "+" expr5() | "-" expr5() | note() | expression()) ")"
+| "." "volume" "(" ("+" expr5() | "-" expr5() | expression()) ")"
+| "." "duration" "(" ("+" expr5() | "-" expr5() | expression()) ")"
 | "." ("quarter" | "half" | "whole")
 }
 
