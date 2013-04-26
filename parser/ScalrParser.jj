@@ -74,7 +74,7 @@ loop() {System.out.println("loop line matched");}
 }
 
 void loop(): {System.out.println("matching loop");} {
-"while" "(" /*booleanExpr()*/ ")" block() "end"
+"while" "(" /*booleanExpr()*/ ")" block()
 | "foreach" "(" <ID> "in" sequence() ")" block()
 }
 
@@ -93,7 +93,8 @@ void bE1(): {Token op; System.out.println("matching bE1:");} {
 }
 
 void conditional (): {System.out.println("trying to match conditional:");} {
-"if" "(" booleanExpr() ")" block() (els3())?
+"if" "(" booleanExpr() ")" block()
+| "if" "(" booleanExpr() ")" (line())+ els3()
 }
 
 void els3(): {} {
