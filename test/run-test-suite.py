@@ -21,20 +21,31 @@ def succeed_message(message):
 def fail_message(message):
   print bcolors.OKGREEN + message + bcolors.ENDC
 
+def header_message(message):
+  print bcolors.HEADER + message + bcolors.ENDC
+
+def run_test_suite_for(root):
+  for directory in listdir(root):
+    header_message(directory + "/")
+    tscalr = ""
+    fscalrs = []
+    for file in listdir(join(root,directory)):
+      if file.endswith(".tscalr"):
+        tscalr = root + "/" + directory + "/" + file + " "
+      if file.endswith(".fscalr"):
+        fscalrs.append(root + "/" + directory + "/" + file + " ")
+    
+    a_test = ".././scalr " + tscalr
+    for fscalr in fscalrs:
+      a_test += fscalr
+    print a_test + "\n"
+
 print "===Beginning test suite==="
 print ""
 print "Starting with tests that should succeed..."
 
-root="tests-that-should-succeed"
-for directory in listdir(root):
-  print directory + "/"
-  for file in listdir(join(root,directory)):
-    print "\t" + file
+run_test_suite_for("tests-that-should-succeed")
 
 print "Now onto tests that should raise exceptions..."
 
-root="tests-that-should-raise-exceptions"
-for directory in listdir(root):
-  print directory + "/"
-  for file in listdir(join(root,directory)):
-    print "\t" + file
+run_test_suite_for("tests-that-should-raise-exceptions")
