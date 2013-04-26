@@ -1,0 +1,3 @@
+func foo ()
+  note.pitch(C3).quarter
+end

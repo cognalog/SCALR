@@ -1,0 +1,8 @@
+import redefintion
+import redefinition2
+
+main
+  seq = foo()
+end
+
+track -> [seq]

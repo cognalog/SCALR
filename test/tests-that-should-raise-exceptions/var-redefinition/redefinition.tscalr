@@ -1,0 +1,7 @@
+import redefinition
+
+main
+  seq = hello()
+end
+
+track -> [seq]
