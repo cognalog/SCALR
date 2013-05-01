@@ -15,6 +15,10 @@ run: all
 example: all
 	make && java -classpath './:../' parser.ScalrParser 'tests/2-halves.fscalr'
 
+.PHONY: refresh
+refresh: clean all
+	make
+
 ScalrParser.jj: ScalrParser.jjt
 	../javacc/jjtree ScalrParser.jjt
 
