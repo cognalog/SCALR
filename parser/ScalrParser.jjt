@@ -21,7 +21,7 @@ public class ScalrParser {
         ScalrParser parser = new ScalrParser(new java.io.StringReader(text));
         SimpleNode root = parser.fscalr();
         root.dump("");
-        new BackendMain();
+        new BackendMain(root);
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!

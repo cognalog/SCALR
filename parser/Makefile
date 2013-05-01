@@ -17,7 +17,6 @@ example: all
 
 .PHONY: refresh
 refresh: clean all
-	make
 
 ScalrParser.jj: ScalrParser.jjt
 	../javacc/jjtree ScalrParser.jjt
