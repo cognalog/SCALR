@@ -7,7 +7,7 @@ public class BackendMain
 	
 	public BackendMain()
 	{
-		// TODO Auto-generated constructor stub
+		System.out.println(tempo);
 	}
 	
 }

@@ -3,7 +3,9 @@ options
   LOOKAHEAD=3;
 }
 PARSER_BEGIN(ScalrParser)
+package parser;
 import java.io.*;
+import scalr.*;
 
 public class ScalrParser {
     public static void main(String[] args) {
@@ -19,6 +21,7 @@ public class ScalrParser {
         ScalrParser parser = new ScalrParser(new java.io.StringReader(text));
         SimpleNode root = parser.fscalr();
         root.dump("");
+        new BackendMain();
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
