@@ -19,7 +19,7 @@ public class ScalrParser {
 
             }
         ScalrParser parser = new ScalrParser(new java.io.StringReader(text));
-        SimpleNode root = parser.fscalr();
+        SimpleNode root = parser.scalr();
         root.dump("");
         new BackendMain(root);
 	    System.out.println("grats, your program compiled alright");
@@ -46,15 +46,19 @@ TOKEN: {
     	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")>
 	}
 
+SimpleNode scalr(): {} {
+tscalr() {return jjtThis;}
+| fscalr() {return jjtThis;} }
+
 void tscalr(): {} { (imp())+ tfunc() (track())+ }
 
 void imp(): {} { "import" "\"" fscalrFile() }
 
-void tfunc(): {} { "func" "main" "(" (parameters())? ")" fblock() }
+void tfunc(): {} { "func" "main" "(" (parameters())? ")" block() }
 
 void fscalrFile(): {} { id() ".fscalr" }
 
-SimpleNode fscalr(): {} { function() (fscalr2())* <EOF> {return jjtThis;}}
+void fscalr(): {} { function() (fscalr2())* <EOF> }
 
 void fscalr2(): {} { /*("\n")+*/ function() }
 
@@ -143,11 +147,14 @@ void expr5(): {} {
 }
 
 void operand(): {System.out.println("matching operand:");} {
-id() {System.out.println("operand is id ");}
+funcall()
+| id() {System.out.println("operand is id ");}
 | note() {System.out.println("operand is note");}
 | sequence() {System.out.println("operand is sequence");}
 | num() {System.out.println("operand is int");}
 }
+
+void funcall(): {} { id() "(" (operand())* ")" }
 
 void note(): {System.out.println("matching note");} {
 "note" (note1())+ {System.out.println("note is created here");}
