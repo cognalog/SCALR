@@ -36,8 +36,9 @@ public class FscalrParser
 		for (SimpleNode n : params)
 			func.addParameter((String) n.jjtGetValue());
 		// Then, get the statements
-		ArrayList<SimpleNode> stmt = BackendMain.getChildren((SimpleNode) node.jjtGetChild(2));
-		for (SimpleNode n : stmt)
-			func.addStatement(StatementBuilder.buildStmt(node));
+		ArrayList<SimpleNode> fblock = BackendMain.getChildren((SimpleNode) node.jjtGetChild(2));
+		for (SimpleNode n : fblock) {
+			StatementBuilder.buildStmt(n, func);
+		}
 	}
 }

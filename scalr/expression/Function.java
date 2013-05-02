@@ -42,6 +42,11 @@ public class Function
 		statements.add(expr);
 	}
 	
+	public boolean hasParameter(String paramName)
+	{
+		return parameterName.contains(paramName);
+	}
+	
 	public String getName()
 	{
 		return id;
