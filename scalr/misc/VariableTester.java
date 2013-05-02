@@ -13,8 +13,8 @@ public class VariableTester
 	{
 		Note note = Note.note();
 		System.out.println(note);
-		System.out.println(note.modPitch(127).modPitch(-5).modPitch(5000));
-		System.out.println(note);
+		System.out.println(note.pitch("+2").volume("+10"));
+		System.out.println(note.length("1/8"));
 	}
 	
 }

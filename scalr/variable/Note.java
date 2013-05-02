@@ -46,7 +46,26 @@ public class Note implements Variable
 		length = l;
 	}
 	
-	public Note pitch(String pit)
+	public Note volume(String vol) throws IllegalArgumentException
+	{
+		// Remove all whitespaces
+		vol = vol.replaceAll("\\s", "");
+		
+		// Determine if they're modding the volume or setting it
+		if (Pattern.matches("^[\\+\\-]\\d+$", vol))
+			return modVolume(Integer.parseInt(vol));
+		
+		// If we're here, then they're setting the volume
+		// Number pattern
+		if (Pattern.matches("^\\d+$", vol))
+			return setVolume(Integer.parseInt(vol));
+		
+		// Otherwise, they gave an illegal argument
+		throw new IllegalArgumentException("The argument, " + vol
+		        + ", does not indicate modding a volume or setting a volume.");
+	}
+	
+	public Note pitch(String pit) throws IllegalArgumentException
 	{
 		// Remove all whitespace
 		pit = pit.replaceAll("\\s", "");
@@ -56,8 +75,25 @@ public class Note implements Variable
 		if (modMatch.matches())
 			return modPitch(Integer.parseInt(pit));
 		
-		// If we're here, then that means that the pitch
-		return this;
+		// If we're here, then that means that they're setting the pitch
+		Degree pitch = null;
+		try {
+			// Capitalize the pitch
+			// If the second character is a letter, set it to lower case
+			if (Character.isLetter(pit.charAt(1)))
+				pit =
+				        pit.substring(0, 1).toUpperCase() + pit.substring(1, 2).toLowerCase()
+				                + pit.substring(2);
+			else
+				pit = pit.substring(0, 1).toUpperCase() + pit.substring(1);
+			pitch = Degree.valueOf(pit);
+		}
+		catch (IllegalArgumentException e) {
+			// The given argument did not match our modding pattern nor was it setting the pitch
+			throw new IllegalArgumentException("The argument, " + pit
+			        + ", does not indicate modding a pitch or setting a pitch.");
+		}
+		return setPitch(pitch);
 	}
 	
 	/**

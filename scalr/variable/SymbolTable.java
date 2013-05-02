@@ -11,7 +11,7 @@ import scalr.Exceptions.TypeError;
  * {@linkplain Variable} instance.
  * @author mark
  */
-public class SymbolTable
+public final class SymbolTable
 {
 	private static final HashMap<String, HashMap<String, Variable>>	reference	=
 	                                                                                  new HashMap<String, HashMap<String, Variable>>();
