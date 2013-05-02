@@ -34,11 +34,11 @@ PARSER_END(ScalrParser)
 SKIP : { " " | "\t" | <"/*" (~[])* "*/"> | "\n"}
 TOKEN: {
        "and" | "or" | "not" | "->" | "." | /*"\n" |*/
-        "," | "+" | "-" | "%" | "(" | ")" | "[" | "]" |
+        "," | "\"" | "+" | "-" | "%" | "(" | ")" | "[" | "]" |
 	"note" | "pitch" | "volume" | 
        	"duration" | "quarter" | "half" | "whole" |
-	"end" | "func" | "while" | "foreach" |
-	 "in" |	"if" | "else" | "import" | "track" |
+	"end" | "func" | "main" | "while" | "foreach" |
+	 "in" |	"if" | "else" | "import" | "track" | ".fscalr" |
 	<ASSIGN: "=" | "+=" | "-=" | "*=" | "/=" | "%="> |
 	<RELN: "==" | "<" | ">" | ">=" "<="> |
 	<INT: "0" | ["1"-"9"](["0"-"9"])*> |
@@ -46,7 +46,13 @@ TOKEN: {
     	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")>
 	}
 
-//void tscalr(): {} { imports() ("\n")+ function() ("\n")+ (track)+ }
+void tscalr(): {} { (imp())+ tfunc() (track())+ }
+
+void imp(): {} { "import" "\"" fscalrFile() }
+
+void tfunc(): {} { "func" "main" "(" (parameters())? ")" fblock() }
+
+void fscalrFile(): {} { id() ".fscalr" }
 
 SimpleNode fscalr(): {} { function() (fscalr2())* <EOF> {return jjtThis;}}
 
