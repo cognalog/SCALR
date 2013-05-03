@@ -53,7 +53,7 @@ public final class StatementBuilder
 				return buildExpr1(children.get(0));
 		}
 		else {
-			// to be defined later
+			return result;
 		}
 		return result;
 	}
@@ -65,8 +65,9 @@ public final class StatementBuilder
 		if (children.size() == 1) {
 			return buildExpr3(children.get(0));
 		}
-		else
+		else {
 			return null;
+		}
 	}
 	
 	private static Expression buildExpr3(SimpleNode node)
@@ -76,13 +77,42 @@ public final class StatementBuilder
 		if (children.size() == 1) {
 			return buildExpr5(children.get(0));
 		}
-		else
+		else {
 			return null;
+		}
 	}
 	
 	private static Expression buildExpr5(SimpleNode node)
 	{
-		
+		// An expr5 either has an expression as its child or an operand. If it's an operand,
+		SimpleNode child = node.jjtGetChild(0);
+		if (child.toString().equals("operand")) {
+			return getOperand(child);
+		}
+		else {
+			return buildExpression(child);
+		}
+	}
+	
+	private static Expression getOperand(SimpleNode node)
+	{
+		// An operand could be one of 5 things
+		String nodeType = node.toString();
+		if (nodeType.equals("funcall")) {
+			
+		}
+		else if (nodeType.equals("id")) {
+			
+		}
+		else if (nodeType.equals("note")) {
+			
+		}
+		else if (nodeType.equals("sequence")) {
+			
+		}
+		else if (nodeType.equals("num")) {
+			
+		}
 		return null;
 	}
 }
