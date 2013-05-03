@@ -88,7 +88,7 @@ public class SimpleNode implements Node
 	
 	public String toString(String prefix)
 	{
-		return prefix + toString();
+		return prefix + toString() + ": " + jjtGetValue();
 	}
 	
 	/*
