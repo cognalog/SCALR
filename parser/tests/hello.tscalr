@@ -1,0 +1,7 @@
+import hello
+
+main
+	seq = hello()
+end
+
+track -> [seq]
