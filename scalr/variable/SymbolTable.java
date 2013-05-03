@@ -53,8 +53,18 @@ public final class SymbolTable
 			return false;
 		}
 	}
-	public Variable getMember(String func, String id){
+	public static Variable getMember(String func, String id){
 		HashMap selfie= reference.get(func);
 		return selfie.get(id);
+	}
+	public static boolean memberExists(String func, String id){
+		boolean out=false;
+		if(reference.containsKey(func)){
+			HashMap temp = reference.get(func);
+			if(temp.containsKey(id)){
+				out=true;
+			}
+		}
+		return out;
 	}
 }
