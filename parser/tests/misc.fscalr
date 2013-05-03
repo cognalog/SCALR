@@ -2,7 +2,7 @@ func nth_different( nth)
 /* comment, son! */
      myseq= []
      irk+= 1
-     nth=9
+     nth=9+4+(3*5)
      while(irk<nth*2)
 	if(i%nth==0)
 		myseq += note.pitch(A3).quarter

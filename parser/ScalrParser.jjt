@@ -126,20 +126,22 @@ expr1() (expr0())*
 }
 
 void expr0(): {} {
-"+" expr1()
-| "-" expr1()
+"+" expr1() { jjtThis.value = "+"; }
+| "-" expr1() { jjtThis.value = "-"; }
 }
 
 void expr1(): {} { expr3() (expr2())* }
 
 void expr2(): {} {
-"*" expr3()
-| "/" expr3()
+"*" expr3() { jjtThis.value = "*"; }
+| "/" expr3() { jjtThis.value = "/"; }
 }
 
 void expr3(): {} {expr5() (expr4())*}
 
-void expr4(): {} {"%" expr5()}
+void expr4(): {} {
+	"%" expr5() { jjtThis.value = "%"; }
+}
 
 void expr5(): {} {
 "(" expression() ")" 

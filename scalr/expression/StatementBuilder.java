@@ -37,6 +37,15 @@ public final class StatementBuilder
 		        new AssignmentOperator((String) node.jjtGetChild(1).jjtGetValue());
 		System.out.println(assign);
 		// Get the expression being assigned
+		SimpleNode expression = node.jjtGetChild(2);
+		Expression expr = getExpression(expression);
+		return null;
+	}
+	
+	private static Expression getExpression(SimpleNode expression)
+	{
+		ArrayList<SimpleNode> children = BackendMain.getChildren(expression);
+		System.out.println(children.get(0).jjtGetValue());
 		return null;
 	}
 }
