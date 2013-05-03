@@ -45,5 +45,8 @@ public class Number implements Variable
 	{
 		return ExpressionType.NUMBER;
 	}
+	public String toString(){
+		return ""+val;
+	}
 	
 }
