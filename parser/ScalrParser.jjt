@@ -54,7 +54,7 @@ void tscalr(): {} { (imp())+ tfunc() (track())+ }
 
 void imp(): {} { "import" "\"" fscalrFile() }
 
-void tfunc(): {} { "func" "main" "(" (parameters())? ")" block() }
+void tfunc(): {} { "func" "main()" block() }
 
 void fscalrFile(): {} { id() ".fscalr" }
 
@@ -159,7 +159,7 @@ funcall()
 void funcall(): {} { id() "(" (operand())* ")" }
 
 void note(): {System.out.println("matching note");} {
-"note" (note1())+ {System.out.println("note is created here");}
+"note" (note1())* {System.out.println("note is created here");}
 | sequence() "[" expression() "]" {System.out.println("note is nth in a sequence");}
 | id() {System.out.println("note is an ID");}
 }

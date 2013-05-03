@@ -1,7 +1,1 @@
-import hello
-
-main
-	seq = hello()
-end
-
-track -> [seq]
+x = 3

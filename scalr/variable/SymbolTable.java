@@ -13,7 +13,7 @@ import scalr.Exceptions.TypeError;
  */
 public final class SymbolTable
 {
-	private static final HashMap<String, HashMap<String, Variable>>	reference	=
+	public static final HashMap<String, HashMap<String, Variable>>	reference	=
 	                                                                                  new HashMap<String, HashMap<String, Variable>>();
 	
 	private SymbolTable() throws AssertionError
