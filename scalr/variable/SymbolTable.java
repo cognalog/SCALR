@@ -53,4 +53,8 @@ public final class SymbolTable
 			return false;
 		}
 	}
+	public Variable getMember(String func, String id){
+		HashMap selfie= reference.get(func);
+		return selfie.get(id);
+	}
 }
