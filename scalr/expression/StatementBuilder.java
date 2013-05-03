@@ -38,11 +38,11 @@ public final class StatementBuilder
 		System.out.println(assign);
 		// Get the expression being assigned
 		SimpleNode expression = node.jjtGetChild(2);
-		Expression expr = getExpression(expression);
+		Expression expr = buildExpression(expression);
 		return null;
 	}
 	
-	private static Expression getExpression(SimpleNode expression)
+	private static Expression buildExpression(SimpleNode expression)
 	{
 		ArrayList<SimpleNode> children = BackendMain.getChildren(expression);
 		Expression result = null;
@@ -50,7 +50,7 @@ public final class StatementBuilder
 		// expression.
 		if (children.size() == 1) {
 			if (children.get(0).toString().equals("expr1"))
-				result = getExpr1(children.get(0));
+				return buildExpr1(children.get(0));
 		}
 		else {
 			// to be defined later
@@ -58,9 +58,31 @@ public final class StatementBuilder
 		return result;
 	}
 	
-	private static Expression getExpr1(SimpleNode simpleNode)
+	private static Expression buildExpr1(SimpleNode node)
 	{
-		// TODO Auto-generated method stub
+		// An expr1 could have 1 or more expr2 children
+		ArrayList<SimpleNode> children = BackendMain.getChildren(node);
+		if (children.size() == 1) {
+			return buildExpr3(children.get(0));
+		}
+		else
+			return null;
+	}
+	
+	private static Expression buildExpr3(SimpleNode node)
+	{
+		// An expr3 has 1 expr5 child and 0 or more expr4 children
+		ArrayList<SimpleNode> children = BackendMain.getChildren(node);
+		if (children.size() == 1) {
+			return buildExpr5(children.get(0));
+		}
+		else
+			return null;
+	}
+	
+	private static Expression buildExpr5(SimpleNode node)
+	{
+		
 		return null;
 	}
 }
