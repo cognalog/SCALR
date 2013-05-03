@@ -45,7 +45,22 @@ public final class StatementBuilder
 	private static Expression getExpression(SimpleNode expression)
 	{
 		ArrayList<SimpleNode> children = BackendMain.getChildren(expression);
-		System.out.println(children.get(0).jjtGetValue());
+		Expression result = null;
+		// What follows is a case by case listing of what could follow after each production of
+		// expression.
+		if (children.size() == 1) {
+			if (children.get(0).toString().equals("expr1"))
+				result = getExpr1(children.get(0));
+		}
+		else {
+			// to be defined later
+		}
+		return result;
+	}
+	
+	private static Expression getExpr1(SimpleNode simpleNode)
+	{
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

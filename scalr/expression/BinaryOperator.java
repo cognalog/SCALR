@@ -1,13 +1,12 @@
 
 package scalr.expression;
 
-import scalr.Exceptions.TypeError;
-
-public class PlusOperator implements Expression
+public class BinaryOperator implements Expression
 {
 	ExpressionType	exprType;
 	Expression	   expr1;
 	Expression	   expr2;
+	String	       operator;
 	
 	/**
 	 * As defined in section 7.5 of our LRM, the plus operator is defined for numbers, sequences
@@ -15,16 +14,17 @@ public class PlusOperator implements Expression
 	 * @param expr1
 	 * @param expr2
 	 */
-	public PlusOperator(Expression expr1, Expression expr2) throws TypeError
+	public BinaryOperator(String operator)
 	{
-		if (expr1.getType() == expr2.getType() && expr1.getType() == ExpressionType.NUMBER) {
-			this.expr1 = expr1;
-			this.expr2 = expr2;
-			exprType = ExpressionType.NUMBER;
-		}
-		
-		else
-			throw new TypeError(expr1.getValue().toString() + " or " + expr2.getValue().toString());
+		this.operator = operator;
+	}
+	
+	public void addOperand(Expression expr)
+	{
+		if (expr1 == null)
+			expr1 = expr;
+		else if (expr2 == null)
+			expr2 = expr;
 	}
 	
 	@Override
@@ -44,6 +44,6 @@ public class PlusOperator implements Expression
 	@Override
 	public String toString()
 	{
-		return expr1.getValue().toString() + " + " + expr2.getValue().toString();
+		return expr1.getValue().toString() + " " + operator + " " + expr2.getValue().toString();
 	}
 }

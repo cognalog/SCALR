@@ -2,6 +2,7 @@
 package scalr.expression;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import scalr.Exceptions.FunctionExistsError;
 import scalr.Exceptions.TypeError;
@@ -11,17 +12,17 @@ import scalr.variable.Variable;
 public class Function
 {
 	
-	private String	              id;
-	private ArrayList<Variable>	  parameterValue;
-	private ArrayList<String>	  parameterName;
-	private ArrayList<Expression>	statements;
+	private String	                  id;
+	private HashMap<String, Variable>	parameterValue;
+	private ArrayList<String>	      parameterName;
+	private ArrayList<Expression>	  statements;
 	
 	public Function(String name) throws FunctionExistsError
 	{
 		id = name;
 		SymbolTable.addFunc(name);
 		parameterName = new ArrayList<String>();
-		parameterValue = new ArrayList<Variable>();
+		parameterValue = new HashMap<String, Variable>();
 		statements = new ArrayList<Expression>();
 	}
 	
@@ -32,9 +33,9 @@ public class Function
 		parameterName.add(name);
 	}
 	
-	public void setParameter(Variable var)
+	public void setParameter(String name, Variable var)
 	{
-		parameterValue.add(var);
+		parameterValue.put(name, var);
 	}
 	
 	public void addStatement(Expression expr)
