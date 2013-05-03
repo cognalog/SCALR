@@ -69,8 +69,9 @@ public class Sequence implements Variable
 		// Append each note to the string
 		for (Note n : theNotes)
 			result += n.toString() + "|";
-		// remove the last bar
-		result = result.substring(0, result.length() - 1);
+		// remove the last bar (if there is a note)
+		if (theNotes.size() > 0)
+			result = result.substring(0, result.length() - 1);
 		// And it closes with a bracket
 		return result + "]";
 	}
