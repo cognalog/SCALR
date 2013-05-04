@@ -37,7 +37,11 @@ public final class SymbolTable
 	public Function getFuncRef(String id) throws FunctionDoesNotExistError{
 		if(!functionReferences.containsKey(id))
 			throw new FunctionDoesNotExistError(id);
+<<<<<<< HEAD
 		return (Function) functionReferences.get();
+=======
+		return (Function) functionReferences.get(id);
+>>>>>>> fixing symbol table
 	}
 	
 	/**
