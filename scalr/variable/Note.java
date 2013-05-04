@@ -12,12 +12,12 @@ import scalr.expression.ExpressionType;
 public class Note implements Variable
 {
 	public Degree	          pitch;
-	int	                      volume;
-	Length	                  length;
+	public int	              volume;
+	public Length	          length;
 	
 	/**
-	 * The default note. By itself, it is not mutable, but whenever a new note is generated, we
-	 * simple construct a new note using the copy constructor.
+	 * The default note. By itself, it is mutable, but whenever a new note is generated, we simple
+	 * construct a new note using the copy constructor.
 	 */
 	private static final Note	note	= new Note(Degree.C3, 100, Length.quarter);
 	

@@ -62,10 +62,13 @@ public class Function implements Expression
 	@Override
 	public Expression getValue(Expression... expressions)
 	{
-		for (int i = 0; i < statements.size(); i++) {
-			
-		}
-		return null;
+		for (int i = 0; i < statements.size() - 1; i++)
+			statements.get(i).getValue();
+		Expression lastExpr = statements.get(statements.size() - 1);
+		if (lastExpr.getType() == ExpressionType.SEQUENCE)
+			return statements.get(statements.size() - 1).getValue();
+		else
+			return null;
 	}
 	
 	@Override
