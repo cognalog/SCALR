@@ -5,27 +5,24 @@ classes = $(sources:.java=.class)
 f = 
 
 .PHONY: all
-all: ScalrParser.java ScalrParser.jj $(classes)
+all: ScalrParser2.java $(classes)
 
 .PHONY: run
 run: all
-	make && java -classpath './:../' parser.ScalrParser $(f)
+	make && java -classpath './:../' parser.ScalrParser2 $(f)
 
 .PHONY: example
 example: all
-	make && java -classpath './:../' parser.ScalrParser 'tests/2-halves.fscalr'
+	make && java -classpath './:../' parser.ScalrParser2 'tests/hello.tscalr'
 
 .PHONY: refresh
 refresh: clean all
 
-ScalrParser.jj: ScalrParser.jjt
-	../javacc/jjtree ScalrParser.jjt
-
-ScalrParser.java: ScalrParser.jj
-	../javacc/javacc ScalrParser.jj
+ScalrParser2.java: ScalrParser2.jj
+	../javacc/javacc ScalrParser2.jj
 
 clean :
-	rm -f *.class *.java *.jj *~
+	rm -f *.class *.java *~
 
 %.class : %.java
 	$(JAVAC) $(JFLAGS) $<

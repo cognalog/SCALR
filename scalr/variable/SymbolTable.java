@@ -32,12 +32,12 @@ public final class SymbolTable
 		reference.put(func, funcTable);
 	}
 	public static void addFuncRef(Function f){
-		functionReferences.put(f.id, f);
+		functionReferences.put(f.getName(), f);
 	}
 	public Function getFuncRef(String id) throws FunctionDoesNotExistError{
 		if(!functionReferences.containsKey(id))
 			throw new FunctionDoesNotExistError(id);
-		return (Function) functionReferences.get()
+		return (Function) functionReferences.get();
 	}
 	
 	/**
