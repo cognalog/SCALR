@@ -48,15 +48,15 @@ TOKEN: {
 	}
 	
 void assignment(): {
-	Token t1;
+	String t1;
 	Token t2;
 } {
-	t1 = <ID> <ASSIGN> t2 = <INT> {
+	t1=id() <ASSIGN> expression(){
 		try {
 			SymbolTable.addFunc("blah");
 			ScalrNum n = new ScalrNum(Integer.parseInt(t2.image));
-			SymbolTable.addReference("blah", t1.image, n);
-			ScalrNum temp = (ScalrNum) SymbolTable.getMember("blah", t1.image);
+			SymbolTable.addReference("blah", t1, n);
+			ScalrNum temp = (ScalrNum) SymbolTable.getMember("blah", t1);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -67,3 +67,46 @@ String id():
 {
 t=<ID> {return t.image;}
 }
+
+BinaryOperator expression(): {System.out.println("matching expr");} {
+expr1() (expr0())*
+}
+
+void expr0(): {} {
+"+" expr1() { jjtThis.value = "+"; }
+| "-" expr1() { jjtThis.value = "-"; }
+}
+
+void expr1(): {} { expr3() (expr2())* }
+
+void expr2(): {} {
+"*" expr3() { jjtThis.value = "*"; }
+| "/" expr3() { jjtThis.value = "/"; }
+}
+
+void expr3(): {} {expr5() (expr4())*}
+
+void expr4(): {} {
+	"%" expr5() { jjtThis.value = "%"; }
+}
+
+void expr5(): {} {
+"(" expression() ")" 
+| operand()
+}
+
+void operand(): {System.out.println("matching operand:");} {
+funcall()
+| id() {System.out.println("operand is id ");}
+| note() {System.out.println("operand is note");}
+| sequence() {System.out.println("operand is sequence");}
+| num() {System.out.println("operand is int");}
+}
+
+
+
+
+
+
+
+
