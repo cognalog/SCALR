@@ -5,6 +5,8 @@ import java.util.HashMap;
 
 import scalr.Exceptions.FunctionExistsError;
 import scalr.Exceptions.TypeError;
+import scalr.Exceptions.FunctionDoesNotExistError;
+import scalr.expression.Function;
 
 /**
  * This utility class contains a mapping of all IDs ({@linkplain String}) to their
@@ -13,6 +15,7 @@ import scalr.Exceptions.TypeError;
  */
 public final class SymbolTable
 {
+	public static final HashMap<String, Function> functionReferences= new HashMap<String, Function>();
 	public static final HashMap<String, HashMap<String, Variable>>	reference	=
 	                                                                                  new HashMap<String, HashMap<String, Variable>>();
 	
@@ -27,6 +30,14 @@ public final class SymbolTable
 			throw new FunctionExistsError(func);
 		HashMap<String, Variable> funcTable = new HashMap<String, Variable>();
 		reference.put(func, funcTable);
+	}
+	public static void addFuncRef(Function f){
+		functionReferences.put(f.id, f);
+	}
+	public Function getFuncRef(String id) throws FunctionDoesNotExistError{
+		if(!functionReferences.containsKey(id))
+			throw new FunctionDoesNotExistError(id);
+		return (Function) functionReferences.get()
 	}
 	
 	/**
