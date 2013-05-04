@@ -6,7 +6,7 @@ public class FunctionDoesNotExistError extends Exception
 	/**
 	 * 
 	 */
-	private static final long	serialVersionUID	= 55512590469432562L;
+	private static final long	serialVersionUID	= 5551259046943256211L;
 	
 	public FunctionDoesNotExistError(String id)
 	{
