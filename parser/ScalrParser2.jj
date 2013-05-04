@@ -62,3 +62,8 @@ void assignment(): {
 		}
 	}
 }
+String id():
+{Token t;}
+{
+t=<ID> {return t.image;}
+}

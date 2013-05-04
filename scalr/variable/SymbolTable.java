@@ -6,7 +6,7 @@ import java.util.HashMap;
 import scalr.Exceptions.FunctionExistsError;
 import scalr.Exceptions.TypeError;
 import scalr.Exceptions.FunctionDoesNotExistError;
-import scalr.expression.Function;
+import scalr.expression.*;
 
 /**
  * This utility class contains a mapping of all IDs ({@linkplain String}) to their
@@ -16,8 +16,8 @@ import scalr.expression.Function;
 public final class SymbolTable
 {
 	public static final HashMap<String, Function> functionReferences= new HashMap<String, Function>();
-	public static final HashMap<String, HashMap<String, Variable>>	reference	=
-	                                                                                  new HashMap<String, HashMap<String, Variable>>();
+	public static final HashMap<String, HashMap<String, Expression>>	reference	=
+	                                                                                  new HashMap<String, HashMap<String, Expression>>();
 	
 	private SymbolTable() throws AssertionError
 	{
@@ -28,7 +28,7 @@ public final class SymbolTable
 	{
 		if (reference.containsKey(func))
 			throw new FunctionExistsError(func);
-		HashMap<String, Variable> funcTable = new HashMap<String, Variable>();
+		HashMap<String, Expression> funcTable = new HashMap<String, Expression>();
 		reference.put(func, funcTable);
 	}
 	public static void addFuncRef(Function f){
@@ -37,6 +37,10 @@ public final class SymbolTable
 	public Function getFuncRef(String id) throws FunctionDoesNotExistError{
 		if(!functionReferences.containsKey(id))
 			throw new FunctionDoesNotExistError(id);
+<<<<<<< HEAD
+=======
+
+>>>>>>> Symbol table now takes expressions rather than variables
 		return (Function) functionReferences.get(id);
 	}
 	
@@ -48,15 +52,15 @@ public final class SymbolTable
 	 * @return True if this variable doesn't exist in this table. in the table and the replacement
 	 *         variable is of the same type, false
 	 */
-	public static boolean addReference(String func, String id, Variable var) throws TypeError
+	public static boolean addReference(String func, String id, Expression var) throws TypeError
 	{
-		HashMap<String, Variable> locRef = reference.get(func);
+		HashMap<String, Expression> locRef = reference.get(func);
 		if (!locRef.containsKey(id)) {
 			locRef.put(id, var);
 			return true;
 		}
 		else {
-			Variable existingVar = locRef.get(id);
+			Expression existingVar = locRef.get(id);
 			if (existingVar.getType() != var.getType())
 				throw new TypeError(id);
 			locRef.remove(id);
@@ -64,9 +68,13 @@ public final class SymbolTable
 			return false;
 		}
 	}
-	public static Variable getMember(String func, String id){
+	public static Expression getMember(String func, String id){
 		HashMap selfie= reference.get(func);
+<<<<<<< HEAD
 		return (Variable) selfie.get(id);
+=======
+		return (Expression) selfie.get(id);
+>>>>>>> Symbol table now takes expressions rather than variables
 	}
 	public static boolean memberExists(String func, String id){
 		boolean out=false;
