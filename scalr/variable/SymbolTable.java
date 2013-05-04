@@ -37,11 +37,7 @@ public final class SymbolTable
 	public Function getFuncRef(String id) throws FunctionDoesNotExistError{
 		if(!functionReferences.containsKey(id))
 			throw new FunctionDoesNotExistError(id);
-<<<<<<< HEAD
-		return (Function) functionReferences.get();
-=======
 		return (Function) functionReferences.get(id);
->>>>>>> fixing symbol table
 	}
 	
 	/**
@@ -70,7 +66,7 @@ public final class SymbolTable
 	}
 	public static Variable getMember(String func, String id){
 		HashMap selfie= reference.get(func);
-		return selfie.get(id);
+		return (Variable) selfie.get(id);
 	}
 	public static boolean memberExists(String func, String id){
 		boolean out=false;

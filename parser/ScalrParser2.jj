@@ -54,7 +54,7 @@ void assignment(): {
 	t1 = <ID> <ASSIGN> t2 = <INT> {
 		try {
 			SymbolTable.addFunc("blah");
-			ScalrNum n = new ScalrNum(Integer.parseInt(t1.image));
+			ScalrNum n = new ScalrNum(Integer.parseInt(t2.image));
 			SymbolTable.addReference("blah", t1.image, n);
 			ScalrNum temp = (ScalrNum) SymbolTable.getMember("blah", t1.image);
 		} catch (Exception e) {
