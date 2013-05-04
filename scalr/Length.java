@@ -3,7 +3,7 @@ package scalr;
 
 public enum Length {
 	whole("1"), half("1/2"), quarter("1/4"), eighth("1/8"), sixteenth("1/16"), thirtysec("1/32"),
-	eightT("1/12"), sixteenthT("1/24"), thirtysecT("1/48");
+	quarterT("1/6"), eighthT("1/12"), sixteenthT("1/24"), thirtysecT("1/48");
 	
 	public final String	duration;
 	

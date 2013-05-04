@@ -1,7 +1,9 @@
 
 package scalr.expression;
 
+import scalr.variable.Note;
 import scalr.variable.ScalrNum;
+import scalr.variable.Sequence;
 
 public class BinaryOperator implements Expression
 {
@@ -45,7 +47,20 @@ public class BinaryOperator implements Expression
 			        && expr2.getType() == ExpressionType.NUMBER) {
 				ScalrNum num1 = (ScalrNum) expr1.getValue();
 				ScalrNum num2 = (ScalrNum) expr2.getValue();
-				return new ScalrNum(num1.getNum() + num2.getNum());
+				return (cachedResult = new ScalrNum(num1.getNum() + num2.getNum()));
+			}
+			// They're both sequences (or notes)
+			else if (expr1.getType() == ExpressionType.SEQUENCE) {
+				
+			}
+			else if (expr2.getType() == ExpressionType.SEQUENCE) {
+				
+			}
+			else if (expr1.getType() == ExpressionType.NOTE
+			        && expr2.getType() == ExpressionType.NOTE) {
+				Note n1 = (Note) expr1.getValue();
+				Note n2 = (Note) expr2.getValue();
+				Sequence seq = new Sequence();
 			}
 		}
 		else if (operator.equals("-")) {
@@ -54,7 +69,7 @@ public class BinaryOperator implements Expression
 			        && expr2.getType() == ExpressionType.NUMBER) {
 				ScalrNum num1 = (ScalrNum) expr1.getValue();
 				ScalrNum num2 = (ScalrNum) expr2.getValue();
-				return new ScalrNum(num1.getNum() - num2.getNum());
+				return (cachedResult = new ScalrNum(num1.getNum() - num2.getNum()));
 			}
 		}
 		else if (operator.equals("*")) {
