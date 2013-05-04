@@ -155,6 +155,13 @@ ScalrNum num():
 t=<INT> {return new ScalrNum(Integer.parseInt(t.image));}
 }
 
+
+
+
+
+
+
+
 Expression operand(): {
 	Expression ex;
 	String t;
@@ -174,6 +181,13 @@ t=id() {return SymbolTable.getMember("blah", t);}
 | 
 ex=num() {return ex;}
 }
+
+
+
+
+
+
+
 
 Sequence funcall(): {
 	Sequence s;
@@ -216,6 +230,47 @@ ex= operand()
 ArrayList<Expression> parameters1(): {
 	ArrayList<Expression> out;
 } { "," out = parameters() {return out;}}
+
+
+
+
+
+
+
+
+void sequence(): {
+
+
+
+} {
+"[" "]"
+{
+
+
+
+
+}
+| "[" note() sequence1() "]" 
+{
+
+
+
+}
+| id() 
+{
+
+
+
+}
+}
+
+void sequence1(): {} {
+"," note() sequence1()
+| {}
+}
+
+
+
 
 
 
