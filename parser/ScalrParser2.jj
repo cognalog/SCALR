@@ -51,6 +51,19 @@ TOKEN: {
     	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")>
 	}
 	
+
+
+
+
+
+// *** FUNCTIONS ARE A MASSIVE PROBLEM ***
+// on return assign the name of the function to the expressions underneath it
+
+
+
+
+
+
 void assignment(): {
 	String t1;
 	Expression t2;
