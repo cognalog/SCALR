@@ -65,9 +65,12 @@ void tfunc(): {} { "func" "main()" block() }
 
 void fscalrFile(): {} { id() ".fscalr" }
 
-void fscalr(): {} { function() (fscalr2())* <EOF> }
+void fscalr(): {} { function() fscalr2() <EOF> }
 
-void fscalr2(): {} { /*("\n")+*/ function() }
+void fscalr2(): {} {
+function() fscalr2()
+| {}
+}
 
 void function(): {} {
 "func" id() "(" parameters() ")" fblock() {System.out.println("function matched");}
@@ -86,7 +89,7 @@ line1() sequence() "end" {System.out.println("fblock matched");}
 }
 
 void block(): {System.out.println("matching block:");} { 
-line() line1() "end" {System.out.println("block matched");}
+line1() "end" {System.out.println("block matched");}
 }
 
 void line(): {System.out.println("matching line:");} {
@@ -106,27 +109,28 @@ void loop(): {System.out.println("matching loop");} {
 }
 
 void booleanExpr(): {System.out.println("matching bool expr:");} {
-bE1() (booleanExpr1())*
+bE1() booleanExpr1() {System.out.println("bool expr matched"); }
 }
 
 void booleanExpr1(): {} {
-"and" bE1()
-| "or" bE1()
+"and" bE1() booleanExpr1() {System.out.println("logical AND matched");}
+| "or" bE1() booleanExpr1() {System.out.println("logical OR matched");}
+| {}
 }
 
 void bE1(): {System.out.println("matching bE1:");} {
-"not" booleanExpr()
-| "(" booleanExpr() ")"
+"not" booleanExpr() {System.out.println("not be matched");}
+| "(" booleanExpr() ")" {System.out.println("() be matched");}
 | expression() reln() expression() {System.out.println("comparison matched");}
 }
 
 void conditional (): {System.out.println("matching conditional:");} {
-"if" "(" booleanExpr() ")" (line())+ els3()
+"if" "(" booleanExpr() ")" line1() els3()
 | "if" "(" booleanExpr() ")" block()
 }
 
 void els3(): {System.out.println("matching else");} {
-"else" conditional() 
+"else" conditional()
 | "else" block()
 }
 
@@ -191,7 +195,8 @@ void note1(): {} {
 }
 
 void sequence(): {System.out.println("matching sequence:");} {
-"[" note() sequence1() "]" {System.out.println("Sequence is created here");}
+"[" "]"
+| "[" note() sequence1() "]" {System.out.println("Sequence is created here");}
 | id() {System.out.println("Sequence corresponds to an ID");}
 }
 
