@@ -19,7 +19,7 @@ public class ScalrParser {
 
             }
         ScalrParser parser = new ScalrParser(new java.io.StringReader(text));
-        SimpleNode root = parser.note();
+        SimpleNode root = parser.parameters();
         root.dump("");
         new BackendMain(root);
 	    System.out.println("grats, your program compiled alright");
@@ -63,14 +63,16 @@ void fscalr(): {} { function() (fscalr2())* <EOF> }
 void fscalr2(): {} { /*("\n")+*/ function() }
 
 void function(): {} {
-"func" id() "(" (parameters())? ")" fblock() {System.out.println("function matched");}
+"func" id() "(" parameters() ")" fblock() {System.out.println("function matched");}
 }
 
-void parameters(): {System.out.println("trying to match parameters:");} { 
-operand() (parameters1())* {System.out.println("Parameters matched");}
+SimpleNode parameters(): {System.out.println("trying to match parameters:");} { 
+expression() parameters1() {System.out.println("Parameters matched");}
+| {}
 }
 
-void parameters1(): {} { "," parameters() }
+void parameters1(): {} { "," parameters()
+| {} }
 
 void fblock(): {System.out.println("matching function block:");} {
 (line())* sequence() "end" {System.out.println("fblock matched");}
@@ -156,9 +158,9 @@ funcall()
 | num() {System.out.println("operand is int");}
 }
 
-void funcall(): {} { id() "(" (parameters())? ")" }
+void funcall(): {} { id() "(" parameters() ")" }
 
-SimpleNode note(): {System.out.println("matching note");} {
+void note(): {System.out.println("matching note");} {
 "note" note0() {System.out.println("note is created here");}
 | sequence() "[" expression() "]" {System.out.println("note is nth in a sequence");}
 | id() {System.out.println("note is an ID");}
