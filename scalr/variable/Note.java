@@ -11,7 +11,7 @@ import scalr.expression.ExpressionType;
 
 public class Note implements Variable
 {
-	Degree	                  pitch;
+	public Degree	          pitch;
 	int	                      volume;
 	Length	                  length;
 	

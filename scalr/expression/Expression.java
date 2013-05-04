@@ -19,6 +19,11 @@ import scalr.variable.Variable;
 public interface Expression
 {
 	/**
+	 * A field that indicates the function that this expression belongs to.
+	 */
+	public String	owner	= null;
+	
+	/**
 	 * Evaluates this expression and returns a variable that is the result of its operations. The
 	 * resulting {@linkplain Expression} should not have an operator: it should have a single child
 	 * which is the value of this expression.

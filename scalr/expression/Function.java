@@ -62,7 +62,9 @@ public class Function implements Expression
 	@Override
 	public Expression getValue(Expression... expressions)
 	{
-		// TODO Auto-generated method stub
+		for (int i = 0; i < statements.size(); i++) {
+			
+		}
 		return null;
 	}
 	
