@@ -149,14 +149,11 @@ Expression expr5(): {
 | ex = operand() {return ex;}
 }
 
-
 ScalrNum num():
 {Token t;}
 {
 t=<INT> {return new ScalrNum(Integer.parseInt(t.image));}
 }
-
-
 
 Expression operand(): {
 	Expression ex;
@@ -181,12 +178,15 @@ t = id() "(" ex = parameters() ")"
 {
 	Collections.reverse(ex);
 	Function f = SymbolTable.getFuncRef(t);
-	f.getValue(ex.toArray(new Expression[f.getSize()]));
+	s = f.getValue(ex.toArray(new Expression[f.getSize()]));
+	return s;
 }
 |
 t = id() 
 {
-
+	Function f = SymbolTable.getFuncRef(t);
+	s = f.getValue();
+	return s;
 }
 }
 
@@ -210,9 +210,3 @@ ex= operand()
 ArrayList<Expression> parameters1(): {
 	ArrayList<Expression> out;
 } { "," out = parameters() {return out;}}
-
-
-
-
-
-
