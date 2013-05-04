@@ -193,14 +193,15 @@ t = id() "(" ex = parameters() ")"
 {
 	Collections.reverse(ex);
 	Function f = SymbolTable.getFuncRef(t);
-	s = f.getValue(ex.toArray(new Expression[f.getSize()]));
+	Expression[] temp = ex.toArray(new Expression[ex.size()]);
+	s = (Sequence) f.getValue(temp);
 	return s;
 }
 |
 t = id() 
 {
 	Function f = SymbolTable.getFuncRef(t);
-	s = f.getValue();
+	s = (Sequence) f.getValue();
 	return s;
 }
 }
@@ -270,13 +271,16 @@ Note note(): {
 	Note n;
 	Sequence s;
 	Expression e;
+	String t;
+	Expression seq;
 } {
 "note" n = note0() 
 {
 	return n;
 }
-| s=sequence() "[" e=expression() "]" 
+| seq = sequence() "[" e=expression() "]" 
 {
+	s = (Sequence) seq;
 	ScalrNum sn= (ScalrNum) e.getValue();
 	n= s.getNote(sn.toString());
 	return n;
@@ -311,7 +315,7 @@ sa = note1() n = note0()
 | 
 {}
 {
-	return new Note();
+	return Note.note();
 }
 }
 
