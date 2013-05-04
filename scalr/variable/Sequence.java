@@ -22,6 +22,11 @@ public class Sequence implements Variable
 			theNotes.add(n);
 	}
 	
+	public void addSequence(Sequence seq)
+	{
+		theNotes.addAll(seq.theNotes);
+	}
+	
 	public void addNoteToEnd(Note e)
 	{
 		theNotes.add(e);

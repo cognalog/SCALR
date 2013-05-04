@@ -51,7 +51,17 @@ public class BinaryOperator implements Expression
 			}
 			// They're both sequences (or notes)
 			else if (expr1.getType() == ExpressionType.SEQUENCE) {
-				
+				Sequence s = (Sequence) ((Sequence) expr1.getValue()).getCopy();
+				if (expr2.getType() == ExpressionType.NOTE) {
+					Note n = (Note) ((Note) expr2.getValue()).getCopy();
+					s.addNoteToEnd(n);
+					return (cachedResult = s);
+				}
+				else if (expr2.getType() == ExpressionType.SEQUENCE) {
+					Sequence s2 = (Sequence) ((Sequence) expr2.getValue()).getCopy();
+					s.addSequence(s2);
+					return (cachedResult = s);
+				}
 			}
 			else if (expr2.getType() == ExpressionType.SEQUENCE) {
 				
@@ -60,7 +70,7 @@ public class BinaryOperator implements Expression
 			        && expr2.getType() == ExpressionType.NOTE) {
 				Note n1 = (Note) expr1.getValue();
 				Note n2 = (Note) expr2.getValue();
-				Sequence seq = new Sequence();
+				return (cachedResult = new Sequence(n1.getCopy(), n2.getCopy()));
 			}
 		}
 		else if (operator.equals("-")) {
