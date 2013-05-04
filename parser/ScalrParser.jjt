@@ -67,7 +67,7 @@ void function(): {} {
 }
 
 void parameters(): {System.out.println("trying to match parameters:");} { 
-id() (parameters1())* {System.out.println("Parameters matched");}
+operand() (parameters1())* {System.out.println("Parameters matched");}
 }
 
 void parameters1(): {} { "," parameters() }
@@ -156,7 +156,7 @@ funcall()
 | num() {System.out.println("operand is int");}
 }
 
-void funcall(): {} { id() "(" (operand())* ")" }
+void funcall(): {} { id() "(" (parameters())? ")" }
 
 void note(): {System.out.println("matching note");} {
 "note" (note1())* {System.out.println("note is created here");}
