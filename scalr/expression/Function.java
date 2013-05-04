@@ -9,7 +9,7 @@ import scalr.Exceptions.TypeError;
 import scalr.variable.SymbolTable;
 import scalr.variable.Variable;
 
-public class Function
+public class Function implements Expression
 {
 	
 	private String	                  id;
@@ -57,5 +57,18 @@ public class Function
 	public String toString()
 	{
 		return id;
+	}
+	
+	@Override
+	public Expression getValue(Expression... expressions)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public ExpressionType getType()
+	{
+		return ExpressionType.SEQUENCE;
 	}
 }

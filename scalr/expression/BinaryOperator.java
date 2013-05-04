@@ -93,16 +93,40 @@ public class BinaryOperator implements Expression
 			}
 		}
 		else if (operator.equals("*")) {
-			
+			// If they're both numbers:
+			if (expr1.getType() == ExpressionType.NUMBER
+			        && expr2.getType() == ExpressionType.NUMBER) {
+				ScalrNum num1 = (ScalrNum) expr1.getValue();
+				ScalrNum num2 = (ScalrNum) expr2.getValue();
+				return (cachedResult = new ScalrNum(num1.getNum() * num2.getNum()));
+			}
+			// One is a number and the other is a sequence
+			else if (expr1.getType() == ExpressionType.SEQUENCE
+			        && expr2.getType() == ExpressionType.NUMBER) {
+				Sequence s = (Sequence) ((Sequence) expr1.getValue()).getCopy();
+				
+			}
+			else if (expr1.getType() == ExpressionType.NUMBER
+			        && expr2.getType() == ExpressionType.SEQUENCE) {
+				Sequence s = (Sequence) ((Sequence) expr2.getValue()).getCopy();
+			}
 		}
 		else if (operator.equals("/")) {
-			
+			// Only valid for numbers
+			if (expr1.getType() == ExpressionType.NUMBER
+			        && expr2.getType() == ExpressionType.NUMBER) {
+				ScalrNum num1 = (ScalrNum) expr1.getValue();
+				ScalrNum num2 = (ScalrNum) expr2.getValue();
+				return (cachedResult = new ScalrNum(Math.round(num1.getNum() / num2.getNum())));
+			}
 		}
 		else if (operator.equals("%")) {
 			// Only valid for numbers
 			if (expr1.getType() == ExpressionType.NUMBER
 			        && expr2.getType() == ExpressionType.NUMBER) {
-				
+				ScalrNum num1 = (ScalrNum) expr1.getValue();
+				ScalrNum num2 = (ScalrNum) expr2.getValue();
+				return (cachedResult = new ScalrNum(num1.getNum() % num2.getNum()));
 			}
 		}
 		// This should never be reached, but hopefully screws over some invalid syntax and causes an
