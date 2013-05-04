@@ -35,7 +35,7 @@ public final class SymbolTable
 	public static void addFuncRef(Function f){
 		functionReferences.put(f.getName(), f);
 	}
-	public Function getFuncRef(String id) throws FunctionDoesNotExistError{
+	public static Function getFuncRef(String id) throws FunctionDoesNotExistError{
 		if(!functionReferences.containsKey(id))
 			throw new FunctionDoesNotExistError(id);
 
