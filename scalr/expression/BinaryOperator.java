@@ -104,11 +104,13 @@ public class BinaryOperator implements Expression
 			else if (expr1.getType() == ExpressionType.SEQUENCE
 			        && expr2.getType() == ExpressionType.NUMBER) {
 				Sequence s = (Sequence) ((Sequence) expr1.getValue()).getCopy();
+				ScalrNum num = (ScalrNum) expr2.getValue();
 				
 			}
 			else if (expr1.getType() == ExpressionType.NUMBER
 			        && expr2.getType() == ExpressionType.SEQUENCE) {
 				Sequence s = (Sequence) ((Sequence) expr2.getValue()).getCopy();
+				ScalrNum num = (ScalrNum) expr1.getValue();
 			}
 		}
 		else if (operator.equals("/")) {

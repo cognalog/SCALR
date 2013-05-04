@@ -27,6 +27,14 @@ public class Sequence implements Variable
 		return theNotes.get(Integer.parseInt(index));
 	}
 	
+	public void extend(int ext)
+	{
+		ArrayList<Note> extendedNotes = new ArrayList<Note>(theNotes.size() * ext + 10);
+		for (int i = 0; i < ext; i++) {
+			
+		}
+	}
+	
 	public void addSequence(Sequence seq)
 	{
 		theNotes.addAll(seq.theNotes);
