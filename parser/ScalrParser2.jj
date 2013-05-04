@@ -8,6 +8,8 @@ package parser;
 import java.io.*;
 import scalr.variable.*;
 import scalr.Exceptions.*;
+import tuple.*;
+import scalr.expression.*;
 
 public class ScalrParser2 {
     public static void main(String[] args) throws TypeError {
@@ -49,13 +51,13 @@ TOKEN: {
 	
 void assignment(): {
 	String t1;
-	Token t2;
+	Expression t2;
 } {
-	t1=id() <ASSIGN> expression(){
+	t1=id() <ASSIGN> t2=expression(){
 		try {
 			SymbolTable.addFunc("blah");
-			ScalrNum n = new ScalrNum(Integer.parseInt(t2.image));
-			SymbolTable.addReference("blah", t1, n);
+			//ScalrNum n = new ScalrNum(Integer.parseInt(t2.image));
+			SymbolTable.addReference("blah", t1, t2);
 			ScalrNum temp = (ScalrNum) SymbolTable.getMember("blah", t1);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -65,42 +67,106 @@ void assignment(): {
 String id():
 {Token t;}
 {
-t=<ID> {return t.image;}
+t=<ID> {return t.image;}  //blah should be changed with the string that shows in which function we ARE!!!
 }
 
-BinaryOperator expression(): {System.out.println("matching expr");} {
-expr1() (expr0())*
+Expression expression(): {
+	Expression ex;
+	Pair<String, Expression> t;
+} 
+{
+ex=expr1() t=expr0()
+{
+	BinaryOperator out = new BinaryOperator(t.getValue0());
+	out.addOperand(ex);
+	out.addOperand(t.getValue1());
+	return out;
+}
+|
+ex= expr1()
+{
+	return ex;
+}
 }
 
-void expr0(): {} {
-"+" expr1() { jjtThis.value = "+"; }
-| "-" expr1() { jjtThis.value = "-"; }
+
+Pair<String, Expression> expr0(): {Expression e;} {
+"+" e=expr1() { return Pair.with("+", e); }
+| "-" e=expr1() { return Pair.with("-", e); }
 }
 
-void expr1(): {} { expr3() (expr2())* }
-
-void expr2(): {} {
-"*" expr3() { jjtThis.value = "*"; }
-| "/" expr3() { jjtThis.value = "/"; }
+Expression expr1(): {
+	Expression ex;
+	Pair<String, Expression> t;
+} { ex=expr3() t=expr2() 
+{
+	BinaryOperator out = new BinaryOperator(t.getValue0());
+	out.addOperand(ex);
+	out.addOperand(t.getValue1());
+	return out;
+}
+|
+ex= expr3()
+{
+	return ex;
+}
 }
 
-void expr3(): {} {expr5() (expr4())*}
-
-void expr4(): {} {
-	"%" expr5() { jjtThis.value = "%"; }
+Pair<String, Expression> expr2(): {Expression e;} {
+"*" e=expr3() { return Pair.with("*", e); }
+| "/" e=expr3() { return Pair.with("/", e); }
 }
 
-void expr5(): {} {
-"(" expression() ")" 
-| operand()
+Expression expr3(): {
+	Expression ex;
+	Pair<String, Expression> t;
+} {ex = expr5() t=expr4()
+{
+	BinaryOperator out = new BinaryOperator(t.getValue0());
+	out.addOperand(ex);
+	out.addOperand(t.getValue1());
+	return out;
+}
+|
+ex= expr5()
+{
+	return ex;
+}
 }
 
-void operand(): {System.out.println("matching operand:");} {
-funcall()
-| id() {System.out.println("operand is id ");}
-| note() {System.out.println("operand is note");}
-| sequence() {System.out.println("operand is sequence");}
-| num() {System.out.println("operand is int");}
+Pair<String, Expression> expr4(): {
+	Expression ex;
+} {
+	"%" ex = expr5() { return Pair.with("%", ex); }
+}
+
+Expression expr5(): {
+	Expression ex;
+} {
+"(" ex = expression() ")" {return ex;}
+| ex = operand() {return ex;}
+}
+
+
+ScalrNum num():
+{Token t;}
+{
+t=<INT> {return new ScalrNum(Integer.parseInt(t.image));}
+}
+
+
+
+Expression operand(): {
+	Expression ex;
+	String t;
+} {
+//funcall()
+//| 
+t=id() {return SymbolTable.getMember("blah", t);}
+//| note() {System.out.println("operand is note");}
+//| sequence() {System.out.println("operand is sequence");}
+| 
+ex=num() {return ex;}
 }
 
 

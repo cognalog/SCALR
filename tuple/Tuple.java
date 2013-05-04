@@ -1,4 +1,4 @@
-package scalr.tuple;
+package tuple;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -15,6 +15,7 @@ import scalr.expression.*;
  */
 public final class SymbolTable
 {
+	public static String currentFunctionScope="";
 	public static final HashMap<String, Function> functionReferences= new HashMap<String, Function>();
 	public static final HashMap<String, HashMap<String, Expression>>	reference	=
 	                                                                                  new HashMap<String, HashMap<String, Expression>>();
@@ -66,7 +67,7 @@ public final class SymbolTable
 		}
 	}
 	public static Expression getMember(String func, String id){
-		HashMap selfie= reference.get(func);
+		HashMap<String, Expression> selfie= reference.get(func);
 
 		return (Expression) selfie.get(id);
 
@@ -74,7 +75,7 @@ public final class SymbolTable
 	public static boolean memberExists(String func, String id){
 		boolean out=false;
 		if(reference.containsKey(func)){
-			HashMap temp = reference.get(func);
+			HashMap<String, Expression> temp = reference.get(func);
 			if(temp.containsKey(id)){
 				out=true;
 			}
