@@ -19,7 +19,7 @@ public class ScalrParser {
 
             }
         ScalrParser parser = new ScalrParser(new java.io.StringReader(text));
-        SimpleNode root = parser.scalr();
+        SimpleNode root = parser.note();
         root.dump("");
         new BackendMain(root);
 	    System.out.println("grats, your program compiled alright");
@@ -158,10 +158,15 @@ funcall()
 
 void funcall(): {} { id() "(" (parameters())? ")" }
 
-void note(): {System.out.println("matching note");} {
-"note" (note1())* {System.out.println("note is created here");}
+SimpleNode note(): {System.out.println("matching note");} {
+"note" note0() {System.out.println("note is created here");}
 | sequence() "[" expression() "]" {System.out.println("note is nth in a sequence");}
 | id() {System.out.println("note is an ID");}
+}
+
+void note0(): {} {
+note1() note0()
+| {}
 }
 
 void note1(): {} {
