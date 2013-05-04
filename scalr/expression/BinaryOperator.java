@@ -64,7 +64,17 @@ public class BinaryOperator implements Expression
 				}
 			}
 			else if (expr2.getType() == ExpressionType.SEQUENCE) {
-				
+				Sequence s = (Sequence) ((Sequence) expr2.getValue()).getCopy();
+				if (expr1.getType() == ExpressionType.NOTE) {
+					Note n = (Note) ((Note) expr1.getValue()).getCopy();
+					s.addNoteToEnd(n);
+					return (cachedResult = s);
+				}
+				else if (expr1.getType() == ExpressionType.SEQUENCE) {
+					Sequence s2 = (Sequence) ((Sequence) expr1.getValue()).getCopy();
+					s.addSequence(s2);
+					return (cachedResult = s);
+				}
 			}
 			else if (expr1.getType() == ExpressionType.NOTE
 			        && expr2.getType() == ExpressionType.NOTE) {
@@ -89,7 +99,11 @@ public class BinaryOperator implements Expression
 			
 		}
 		else if (operator.equals("%")) {
-			
+			// Only valid for numbers
+			if (expr1.getType() == ExpressionType.NUMBER
+			        && expr2.getType() == ExpressionType.NUMBER) {
+				
+			}
 		}
 		// This should never be reached, but hopefully screws over some invalid syntax and causes an
 		// error

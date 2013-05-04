@@ -32,6 +32,14 @@ public class Sequence implements Variable
 		theNotes.add(e);
 	}
 	
+	public void addNoteToStart(Note e)
+	{
+		if (theNotes.size() > 0)
+			theNotes.add(0, e);
+		else
+			theNotes.add(e);
+	}
+	
 	public void deleteLeftmost()
 	{
 		theNotes.remove(0);
