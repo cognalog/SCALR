@@ -239,7 +239,7 @@ Expression sequence(): {
 }
 | "[" n = note() s = sequence1() "]" 
 {
-	s.addToStart(n);
+	s.addNoteToStart(n);
 	return s;
 }
 | id = id() 
@@ -256,7 +256,7 @@ Sequence sequence1(): {
 } {
 "," n = note() s = sequence1()
 {
-	s.addToStart(n);
+	s.addNoteToStart(n);
 	return s;
 }
 | {}
@@ -269,6 +269,7 @@ Sequence sequence1(): {
 Note note(): {
 	Note n;
 	Sequence s;
+	Expression e;
 } {
 "note" n = note0() 
 {
@@ -303,7 +304,7 @@ sa = note1() n = note0()
 		out = n.volume(sa[1]);
 	}
 	if(s.equals("duration")){
-		out = n.duration(sa[1]);
+		out = n.length(sa[1]);
 	}
 	return out;
 }
