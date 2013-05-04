@@ -51,6 +51,19 @@ TOKEN: {
     	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")>
 	}
 	
+
+
+
+
+
+// *** FUNCTIONS ARE A MASSIVE PROBLEM ***
+// on return assign the name of the function to the expressions underneath it
+
+
+
+
+
+
 void assignment(): {
 	String t1;
 	Expression t2;
@@ -155,13 +168,6 @@ ScalrNum num():
 t=<INT> {return new ScalrNum(Integer.parseInt(t.image));}
 }
 
-
-
-
-
-
-
-
 Expression operand(): {
 	Expression ex;
 	String t;
@@ -170,24 +176,13 @@ Expression operand(): {
 s = funcall() {return s;}
 | 
 t=id() {return SymbolTable.getMember("blah", t);}
-| note() 
+| ex = note() 
 {
-
-
-
-
+	return ex;
 }
-//| sequence() {System.out.println("operand is sequence");}
-| 
-ex=num() {return ex;}
+| ex = sequence() {return ex;}
+| ex=num() {return ex;}
 }
-
-
-
-
-
-
-
 
 Sequence funcall(): {
 	Sequence s;
@@ -271,17 +266,6 @@ Sequence sequence1(): {
 }
 }
 
-
-
-
-
-
-
-
-
-
-
-
 Note note(): {
 	Note n;
 	Sequence s;
@@ -290,26 +274,18 @@ Note note(): {
 {
 	return n;
 }
-| sequence() "[" expression() "]" 
+| s=sequence() "[" e=expression() "]" 
 {
-
-
-
+	ScalrNum sn= (ScalrNum) e.getValue();
+	n= s.getNote(sn.toString());
+	return n;
 }
 | t = id() 
 {
-
-
-
+	n = (Note) SymbolTable.getMember("blah", t);
+	return n;
 }
 }
-
-
-
-
-
-
-
 
 Note note0(): {
 	String[] sa;
@@ -352,7 +328,7 @@ String[] note1(): {
 	| n = note() {s = n.pitch.toString();} 
 	| ex = expression() {ex2 = ex.getValue(); s = ex2.toString();}) ")"
 {
-	sa = new Sting[2];
+	sa = new String[2];
 	sa[0] = "pitch";
 	sa[1] = s;
 	return sa;
@@ -362,7 +338,7 @@ String[] note1(): {
 	| "-" ex = expr5() {ex2 = ex.getValue(); s = "-" + ex2.toString();} 
 	| ex = expression() {ex2 = ex.getValue(); s = ex2.toString();}) ")"
 {
-	sa = new Sting[2];
+	sa = new String[2];
 	sa[0] = "volume";
 	sa[1] = s;
 	return sa;
@@ -372,7 +348,7 @@ String[] note1(): {
 	| "-" ex = expr5() {ex2 = ex.getValue(); s = "-" + ex2.toString();} 
 	| ex = expression() {ex2 = ex.getValue(); s = ex2.toString();}) ")"
 {
-	sa = new Sting[2];
+	sa = new String[2];
 	sa[0] = "duration";
 	sa[1] = s;
 	return sa;
@@ -381,7 +357,7 @@ String[] note1(): {
 	| s = "sixteenth" | s = "thirtysec" | s = "eightT" | s = "sixteenthT" 
 	| s = "thirtysecT")
 {
-	sa = new Sting[2];
+	sa = new String[2];
 	sa[0] = "duration";
 	sa[1] = s;
 	return sa;
