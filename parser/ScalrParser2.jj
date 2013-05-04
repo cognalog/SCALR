@@ -231,42 +231,44 @@ ArrayList<Expression> parameters1(): {
 	ArrayList<Expression> out;
 } { "," out = parameters() {return out;}}
 
-
-
-
-
-
-
-
-void sequence(): {
-
-
+Expression sequence(): {
+	Sequence s;
+	Note n;
+	String id;
 
 } {
 "[" "]"
 {
-
-
-
-
+	s = new Sequence();
+	return s;
 }
-| "[" note() sequence1() "]" 
+| "[" n = note() s = sequence1() "]" 
 {
-
-
-
+	s.addToStart(n);
+	return s;
 }
-| id() 
+| id = id() 
 {
-
-
-
+	Expression e = SymbolTable.getMember("blah", id);
+	return e;
 }
 }
 
-void sequence1(): {} {
-"," note() sequence1()
+Sequence sequence1(): {
+	Sequence s;
+	Note n;
+
+} {
+"," n = note() s = sequence1()
+{
+	s.addToStart(n);
+	return s;
+}
 | {}
+{
+	s = new Sequence();
+	return s;
+}
 }
 
 
@@ -282,6 +284,7 @@ void sequence1(): {} {
 
 Note note(): {
 	Note n;
+	Sequence s;
 } {
 "note" n = note0() 
 {
@@ -300,6 +303,13 @@ Note note(): {
 
 }
 }
+
+
+
+
+
+
+
 
 Note note0(): {
 	String[] sa;
