@@ -10,6 +10,8 @@ import scalr.variable.*;
 import scalr.Exceptions.*;
 import tuple.*;
 import scalr.expression.*;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class ScalrParser2 {
     public static void main(String[] args) throws TypeError {
@@ -159,9 +161,10 @@ t=<INT> {return new ScalrNum(Integer.parseInt(t.image));}
 Expression operand(): {
 	Expression ex;
 	String t;
+	Sequence s;
 } {
-//funcall()
-//| 
+s = funcall() {return s;}
+| 
 t=id() {return SymbolTable.getMember("blah", t);}
 //| note() {System.out.println("operand is note");}
 //| sequence() {System.out.println("operand is sequence");}
@@ -169,7 +172,44 @@ t=id() {return SymbolTable.getMember("blah", t);}
 ex=num() {return ex;}
 }
 
+Sequence funcall(): {
+	Sequence s;
+	String t;
+	ArrayList<Expression> ex;
+} { 
+t = id() "(" ex = parameters() ")" 
+{
+	Collections.reverse(ex);
+	Function f = SymbolTable.getFuncRef(t);
+	f.getValue(ex.toArray(new Expression[f.getSize()]));
+}
+|
+t = id() 
+{
 
+}
+}
+
+ArrayList<Expression> parameters(): {
+	Expression ex;
+	ArrayList<Expression> ex2;
+} { 
+ex = operand() ex2 = parameters1() 
+{
+	ex2.add(ex);
+}
+|
+ex= operand()
+{
+	ex2 = new ArrayList<Expression>();
+	ex2.add(ex);
+	return ex2;
+}
+}
+
+ArrayList<Expression> parameters1(): {
+	ArrayList<Expression> out;
+} { "," out = parameters() {return out;}}
 
 
 

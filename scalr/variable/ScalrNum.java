@@ -35,7 +35,7 @@ public class ScalrNum implements Variable
 	}
 	
 	@Override
-	public Expression getValue()
+	public Expression getValue(Expression... expressions)
 	{
 		return this;
 	}
