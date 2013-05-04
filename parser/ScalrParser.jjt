@@ -19,7 +19,7 @@ public class ScalrParser {
 
             }
         ScalrParser parser = new ScalrParser(new java.io.StringReader(text));
-        SimpleNode root = parser.fblock();
+        SimpleNode root = parser.scalr();
         root.dump("");
         new BackendMain(root);
 	    System.out.println("grats, your program compiled alright");
@@ -50,9 +50,16 @@ SimpleNode scalr(): {} {
 tscalr() {return jjtThis;}
 | fscalr() {return jjtThis;} }
 
-void tscalr(): {} { (imp())+ tfunc() (track())+ }
+void tscalr(): {} { imp1() tfunc() track() track1()}
 
-void imp(): {} { "import" "\"" fscalrFile() }
+void imp(): {} { 
+"import" "\"" fscalrFile() "\"" {System.out.println("import statement matched");}
+}
+
+void imp1(): {} { 
+imp() imp1()
+| {}
+}
 
 void tfunc(): {} { "func" "main()" block() }
 
@@ -74,7 +81,7 @@ expression() parameters1() {System.out.println("Parameters matched");}
 void parameters1(): {} { "," parameters()
 | {} }
 
-SimpleNode fblock(): {System.out.println("matching function block:");} {
+void fblock(): {System.out.println("matching function block:");} {
 line1() sequence() "end" {System.out.println("fblock matched");}
 }
 
@@ -158,8 +165,8 @@ void expr5(): {} {
 void operand(): {System.out.println("matching operand:");} {
 funcall()
 | id() {System.out.println("operand is id ");}
-| note() {System.out.println("operand is note");}
 | sequence() {System.out.println("operand is sequence");}
+| note() {System.out.println("operand is note");}
 | num() {System.out.println("operand is int");}
 }
 
@@ -184,14 +191,22 @@ void note1(): {} {
 }
 
 void sequence(): {System.out.println("matching sequence:");} {
-"[" (note() (sequence1())*)? "]" {System.out.println("Sequence is created here");}
+"[" note() sequence1() "]" {System.out.println("Sequence is created here");}
 | id() {System.out.println("Sequence corresponds to an ID");}
 }
 
-void sequence1(): {} {"," /*("\n")**/ note()}
+void sequence1(): {} {
+"," note() sequence1()
+| {}
+}
 
 void track(): {} {
 "track" "->" sequence()
+}
+
+void track1(): {} {
+track() track1()
+| {}
 }
 
 void id():
