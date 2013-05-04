@@ -19,7 +19,7 @@ public class ScalrParser {
 
             }
         ScalrParser parser = new ScalrParser(new java.io.StringReader(text));
-        SimpleNode root = parser.parameters();
+        SimpleNode root = parser.fblock();
         root.dump("");
         new BackendMain(root);
 	    System.out.println("grats, your program compiled alright");
@@ -66,7 +66,7 @@ void function(): {} {
 "func" id() "(" parameters() ")" fblock() {System.out.println("function matched");}
 }
 
-SimpleNode parameters(): {System.out.println("trying to match parameters:");} { 
+void parameters(): {System.out.println("trying to match parameters:");} { 
 expression() parameters1() {System.out.println("Parameters matched");}
 | {}
 }
@@ -74,18 +74,23 @@ expression() parameters1() {System.out.println("Parameters matched");}
 void parameters1(): {} { "," parameters()
 | {} }
 
-void fblock(): {System.out.println("matching function block:");} {
-(line())* sequence() "end" {System.out.println("fblock matched");}
+SimpleNode fblock(): {System.out.println("matching function block:");} {
+line1() sequence() "end" {System.out.println("fblock matched");}
 }
 
 void block(): {System.out.println("matching block:");} { 
-(line())+ "end" {System.out.println("block matched");}
+line() line1() "end" {System.out.println("block matched");}
 }
 
 void line(): {System.out.println("matching line:");} {
 loop() {System.out.println("loop line matched");}
 | conditional() {System.out.println("conditional line matched");}
 | assignment() {System.out.println("assignment line matched");}
+}
+
+void line1(): {} {
+line() line1()
+| {}
 }
 
 void loop(): {System.out.println("matching loop");} {
