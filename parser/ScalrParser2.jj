@@ -149,14 +149,11 @@ Expression expr5(): {
 | ex = operand() {return ex;}
 }
 
-
 ScalrNum num():
 {Token t;}
 {
 t=<INT> {return new ScalrNum(Integer.parseInt(t.image));}
 }
-
-
 
 Expression operand(): {
 	Expression ex;
@@ -166,7 +163,13 @@ Expression operand(): {
 s = funcall() {return s;}
 | 
 t=id() {return SymbolTable.getMember("blah", t);}
-//| note() {System.out.println("operand is note");}
+| note() 
+{
+
+
+
+
+}
 //| sequence() {System.out.println("operand is sequence");}
 | 
 ex=num() {return ex;}
@@ -181,12 +184,15 @@ t = id() "(" ex = parameters() ")"
 {
 	Collections.reverse(ex);
 	Function f = SymbolTable.getFuncRef(t);
-	f.getValue(ex.toArray(new Expression[f.getSize()]));
+	s = f.getValue(ex.toArray(new Expression[f.getSize()]));
+	return s;
 }
 |
 t = id() 
 {
-
+	Function f = SymbolTable.getFuncRef(t);
+	s = f.getValue();
+	return s;
 }
 }
 
@@ -216,3 +222,59 @@ ArrayList<Expression> parameters1(): {
 
 
 
+
+
+
+Variable note(): {
+
+
+
+} {
+"note" note0() 
+{
+
+
+}
+| sequence() "[" expression() "]" 
+{
+
+
+
+}
+| t = id() 
+{
+
+
+
+}
+}
+
+void note0(): {
+
+} {
+note1() note0()
+{
+
+
+
+}
+| 
+{}
+{
+
+
+
+}
+}
+
+void note1(): {
+	Note n;
+	Expression ex;
+
+
+} {
+"." "pitch" "(" ( ex = degree() | "+" ex = expr5() | "-" ex = expr5() | note() | expression()) ")"
+| "." "volume" "(" ("+" expr5() | "-" expr5() | expression()) ")"
+| "." "duration" "(" ("+" expr5() | "-" expr5() | expression()) ")"
+| "." ("quarter" | "half" | "whole")
+}

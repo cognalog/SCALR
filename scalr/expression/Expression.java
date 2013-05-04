@@ -24,7 +24,7 @@ public interface Expression
 	 * which is the value of this expression.
 	 * @return The variable representing the result of this expression.
 	 */
-	public Expression getValue();
+	public Expression getValue(Expression... expressions);
 	
 	/**
 	 * Returns the {@linkplain ExpressionType} of this {@linkplain Expression}. If this returns
