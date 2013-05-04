@@ -225,15 +225,12 @@ ArrayList<Expression> parameters1(): {
 
 
 
-Variable note(): {
-
-
-
+Note note(): {
+	Note n;
 } {
-"note" note0() 
+"note" n = note0() 
 {
-
-
+	return n;
 }
 | sequence() "[" expression() "]" 
 {
@@ -249,32 +246,85 @@ Variable note(): {
 }
 }
 
-void note0(): {
-
+Note note0(): {
+	String[] sa;
+	Note n;
+	Note out;
 } {
-note1() note0()
+sa = note1() n = note0()
 {
-
-
-
+	out = null;
+	String s = sa[0];
+	if(s.equals("pitch")){
+		out = n.pitch(sa[1]);
+	}
+	if(s.equals("volume")){
+		out = n.volume(sa[1]);
+	}
+	if(s.equals("duration")){
+		out = n.duration(sa[1]);
+	}
+	return out;
 }
 | 
 {}
 {
-
-
-
+	return new Note();
 }
 }
 
-void note1(): {
+String[] note1(): {
 	Note n;
 	Expression ex;
-
+	Expression ex2;
+	String s;
+	String[] sa;
 
 } {
-"." "pitch" "(" ( ex = degree() | "+" ex = expr5() | "-" ex = expr5() | note() | expression()) ")"
-| "." "volume" "(" ("+" expr5() | "-" expr5() | expression()) ")"
-| "." "duration" "(" ("+" expr5() | "-" expr5() | expression()) ")"
-| "." ("quarter" | "half" | "whole")
+"." "pitch" "(" ( s = degree() {} 
+	| "+" ex = expr5() {ex2 = ex.getValue(); s = "+" + ex2.toString();}
+	| "-" ex = expr5() {ex2 = ex.getValue(); s = "-" + ex2.toString();}
+	| n = note() {s = n.pitch.toString();} 
+	| ex = expression() {ex2 = ex.getValue(); s = ex2.toString();}) ")"
+{
+	sa = new Sting[2];
+	sa[0] = "pitch";
+	sa[1] = s;
+	return sa;
+}
+| "." "volume" "(" (
+	"+" ex = expr5() {ex2 = ex.getValue(); s = "+" + ex2.toString();}
+	| "-" ex = expr5() {ex2 = ex.getValue(); s = "-" + ex2.toString();} 
+	| ex = expression() {ex2 = ex.getValue(); s = ex2.toString();}) ")"
+{
+	sa = new Sting[2];
+	sa[0] = "volume";
+	sa[1] = s;
+	return sa;
+}
+| "." "duration" "(" (
+	"+" ex = expr5() {ex2 = ex.getValue(); s = "+" + ex2.toString();}
+	| "-" ex = expr5() {ex2 = ex.getValue(); s = "-" + ex2.toString();} 
+	| ex = expression() {ex2 = ex.getValue(); s = ex2.toString();}) ")"
+{
+	sa = new Sting[2];
+	sa[0] = "duration";
+	sa[1] = s;
+	return sa;
+}
+| "." (s = "quarter" | s = "half" | s = "whole" | s = "eighth" 
+	| s = "sixteenth" | s = "thirtysec" | s = "eightT" | s = "sixteenthT" 
+	| s = "thirtysecT")
+{
+	sa = new Sting[2];
+	sa[0] = "duration";
+	sa[1] = s;
+	return sa;
+}
+}
+
+String degree():
+{Token t;}
+{
+t=<DEGREE> {return t.image;}
 }
