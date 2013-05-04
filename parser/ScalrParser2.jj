@@ -163,7 +163,13 @@ Expression operand(): {
 s = funcall() {return s;}
 | 
 t=id() {return SymbolTable.getMember("blah", t);}
-//| note() {System.out.println("operand is note");}
+| note() 
+{
+
+
+
+
+}
 //| sequence() {System.out.println("operand is sequence");}
 | 
 ex=num() {return ex;}
@@ -210,3 +216,65 @@ ex= operand()
 ArrayList<Expression> parameters1(): {
 	ArrayList<Expression> out;
 } { "," out = parameters() {return out;}}
+
+
+
+
+
+
+
+
+
+Variable note(): {
+
+
+
+} {
+"note" note0() 
+{
+
+
+}
+| sequence() "[" expression() "]" 
+{
+
+
+
+}
+| t = id() 
+{
+
+
+
+}
+}
+
+void note0(): {
+
+} {
+note1() note0()
+{
+
+
+
+}
+| 
+{}
+{
+
+
+
+}
+}
+
+void note1(): {
+	Note n;
+	Expression ex;
+
+
+} {
+"." "pitch" "(" ( ex = degree() | "+" ex = expr5() | "-" ex = expr5() | note() | expression()) ")"
+| "." "volume" "(" ("+" expr5() | "-" expr5() | expression()) ")"
+| "." "duration" "(" ("+" expr5() | "-" expr5() | expression()) ")"
+| "." ("quarter" | "half" | "whole")
+}
