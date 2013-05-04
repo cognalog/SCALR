@@ -328,7 +328,7 @@ String[] note1(): {
 	| n = note() {s = n.pitch.toString();} 
 	| ex = expression() {ex2 = ex.getValue(); s = ex2.toString();}) ")"
 {
-	sa = new Sting[2];
+	sa = new String[2];
 	sa[0] = "pitch";
 	sa[1] = s;
 	return sa;
@@ -338,7 +338,7 @@ String[] note1(): {
 	| "-" ex = expr5() {ex2 = ex.getValue(); s = "-" + ex2.toString();} 
 	| ex = expression() {ex2 = ex.getValue(); s = ex2.toString();}) ")"
 {
-	sa = new Sting[2];
+	sa = new String[2];
 	sa[0] = "volume";
 	sa[1] = s;
 	return sa;
@@ -348,7 +348,7 @@ String[] note1(): {
 	| "-" ex = expr5() {ex2 = ex.getValue(); s = "-" + ex2.toString();} 
 	| ex = expression() {ex2 = ex.getValue(); s = ex2.toString();}) ")"
 {
-	sa = new Sting[2];
+	sa = new String[2];
 	sa[0] = "duration";
 	sa[1] = s;
 	return sa;
@@ -357,7 +357,7 @@ String[] note1(): {
 	| s = "sixteenth" | s = "thirtysec" | s = "eightT" | s = "sixteenthT" 
 	| s = "thirtysecT")
 {
-	sa = new Sting[2];
+	sa = new String[2];
 	sa[0] = "duration";
 	sa[1] = s;
 	return sa;
