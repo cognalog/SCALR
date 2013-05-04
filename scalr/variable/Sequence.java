@@ -30,27 +30,29 @@ public class Sequence implements Variable
 	public void extend(int ext)
 	{
 		ArrayList<Note> extendedNotes = new ArrayList<Note>(theNotes.size() * ext + 10);
-		for (int i = 0; i < ext; i++) {
-			
-		}
+		for (int i = 0; i < ext; i++)
+			for (Note n : theNotes)
+				extendedNotes.add(n.getCopy());
+		theNotes = extendedNotes;
 	}
 	
 	public void addSequence(Sequence seq)
 	{
-		theNotes.addAll(seq.theNotes);
+		for (Note n : seq.theNotes)
+			theNotes.add(n.getCopy());
 	}
 	
 	public void addNoteToEnd(Note e)
 	{
-		theNotes.add(e);
+		theNotes.add(e.getCopy());
 	}
 	
 	public void addNoteToStart(Note e)
 	{
 		if (theNotes.size() > 0)
-			theNotes.add(0, e);
+			theNotes.add(0, e.getCopy());
 		else
-			theNotes.add(e);
+			theNotes.add(e.getCopy());
 	}
 	
 	public void deleteLeftmost()
