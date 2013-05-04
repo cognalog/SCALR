@@ -15,6 +15,7 @@ public class VariableTester
 		System.out.println(note);
 		System.out.println(note.pitch("+2").volume("+10"));
 		System.out.println(note.length("1/8"));
+		System.out.println(note.pitch("a5"));
 	}
 	
 }

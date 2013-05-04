@@ -1,12 +1,15 @@
 
 package scalr.expression;
 
+import scalr.variable.ScalrNum;
+
 public class BinaryOperator implements Expression
 {
 	ExpressionType	exprType;
 	Expression	   expr1;
 	Expression	   expr2;
 	String	       operator;
+	Expression	   cachedResult;
 	
 	/**
 	 * As defined in section 7.5 of our LRM, the plus operator is defined for numbers, sequences
@@ -27,10 +30,44 @@ public class BinaryOperator implements Expression
 			expr2 = expr;
 	}
 	
+	/**
+	 * This implements the semantic actions of sections 7.4 and 7.5. The getType() method was
+	 * written first, and this it shows the pattern that this method will follow.
+	 */
 	@Override
 	public Expression getValue(Expression... expressions)
 	{
-		// TODO Auto-generated method stub
+		if (cachedResult != null)
+			return cachedResult;
+		if (operator.equals("+")) {
+			// They're both numbers
+			if (expr1.getType() == ExpressionType.NUMBER
+			        && expr2.getType() == ExpressionType.NUMBER) {
+				ScalrNum num1 = (ScalrNum) expr1.getValue();
+				ScalrNum num2 = (ScalrNum) expr2.getValue();
+				return new ScalrNum(num1.getNum() + num2.getNum());
+			}
+		}
+		else if (operator.equals("-")) {
+			// Only valid for numbers
+			if (expr1.getType() == ExpressionType.NUMBER
+			        && expr2.getType() == ExpressionType.NUMBER) {
+				ScalrNum num1 = (ScalrNum) expr1.getValue();
+				ScalrNum num2 = (ScalrNum) expr2.getValue();
+				return new ScalrNum(num1.getNum() - num2.getNum());
+			}
+		}
+		else if (operator.equals("*")) {
+			
+		}
+		else if (operator.equals("/")) {
+			
+		}
+		else if (operator.equals("%")) {
+			
+		}
+		// This should never be reached, but hopefully screws over some invalid syntax and causes an
+		// error
 		return null;
 	}
 	

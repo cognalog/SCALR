@@ -18,7 +18,7 @@ public class AssignmentOperator implements Expression
 	}
 	
 	@Override
-	public Expression getValue()
+	public Expression getValue(Expression... expressions)
 	{
 		// TODO Auto-generated method stub
 		return null;

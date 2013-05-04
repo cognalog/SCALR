@@ -18,6 +18,11 @@ public class ScalrNum implements Variable
 		val = i;
 	}
 	
+	public int getNum()
+	{
+		return val;
+	}
+	
 	public void modValue(int i)
 	{
 		val += i;
