@@ -12,6 +12,7 @@ import scalr.Exceptions.*;
 import java.util.ArrayList;
 
 public class ScalrParserTest {
+	public static String currentFunc;
     public static void main(String[] args) throws TypeError {
 		BufferedReader br = null;
         String text = "";
@@ -23,7 +24,7 @@ public class ScalrParserTest {
 
             }
         ScalrParserTest parser = new ScalrParserTest(new java.io.StringReader(text));
-        parser.fscalr();
+        parser.tscalr();
         System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
@@ -49,9 +50,25 @@ TOKEN: {
     	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")>
 	}
 
+void tscalr(): {}
+{
+	(imp())+ (funcDef())* main() <EOF>
+}
+
+void main(): {
+	currentFunc = "main";
+} {
+	"main" (statement())+ "end" (track())+
+}
+
 void fscalr(): {}
 {
 	(funcDef())* <EOF>
+}
+
+void imp(): {}
+{
+	"import" <ID>
 }
 
 void funcCall(): {
@@ -69,13 +86,20 @@ void paramExpr(ArrayList<Expression> params): {
 	t = <INT> { params.add(new ScalrNum(Integer.parseInt(t.image))); }
 }
 
+// The production to define a function
 void funcDef(): {
 	Token name;
 	ArrayList<String> params = new ArrayList<String>();
 } {
-	"func" name = <ID> "(" (id(params) ("," id(params))*)? ")" (statement(name.image))* "end" {
+	"func" name = <ID> "(" (id(params) ("," id(params))*)? ")" funcBody(name.image) "end" {
 		System.out.println("Function name: " + name + " | Paramters: " + params);
 	}
+}
+
+void funcBody(String funcName): {
+	currentFunc = funcName;
+} {
+	(statement())+
 }
 
 void id(ArrayList<String> params): {
@@ -84,9 +108,9 @@ void id(ArrayList<String> params): {
 	t = <ID> { params.add(t.image); }
 }
 
-void statement(String funcName): {}
+void statement(): {}
 {
-	assignment() { System.out.println("Assignment from function: " + funcName); }
+	assignment() { System.out.println("Assignment from function: " + currentFunc); }
 }
 
 void assignment(): {
@@ -95,11 +119,21 @@ void assignment(): {
 } {
 	t1 = <ID> <ASSIGN> t2 = <INT> {
 		try {
-			SymbolTable.addFunc("blah");
+			SymbolTable.addFunc(currentFunc);
 			ScalrNum n = new ScalrNum(Integer.parseInt(t2.image));
-			SymbolTable.addReference("blah", t1.image, n);
+			SymbolTable.addReference(currentFunc, t1.image, n);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+}
+
+void track(): {}
+{
+	"track" "->" sequence()
+}
+
+void sequence() : {}
+{
+	"[" (<ID> ("," <ID>)*)? "]"
 }

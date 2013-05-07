@@ -1,0 +1,7 @@
+import testfile
+
+main
+	seq = 5
+end
+
+track -> [seq]
