@@ -13,8 +13,8 @@ import scalr.Exceptions.*;
 import java.util.ArrayList;
 
 public class ScalrParserTest {
-	public static String currentFunc;
-    public static void main(String[] args) throws TypeError {
+	public static String currentFunc = "test";
+    public static void main(String[] args) throws Exception {
 		BufferedReader br = null;
         String text = "";
         try {
@@ -25,18 +25,21 @@ public class ScalrParserTest {
 
             }
         ScalrParserTest parser = new ScalrParserTest(new java.io.StringReader(text));
+        SymbolTable.addFunc(currentFunc);
+        parser.statement();
         parser.statement();
         System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
-            System.out.println("Syntax check failed: " + e.getMessage());
+            System.out.println("Syntax check failed: ");
+            e.printStackTrace();
         }
     }
 }
 PARSER_END(ScalrParserTest)
 
-SKIP : { " " | "\t" | <"/*" (~[])* "*/"> | "\n"}
+SKIP : { " " | "\t" | <"/*" (~[])* "*/"> }
 TOKEN: {
 	"and" | "or" | "not" | "->" | "." /*"\n" |*/
     | "," | "\"" | "+" | "-" | "%" | "(" | ")" | "[" | "]" | "note" | "pitch"
@@ -46,12 +49,12 @@ TOKEN: {
 	 "in" |	"if" | "else" | "import" | "track" | ".fscalr" |
 	<ASSIGN: "+=" | "-=" | "*=" | "/=" | "%="> |
 	<RELN: "==" | "<" | ">" | ">=" "<="> |
-	<INT: ("-")? ("0" | ["1"-"9"](["0"-"9"])*)> |
+	<INT: ("0" | ["1"-"9"](["0"-"9"])*)> |
 	<ID: ["a"-"z"](["A"-"Z"] | ["a"-"z"] | <INT> | "_")*> |
-    	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")> |
-    	<MOD: "+" | "-"> | <LENGTH: "whole" | "half" | "quarter" | "eighth" | "sixteenth" |
+    	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "10")>
+    | <LENGTH: "whole" | "half" | "quarter" | "eighth" | "sixteenth" |
     		"thirtysec" | "quarterT" | "eighthT" | "sixteenthT" | "thirtysecT">
-    | <PROD: "*" | "/" | "%"> | <INCR: "--" | "++">
+    | <PLUS: "+" | "-">
 	}
 
 void id(ArrayList<String> params): {
@@ -62,17 +65,16 @@ void id(ArrayList<String> params): {
 
 void statement(): {}
 {
-	creation() { System.out.println("Assignment from function: " + currentFunc); }
+	("\n")* creation() "\n" { System.out.println("Assignment from function: " + currentFunc); }
 }
 
 void creation(): {
 	Token t1;
-	Expression expr;
+	Expression expr;	
 } {
 	t1 = <ID> "=" expr = arithExpr() {
 		try {
-			System.out.println(t1.image);
-			System.out.println(expr);
+			SymbolTable.addReference(currentFunc, t1.image, expr);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -84,8 +86,8 @@ Expression arithExpr(): {
 	Expression e2 = null;
 	Token op = null;
 } {
-	// <MOD> contains + and -
-	e1 = mulOrDiv() ((op = <MOD>) e2 = arithExpr())? {
+	// <PLUS> contains + and -
+	e1 = mulOrDiv() ((op = "+" | op = "-") e2 = arithExpr())? {
 		if (op != null) {
 			BinaryOperator bo = new BinaryOperator(op.image);
 			bo.addOperand(e1);
@@ -103,7 +105,7 @@ Expression mulOrDiv(): {
 	Token op = null;
 } {
 	// PORD contains *, %, and /
-	e1 = unary() ((op = <PROD>) e2 = arithExpr())? {
+	e1 = unary() ((op = "*" | op = "%" | op = "/") e2 = arithExpr())? {
 		if (op != null) {
 			BinaryOperator bo = new BinaryOperator(op.image);
 			bo.addOperand(e1);
@@ -121,7 +123,7 @@ Expression unary(): {
 	Token op = null;
 	Token post = null;
 } {
-	(op = "-")? ("(" e = arithExpr() ")" | base = var() (post = <INCR>)?) {
+	(op = "-")? ("(" e = arithExpr() ")" | base = var() (post = "--" | post = "++")?) {
 		if (e == null) {
 			Expression ret = base;
 			if (post != null) {
@@ -177,13 +179,13 @@ void pitch(Note n): {
 	Expression e = null;
 } {
 	// Pretty much defines anything that can be in pitch. Type checking will have to be done in the backend
-	"pitch(" (((mod = <MOD>)? idName = <ID> (length = ".length(" ")")?) | degree = <DEGREE> | (mod = <MOD>)? num = <INT> | (mod = <MOD>)? e = arithExpr())? ")" { System.out.println("here"); }
+	"pitch(" (((mod = <PLUS>)? idName = <ID> (length = ".length(" ")")?) | degree = <DEGREE> | (mod = <PLUS>)? num = <INT> | (mod = <PLUS>)? e = arithExpr())? ")" { System.out.println("here"); }
 }
 
 void length(Note n): {
 	Token mod = null;
 } {
-	"length(" (mod = <MOD>)? ")" { ; }
+	"length(" (mod = <PLUS>)? ")" { ; }
 }
 
 void volume(Note n): {}
