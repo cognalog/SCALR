@@ -52,8 +52,8 @@ void funcDef(): {
 	Token name;
 	ArrayList<String> params = new ArrayList<String>();
 } {
-	"func" name = <ID> "(" (id(params) ("," id(params))*)? ")" (statement())* "end" {
-		System.out.println(params);
+	"func" name = <ID> "(" (id(params) ("," id(params))*)? ")" (statement(name.image))* "end" {
+		System.out.println("Function name: " + name + " | Arguments: " + params);
 	}
 }
 
@@ -63,9 +63,9 @@ void id(ArrayList<String> params): {
 	t = <ID> { params.add(t.image); }
 }
 
-void statement(): {}
+void statement(String funcName): {}
 {
-	assignment()
+	assignment() { System.out.println("Assignment from function: " + funcName); }
 }
 
 void assignment(): {
