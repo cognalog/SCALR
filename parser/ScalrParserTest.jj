@@ -7,6 +7,7 @@ PARSER_BEGIN(ScalrParserTest)
 package parser;
 import java.io.*;
 import scalr.variable.*;
+import scalr.expression.*;
 import scalr.Exceptions.*;
 import java.util.ArrayList;
 
@@ -22,7 +23,7 @@ public class ScalrParserTest {
 
             }
         ScalrParserTest parser = new ScalrParserTest(new java.io.StringReader(text));
-        parser.funcDef();
+        parser.fscalr();
         System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
@@ -48,12 +49,32 @@ TOKEN: {
     	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")>
 	}
 
+void fscalr(): {}
+{
+	(funcDef())* <EOF>
+}
+
+void funcCall(): {
+	Token funcName;
+	ArrayList<Expression> params = new ArrayList<Expression>();
+} {
+	funcName = <ID> "(" (paramExpr(params) ("," paramExpr(params))*)? ")" {
+		System.out.println("Function call: " + funcName + " | Arguments: " + params);
+	}
+}
+
+void paramExpr(ArrayList<Expression> params): {
+	Token t;
+} {
+	t = <INT> { params.add(new ScalrNum(Integer.parseInt(t.image))); }
+}
+
 void funcDef(): {
 	Token name;
 	ArrayList<String> params = new ArrayList<String>();
 } {
 	"func" name = <ID> "(" (id(params) ("," id(params))*)? ")" (statement(name.image))* "end" {
-		System.out.println("Function name: " + name + " | Arguments: " + params);
+		System.out.println("Function name: " + name + " | Paramters: " + params);
 	}
 }
 
