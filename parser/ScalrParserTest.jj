@@ -89,6 +89,7 @@ Expression arithExpr(): {
 	// <PLUS> contains + and -
 	e1 = mulOrDiv() ((op = "+" | op = "-") e2 = arithExpr())? {
 		if (op != null) {
+			System.out.println("here");
 			BinaryOperator bo = new BinaryOperator(op.image);
 			bo.addOperand(e1);
 			bo.addOperand(e2);
