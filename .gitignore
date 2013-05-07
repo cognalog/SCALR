@@ -19,7 +19,10 @@
 *ScalrParser.jj
 *ScalrParser*.java
 *ScalrParserTest*.java
+*ScalrParser2*.java
 *scratch.java
+*Scratch.java
+*classCleaner
 
 
 # A file I often create that contains scratch work not interesting to anyone

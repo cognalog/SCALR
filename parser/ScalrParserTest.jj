@@ -27,7 +27,6 @@ public class ScalrParserTest {
         ScalrParserTest parser = new ScalrParserTest(new java.io.StringReader(text));
         SymbolTable.addFunc(currentFunc);
         parser.statement();
-        parser.statement();
         System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
@@ -117,6 +116,8 @@ Expression mulOrDiv(): {
 			return e1;
 	}
 }
+
+
 
 Expression unary(): {
 	Expression e = null;
