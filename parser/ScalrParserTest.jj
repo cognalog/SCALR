@@ -169,7 +169,22 @@ void track(): {}
 Expression note(): {
 	Expression n = Note.note();
 } {
-	"note" (".pitch(" pitch() ")" | (".length()") | ".volume()")* { return n; }
+	"note" (".pitch(" pitch(n) ")" | ".length(" length(n) ")" | ".volume(" volume(n) ")")* { return n; }
+}
+
+void pitch(Expression n): {}
+{
+	
+}
+
+void length(Expression n): {}
+{
+	
+}
+
+void volume(Expression n): {}
+{
+	
 }
 
 Sequence sequence() : {}
