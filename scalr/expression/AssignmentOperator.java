@@ -4,9 +4,8 @@ package scalr.expression;
 public class AssignmentOperator implements Expression
 {
 	
-	private String	   operatorType;
-	private String	   var, func;
-	private Expression	expr;
+	private String	operatorType;
+	private String	var, func;
 	
 	public AssignmentOperator(String type)
 	{
