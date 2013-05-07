@@ -1,0 +1,296 @@
+accidentals.fscalr
+
+func hello ()
+  note.pitch(A#3).quarter
+end
+************
+accidentals.tscalr
+
+import accidentals
+
+main
+  seq = hello()
+end
+
+track -> [seq]
+************
+expected-output
+
+[58,1.00000,100]
+************
+breaks.fscalr
+
+func seq1()
+  seq= [note.pitch(A3).quarter break.half note.pitch(A3).quarter]
+end
+************
+breaks.tscalr
+
+import breaks
+
+func main()
+  seq = seq1()
+end
+
+track -> [seq]
+************
+expected-output
+
+[57,1.00000,100|200,2.00000,100|57,1.00000,100]
+************
+each.fscalr
+
+func iterate(sequence)
+  foreach(n) in sequence
+    n.length.half
+  end
+end
+************
+each.tscalr
+
+import each
+
+main
+  seq = iterate([note.pitch(A4).quarter note.pitch(A#4).quarter note.pitch(B4).quarter])
+end
+
+track -> [seq]
+************
+expected-output
+
+[57,0.50000,100|58,0.50000,100|59,0.50000,100]
+************
+expected-output
+
+[57,1.00000,100]
+************
+hello.fscalr
+
+func hello ()
+  note.pitch(A3).quarter
+end
+************
+hello.tscalr
+
+import hello
+
+main
+  seq = hello()
+end
+
+track -> [seq]
+************
+expected-output
+
+[48,1.00000,100|48,1.00000,100|57,1.00000,100|48,1.00000,100|48,1.00000,100]
+************
+ifelse.fscalr
+
+func nth_different( nth)
+  myseq= []
+  i=1
+  while(i<nth*2)
+    if(i%nth==0)
+      myseq += note.pitch(A3).quarter
+    else
+      myseq += note.pitch(C3).quarter
+    end
+    i+=1
+  end
+end
+
+************
+ifelse.tscalr
+
+import ifelse
+
+main
+  seq = nth_different(3)
+end
+
+track -> [seq]
+************
+complete.tscalr
+
+import person1
+import person2
+
+main
+  c_scale = {C3 D3 E3 F3 G3 A3 B3 C4}
+  seq = [first_half(c_scale) second_half(c_scale)]
+end
+
+track -> [seq]
+************
+expected-output
+
+[48,1.00000,100|50,1.00000,100|52,1.00000,100|53,1.00000,100|55,1.00000,100|57,1.00000,100|59,1.00000,100|60,1.00000,100]
+************
+person1.fscalr
+
+func first_half (scale)
+  [note.pitch(scale[1]).quarter note.pitch(scale[2]).quarter
+   note.pitch(scale[3]).quarter note.pitch(scale[4]).quarter]
+end
+************
+person2.fscalr
+
+func second_half (scale)
+  [note.pitch(scale[5]).quarter note.pitch(scale[6]).quarter
+   note.pitch(scale[7]).quarter note.pitch(scale[8]).quarter]
+end
+
+************
+expected-output
+
+[48,1.00000,100|50,1.00000,100|52,1.00000,100|53,1.00000,100][55,1.00000,100|57,1.00000,100|59,1.00000,100|60,1.00000,100]
+************
+parallel.fscalr
+
+func first_ver (scale)
+  [note.pitch(scale[1]).quarter note.pitch(scale[2]).quarter
+   note.pitch(scale[3]).quarter note.pitch(scale[4]).quarter]
+end
+
+func second_ver (scale)
+  [note.pitch(scale[5]).quarter note.pitch(scale[6]).quarter
+   note.pitch(scale[7]).quarter note.pitch(scale[8]).quarter]
+end
+************
+parallel.tscalr
+
+import parallel
+
+main
+  c_scale = {C3 D3 E3 F3 G3 A3 B3 C4}
+  seq = first_ver(c_scale)
+  seq2 = second_ver(c_scale)
+end
+
+track -> [seq]
+track -> [seq2]
+
+************
+expected-output
+
+[48,1.00000,100|50,1.00000,100|52,1.00000,100]
+************
+scales.fscalr
+
+func seq1 (scale)
+  myseq = []
+  myseq += note.pitch(scale[1]).quarter
+  myseq += note.pitch(scale[2]).quarter
+  myseq += note.pitch(scale[3]).quarter
+  myseq
+end
+************
+scales.tscalr
+
+import scales
+
+main
+  scale1 = {C3 D3 E3 F3 G3 A3 B3}
+  something = seq1(scale1)
+end
+
+track -> [something something]
+
+************
+expected-output
+
+[48,1.00000,100|52,1.00000,100|55,1.00000,100]
+************
+whileloops.fscalr
+
+func seq1 (scale)
+  myseq = []
+  i = 1
+  while(i < 4)
+    degree = i * 2 - 1 /* 1st, 3rd, and 5th degrees of this scale */
+    myseq += note.pitch(scale[degree]).quarter
+    i += 1
+  end
+  myseq
+end
+************
+whileloops.tscalr
+
+import whileloops
+
+main
+  scale1 = {C3 D3 E3 F3 G3 A3 B3}
+  something = seq1(scale1)
+end
+
+track -> [something something]
+
+************
+expected-output
+
+The function foo is defined multiple times
+************
+redefinition.fscalr
+
+func foo ()
+  note.pitch(A3).quarter
+end
+************
+redefinition.tscalr
+
+import redefintion
+import redefinition2
+
+main
+  seq = foo()
+end
+
+track -> [seq]
+************
+redefinition2.fscalr
+
+func foo ()
+  note.pitch(C3).quarter
+end
+************
+expected-output
+
+The variable somethingnew is not defined or is already defined and you are trying to give it a different type
+************
+undefined.fscalr
+
+func hello ()
+  note.pitch(A3).quarter
+end
+************
+undefined.tscalr
+
+import undefined
+
+main
+  seq = hello()
+end
+
+track -> [somethingnew]
+************
+expected-output
+
+The variable note is not defined or is already defined and you are trying to give it a different type
+************
+redefinition.fscalr
+
+func hello ()
+  note = {C3}
+  note.pitch(A3).quarter
+end
+************
+redefinition.tscalr
+
+import redefinition
+
+main
+  seq = hello()
+end
+
+track -> [seq]
+************

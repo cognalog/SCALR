@@ -34,7 +34,6 @@ def run_test_suite_for(root):
         tscalr = root + "/" + directory + "/" + file + " "
       if file.endswith(".fscalr"):
         fscalrs.append(root + "/" + directory + "/" + file + " ")
-    
     a_test = ".././scalr " + tscalr
     for fscalr in fscalrs:
       a_test += fscalr

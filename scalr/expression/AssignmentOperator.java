@@ -41,7 +41,7 @@ public class AssignmentOperator implements Expression
 		// Get the variable from the SymbolTable
 		Expression lval = SymbolTable.getMember(func, var);
 		if (operator.equals("+=")) {
-			if (lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER) {
+			if ((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER) || (lval.getType() == ExpressionType.SEQUENCE && rval.getType() == ExpressionType.NOTE)|| (lval.getType() == ExpressionType.SEQUENCE && rval.getType() == ExpressionType.NOTE)) {
 				BinaryOperator bo = new BinaryOperator("+");
 				bo.addOperand(rval);
 				bo.addOperand(lval);
@@ -57,8 +57,96 @@ public class AssignmentOperator implements Expression
 				}
 				return result;
 			}
-			// Finish out this if block for notes and sequences and then sequences. Technically, +=
-			// is valid only if the lval is a sequence and the rval can be a note or a sequence.
+		}
+		else if (operator.equals("*=")) {
+			if ((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER) || (lval.getType() == ExpressionType.SEQUENCE && rval.getType() == ExpressionType.NOTE)|| (lval.getType() == ExpressionType.SEQUENCE && rval.getType() == ExpressionType.NOTE)) {
+				BinaryOperator bo = new BinaryOperator("*");
+				bo.addOperand(rval);
+				bo.addOperand(lval);
+				Expression result = bo.getValue(expressions);
+				// If the new type isn't the same as the old type, this will throw an error (Type
+				// checking!).
+				try {
+					SymbolTable.addReference(func, var, result);
+				}
+				catch (TypeError e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
+				return result;
+			}
+		}
+		else if (operator.equals("-=")) {
+			if((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)){
+				BinaryOperator bo = new BinaryOperator("-");
+				bo.addOperand(rval);
+				bo.addOperand(lval);
+				Expression result = bo.getValue(expressions);
+				// If the new type isn't the same as the old type, this will throw an error (Type
+				// checking!).
+				try {
+					SymbolTable.addReference(func, var, result);
+				}
+				catch (TypeError e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
+				return result;
+			}
+		}
+		else if (operator.equals("%=")) {
+			if((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)){
+				BinaryOperator bo = new BinaryOperator("%");
+				bo.addOperand(rval);
+				bo.addOperand(lval);
+				Expression result = bo.getValue(expressions);
+				// If the new type isn't the same as the old type, this will throw an error (Type
+				// checking!).
+				try {
+					SymbolTable.addReference(func, var, result);
+				}
+				catch (TypeError e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
+				return result;
+			}
+		}
+		else if (operator.equals("/=")) {
+			if((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)){
+				BinaryOperator bo = new BinaryOperator("/");
+				bo.addOperand(rval);
+				bo.addOperand(lval);
+				Expression result = bo.getValue(expressions);
+				// If the new type isn't the same as the old type, this will throw an error (Type
+				// checking!).
+				try {
+					SymbolTable.addReference(func, var, result);
+				}
+				catch (TypeError e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
+				return result;
+			}
+		}
+		else if (operator.equals("%=")) {
+			if((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)){
+				BinaryOperator bo = new BinaryOperator("%");
+				bo.addOperand(rval);
+				bo.addOperand(lval);
+				Expression result = bo.getValue(expressions);
+				// If the new type isn't the same as the old type, this will throw an error (Type
+				// checking!).
+				try {
+					SymbolTable.addReference(func, var, result);
+				}
+				catch (TypeError e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
+				return result;
+			}
 		}
 		// Else if's for each of the different operator types
 		
