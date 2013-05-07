@@ -1,6 +1,7 @@
 options
 {
-  LOOKAHEAD=3;
+  LOOKAHEAD = 3;
+//  FORCE_LA_CHECK = true;
 }
 
 PARSER_BEGIN(ScalrParserTest)
@@ -24,7 +25,7 @@ public class ScalrParserTest {
 
             }
         ScalrParserTest parser = new ScalrParserTest(new java.io.StringReader(text));
-        parser.tscalr();
+        parser.statement();
         System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
@@ -37,70 +38,21 @@ PARSER_END(ScalrParserTest)
 
 SKIP : { " " | "\t" | <"/*" (~[])* "*/"> | "\n"}
 TOKEN: {
-       "and" | "or" | "not" | "->" | "." | /*"\n" |*/
-        "," | "\"" | "+" | "-" | "%" | "(" | ")" | "[" | "]" |
-	"note" | "pitch" | "volume" | 
+	"and" | "or" | "not" | "->" | "." /*"\n" |*/
+    | "," | "\"" | "+" | "-" | "%" | "(" | ")" | "[" | "]" | "note" | "pitch"
+    | "volume" |
        	"duration" | "quarter" | "half" | "whole" |
 	"end" | "func" | "main" | "while" | "foreach" |
 	 "in" |	"if" | "else" | "import" | "track" | ".fscalr" |
-	<ASSIGN: "=" | "+=" | "-=" | "*=" | "/=" | "%="> |
+	<ASSIGN: "+=" | "-=" | "*=" | "/=" | "%="> |
 	<RELN: "==" | "<" | ">" | ">=" "<="> |
-	<INT: "0" | ["1"-"9"](["0"-"9"])*> |
+	<INT: ("-")? ("0" | ["1"-"9"](["0"-"9"])*)> |
 	<ID: ["a"-"z"](["A"-"Z"] | ["a"-"z"] | <INT> | "_")*> |
-    	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")>
+    	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")> |
+    	<MOD: "+" | "-"> | <LENGTH: "whole" | "half" | "quarter" | "eighth" | "sixteenth" |
+    		"thirtysec" | "quarterT" | "eighthT" | "sixteenthT" | "thirtysecT">
+    | <PROD: "*" | "/" | "%"> | <INCR: "--" | "++">
 	}
-
-void tscalr(): {}
-{
-	(imp())+ (funcDef())* main() <EOF>
-}
-
-void main(): {
-	currentFunc = "main";
-} {
-	"main" (statement())+ "end" (track())+
-}
-
-void fscalr(): {}
-{
-	(funcDef())* <EOF>
-}
-
-void imp(): {}
-{
-	"import" <ID>
-}
-
-void funcCall(): {
-	Token funcName;
-	ArrayList<Expression> params = new ArrayList<Expression>();
-} {
-	funcName = <ID> "(" (paramExpr(params) ("," paramExpr(params))*)? ")" {
-		System.out.println("Function call: " + funcName + " | Arguments: " + params);
-	}
-}
-
-void paramExpr(ArrayList<Expression> params): {
-	Token t;
-} {
-	t = <INT> { params.add(new ScalrNum(Integer.parseInt(t.image))); }
-}
-
-// The production to define a function
-void funcDef(): {
-	Token name;
-	ArrayList<String> params = new ArrayList<String>();
-} {
-	"func" name = <ID> "(" (id(params) ("," id(params))*)? ")" funcBody(name.image) "end" {
-		System.out.println("Function name: " + name + " | Paramters: " + params);
-	}
-}
-
-void funcBody(String funcName): {
-	currentFunc = funcName;
-} {
-	(statement())+
-}
 
 void id(ArrayList<String> params): {
 	Token t;
@@ -110,30 +62,136 @@ void id(ArrayList<String> params): {
 
 void statement(): {}
 {
-	assignment() { System.out.println("Assignment from function: " + currentFunc); }
+	creation() { System.out.println("Assignment from function: " + currentFunc); }
 }
 
-void assignment(): {
+void creation(): {
 	Token t1;
-	Token t2;
+	Expression expr;
 } {
-	t1 = <ID> <ASSIGN> t2 = <INT> {
+	t1 = <ID> "=" expr = arithExpr() {
 		try {
-			SymbolTable.addFunc(currentFunc);
-			ScalrNum n = new ScalrNum(Integer.parseInt(t2.image));
-			SymbolTable.addReference(currentFunc, t1.image, n);
+			System.out.println(t1.image);
+			System.out.println(expr);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 }
 
-void track(): {}
-{
-	"track" "->" sequence()
+Expression arithExpr(): {
+	Expression e1;
+	Expression e2 = null;
+	Token op = null;
+} {
+	// <MOD> contains + and -
+	e1 = mulOrDiv() ((op = <MOD>) e2 = arithExpr())? {
+		if (op != null) {
+			BinaryOperator bo = new BinaryOperator(op.image);
+			bo.addOperand(e1);
+			bo.addOperand(e2);
+			return bo;
+		}
+		else
+			return e1;
+	}
 }
 
-void sequence() : {}
+Expression mulOrDiv(): {
+	Expression e1;
+	Expression e2 = null;
+	Token op = null;
+} {
+	// PORD contains *, %, and /
+	e1 = unary() ((op = <PROD>) e2 = arithExpr())? {
+		if (op != null) {
+			BinaryOperator bo = new BinaryOperator(op.image);
+			bo.addOperand(e1);
+			bo.addOperand(e2);
+			return bo;
+		}
+		else
+			return e1;
+	}
+}
+
+Expression unary(): {
+	Expression e = null;
+	Expression base = null;
+	Token op = null;
+	Token post = null;
+} {
+	(op = "-")? ("(" e = arithExpr() ")" | base = var() (post = <INCR>)?) {
+		if (e == null) {
+			Expression ret = base;
+			if (post != null) {
+				UnaryOperator uo = new UnaryOperator(post.image);
+				uo.addOperand(ret);
+				ret = uo;
+			}
+			if (op != null) {
+				UnaryOperator uo = new UnaryOperator(op.image);
+				uo.addOperand(ret);
+				ret = uo;
+			}
+			return ret;
+		}
+		else {
+			if (op == null)
+				return e;
+			else {
+				UnaryOperator uo = new UnaryOperator(op.image);
+				uo.addOperand(e);
+				return uo;
+			}
+		}
+	}
+}
+
+Expression var(): {
+	Token t;
+	Expression expr;
+} {
+	t = <INT> { return new ScalrNum(Integer.parseInt(t.image)); }
+	| (expr = sequence() | expr = note()) { return expr; }
+	| t = <ID> { return new VariableReference(t.image, currentFunc); }
+}
+
+void track(): {}
 {
-	"[" (<ID> ("," <ID>)*)? "]"
+	"track" "->" "[" sequence() "]"
+}
+
+Expression note(): {
+	Note n = Note.note();
+} {
+	"note" (("." pitch(n)) | ("." length(n)) | ("." volume(n)))* { return n; }
+}
+
+void pitch(Note n): {
+	Token mod = null;
+	Token idName = null;
+	Token length = null;
+	Token degree = null;
+	Token num = null;
+	Expression e = null;
+} {
+	// Pretty much defines anything that can be in pitch. Type checking will have to be done in the backend
+	"pitch(" (((mod = <MOD>)? idName = <ID> (length = ".length(" ")")?) | degree = <DEGREE> | (mod = <MOD>)? num = <INT> | (mod = <MOD>)? e = arithExpr())? ")" { System.out.println("here"); }
+}
+
+void length(Note n): {
+	Token mod = null;
+} {
+	"length(" (mod = <MOD>)? ")" { ; }
+}
+
+void volume(Note n): {}
+{
+	"volume(" ")" { ; }
+}
+
+Sequence sequence() : {}
+{
+	"[" (<ID> ("," <ID>)*)? "]" { return new Sequence(); }
 }
