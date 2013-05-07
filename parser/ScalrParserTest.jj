@@ -167,32 +167,9 @@ void track(): {}
 }
 
 Expression note(): {
-	Note n = Note.note();
+	Expression n = Note.note();
 } {
-	"note" (("." pitch(n)) | ("." length(n)) | ("." volume(n)))* { return n; }
-}
-
-void pitch(Note n): {
-	Token mod = null;
-	Token idName = null;
-	Token length = null;
-	Token degree = null;
-	Token num = null;
-	Expression e = null;
-} {
-	// Pretty much defines anything that can be in pitch. Type checking will have to be done in the backend
-	"pitch(" (((mod = <PLUS>)? idName = <ID> (length = ".length(" ")")?) | degree = <DEGREE> | (mod = <PLUS>)? num = <INT> | (mod = <PLUS>)? e = arithExpr())? ")" { System.out.println("here"); }
-}
-
-void length(Note n): {
-	Token mod = null;
-} {
-	"length(" (mod = <PLUS>)? ")" { ; }
-}
-
-void volume(Note n): {}
-{
-	"volume(" ")" { ; }
+	"note" (".pitch(" pitch() ")" | (".length()") | ".volume()")* { return n; }
 }
 
 Sequence sequence() : {}

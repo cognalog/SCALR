@@ -5,16 +5,21 @@ public class AssignmentOperator implements Expression
 {
 	
 	private String	operatorType;
-	private String	id;
+	private String	var, func;
 	
 	public AssignmentOperator(String type)
 	{
 		operatorType = type;
 	}
 	
-	public void setID(String name)
+	public void setVar(String name)
 	{
-		id = name;
+		var = name;
+	}
+	
+	public void setFunc(String name)
+	{
+		func = name;
 	}
 	
 	@Override

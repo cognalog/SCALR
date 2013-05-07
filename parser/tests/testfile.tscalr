@@ -1,2 +1,2 @@
 /* hi */
-x = note
+x = note.length()
