@@ -1,0 +1,84 @@
+options
+{
+  LOOKAHEAD=3;
+}
+
+PARSER_BEGIN(ScalrParserTest)
+package parser;
+import java.io.*;
+import scalr.variable.*;
+import scalr.Exceptions.*;
+import java.util.ArrayList;
+
+public class ScalrParserTest {
+    public static void main(String[] args) throws TypeError {
+		BufferedReader br = null;
+        String text = "";
+        try {
+			br = new BufferedReader(new FileReader(args[0]));
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                text += line + "\n";
+
+            }
+        ScalrParserTest parser = new ScalrParserTest(new java.io.StringReader(text));
+        parser.funcDef();
+        System.out.println(SymbolTable.reference);
+	    System.out.println("grats, your program compiled alright");
+        } catch (Throwable e) {
+            // Catching Throwable is ugly but JavaCC throws Error objects!
+            System.out.println("Syntax check failed: " + e.getMessage());
+        }
+    }
+}
+PARSER_END(ScalrParserTest)
+
+SKIP : { " " | "\t" | <"/*" (~[])* "*/"> | "\n"}
+TOKEN: {
+       "and" | "or" | "not" | "->" | "." | /*"\n" |*/
+        "," | "\"" | "+" | "-" | "%" | "(" | ")" | "[" | "]" |
+	"note" | "pitch" | "volume" | 
+       	"duration" | "quarter" | "half" | "whole" |
+	"end" | "func" | "main" | "while" | "foreach" |
+	 "in" |	"if" | "else" | "import" | "track" | ".fscalr" |
+	<ASSIGN: "=" | "+=" | "-=" | "*=" | "/=" | "%="> |
+	<RELN: "==" | "<" | ">" | ">=" "<="> |
+	<INT: "0" | ["1"-"9"](["0"-"9"])*> |
+	<ID: ["a"-"z"](["A"-"Z"] | ["a"-"z"] | <INT> | "_")*> |
+    	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")>
+	}
+
+void funcDef(): {
+	Token name;
+	ArrayList<String> params = new ArrayList<String>();
+} {
+	"func" name = <ID> "(" (id(params) ("," id(params))*)? ")" (statement())* "end" {
+		System.out.println(params);
+	}
+}
+
+void id(ArrayList<String> params): {
+	Token t;
+} {
+	t = <ID> { params.add(t.image); }
+}
+
+void statement(): {}
+{
+	assignment()
+}
+
+void assignment(): {
+	Token t1;
+	Token t2;
+} {
+	t1 = <ID> <ASSIGN> t2 = <INT> {
+		try {
+			SymbolTable.addFunc("blah");
+			ScalrNum n = new ScalrNum(Integer.parseInt(t2.image));
+			SymbolTable.addReference("blah", t1.image, n);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
