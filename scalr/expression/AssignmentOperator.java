@@ -167,9 +167,32 @@ public class AssignmentOperator implements Expression
 			// Compare their types
 			if (expr.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)
 				return ExpressionType.NUMBER;
-			else if ((expr.getType() == ExpressionType.SEQUENCE || expr.getType() == ExpressionType.NOTE)
+			else if ((expr.getType() == ExpressionType.SEQUENCE)
 			        && (rval.getType() == ExpressionType.SEQUENCE || rval.getType() == ExpressionType.NOTE))
 				return ExpressionType.SEQUENCE;
+		}
+		else if (operator.equals("*=")) {
+			// Compare their types
+			if (expr.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)
+				return ExpressionType.NUMBER;
+			else if ((expr.getType() == ExpressionType.SEQUENCE)
+			        && (rval.getType() == ExpressionType.SEQUENCE || rval.getType() == ExpressionType.NOTE))
+				return ExpressionType.SEQUENCE;
+		}
+		else if (operator.equals("-=")) {
+			// Compare their types
+			if (expr.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)
+				return ExpressionType.NUMBER;
+		}
+		else if (operator.equals("/=")) {
+			// Compare their types
+			if (expr.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)
+				return ExpressionType.NUMBER;
+		}
+		else if (operator.equals("%=")) {
+			// Compare their types
+			if (expr.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)
+				return ExpressionType.NUMBER;
 		}
 		// More else if's (else if's only) for each different operator
 		
