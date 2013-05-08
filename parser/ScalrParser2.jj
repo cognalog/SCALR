@@ -26,10 +26,9 @@ public class ScalrParser2 {
 
             }
         ScalrParser2 parser = new ScalrParser2(new java.io.StringReader(text));
-        parser.function();
-        System.out.println(SymbolTable.reference);
-        parser.funcall();
-       
+        SymbolTable.addFunc("test");
+        SymbolTable.currentFunctionScope = "test";
+        parser.assignment();
         System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
@@ -119,7 +118,10 @@ ArrayList<Expression> line1() throws Exception: {
 	Expression e;
 } {
 e=line() out=line1(){
+	if(e != null){
 	out.add(e);
+	return out;
+	}
 	return out;
 }
 | {}{

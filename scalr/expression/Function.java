@@ -40,7 +40,8 @@ public class Function implements Expression
 	
 	public void addStatement(Expression expr)
 	{
-		statements.add(expr);
+		if (expr != null)
+			statements.add(expr);
 	}
 	
 	public boolean hasParameter(String paramName)

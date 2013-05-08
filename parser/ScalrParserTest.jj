@@ -167,24 +167,59 @@ void track(): {}
 }
 
 Expression note(): {
+	Token t;
 	Expression n = Note.note();
 } {
-	"note" (".pitch(" pitch(n) ")" | ".length(" length(n) ")" | ".volume(" volume(n) ")")* { return n; }
+	"note" (".pitch(" n = pitch(n) ")" | ".length(" n = length(n) ")" | ".volume(" n = volume(n) ")" | t = <LENGTH> { NoteOps no = new NoteOps("pit"); 
+		no})* { return n; }
 }
 
-void pitch(Expression n): {}
-{
-	
+Expression pitch(Expression n): {
+	Token mod = null;
+	Expression e;
+} {
+	mod = <DEGREE> {
+		NoteOps no = new NoteOps("pit");
+		no.addOperand(n);
+		no.addPitch(mod.image);
+		return no;
+	}
+	| (mod = "+" | mod = "-")? e = arithExpr() {
+		NoteOps no = new NoteOps("pit");
+		no.addOperand(n);
+		no.addNum(e);
+		if(mod != null)
+			no.addMod(mod.image);
+		return no;
+	}
 }
 
-void length(Expression n): {}
-{
-	
+Expression length(Expression n): {
+	Expression e;
+	Token mod = null;
+} {
+	(mod = "+" | mod = "-")? e = arithExpr() {
+		NoteOps no = new NoteOps("len");
+		no.addOperand(n);
+		no.addNum(e);
+		if(mod != null)
+			no.addMod(mod.image);
+		return no;
+	}
 }
 
-void volume(Expression n): {}
-{
-	
+Expression volume(Expression n): {
+	Expression e;
+	Token mod = null;
+} {
+	(mod = "+" | mod = "-")? e = arithExpr() {
+		NoteOps no = new NoteOps("vol");
+		no.addOperand(n);
+		no.addNum(e);
+		if(mod != null)
+			no.addMod(mod.image);
+		return no;
+	}
 }
 
 Sequence sequence() : {}
