@@ -27,6 +27,7 @@ public final class SymbolTable
 	
 	public static void addFunc(String func) throws FunctionExistsError
 	{
+		System.out.println("Adding function "+ func);
 		if (reference.containsKey(func))
 			throw new FunctionExistsError(func);
 		HashMap<String, Expression> funcTable = new HashMap<String, Expression>();

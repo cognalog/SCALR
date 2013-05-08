@@ -1,1 +1,7 @@
-x = 3
+func hello()
+	seq= [ note.quarter ]
+	seq
+end
+
+hello
+

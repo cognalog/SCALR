@@ -1,6 +1,7 @@
 options
 {
   LOOKAHEAD=3;
+
 }
 
 PARSER_BEGIN(ScalrParser2)
@@ -25,7 +26,10 @@ public class ScalrParser2 {
 
             }
         ScalrParser2 parser = new ScalrParser2(new java.io.StringReader(text));
-        parser.assignment();
+        parser.function();
+        System.out.println(SymbolTable.reference);
+        parser.funcall();
+       
         System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
@@ -61,31 +65,94 @@ TOKEN: {
 
 
 
+void idDefs(ArrayList<String> params): {
+	Token t;
+} {
+	t = <ID> { params.add(t.image); }
+}
+void function() throws Exception: {
+	System.out.println("starting function def");
+	String funcName;
+	Function f;
+	ArrayList<String> params= new ArrayList<String>();
+	ArrayList<Expression> expressions = new ArrayList<Expression>();
+	Expression returnSeq;
+} {
+"func" funcName=id() {SymbolTable.currentFunctionScope= funcName; f= new Function(funcName); } 
+	"(" (idDefs(params) ("," idDefs(params))*)? {
+		for(String s: params){
+			f.addParameter(s);
+		}
+	} 
+
+	")" expressions = line1() {
+		for(Expression e: expressions){
+			f.addStatement(e);
+		}
+	}
+	
+	returnSeq= sequence(){
+		System.out.println("hit return sequence");
+		f.addStatement(returnSeq);
+	} 
+	"end" {
+		System.out.println("adding function with name "+ f.getName());
+		SymbolTable.addFuncRef(f);
+	}
+}
+Expression line() throws Exception: {
+	System.out.println("LINE");
+	Expression e;
+} {
+//loop() {System.out.println("loop line matched");}
+//| conditional() {System.out.println("conditional line matched");}
+//| 
+	assignment() {
+		return null;
+	}
+
+}
 
 
+ArrayList<Expression> line1() throws Exception: {
+	ArrayList<Expression> out; 
+	Expression e;
+} {
+e=line() out=line1(){
+	out.add(e);
+	return out;
+}
+| {}{
+	return new ArrayList<Expression>();
+}
+}
 
-void assignment(): {
+void assignment() throws Exception: {
 	String t1;
 	Expression t2;
-} {
+} 
+{
+	t1=id() <ASSIGN> t2=sequence() {SymbolTable.addReference(SymbolTable.currentFunctionScope, t1, t2);}
+	|
+
 	t1=id() <ASSIGN> t2=expression(){
 		try {
-			SymbolTable.addFunc("blah");
+			
 			//ScalrNum n = new ScalrNum(Integer.parseInt(t2.image));
-			SymbolTable.addReference("blah", t1, t2);
-			ScalrNum temp = (ScalrNum) SymbolTable.getMember("blah", t1);
+			SymbolTable.addReference(SymbolTable.currentFunctionScope, t1, t2);
+			//ScalrNum temp = (ScalrNum) SymbolTable.getMember(SymbolTable.currentFunctionScope, t1);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 }
-String id():
+String id() throws Exception:
 {Token t;}
 {
 t=<ID> {return t.image;}  //blah should be changed with the string that shows in which function we ARE!!!
 }
 
-Expression expression(): {
+Expression expression() throws Exception: {
 	Expression ex;
 	Pair<String, Expression> t;
 } 
@@ -105,12 +172,12 @@ ex= expr1()
 }
 
 
-Pair<String, Expression> expr0(): {Expression e;} {
+Pair<String, Expression> expr0() throws Exception: {Expression e;} {
 "+" e=expr1() { return Pair.with("+", e); }
 | "-" e=expr1() { return Pair.with("-", e); }
 }
 
-Expression expr1(): {
+Expression expr1() throws Exception: {
 	Expression ex;
 	Pair<String, Expression> t;
 } { ex=expr3() t=expr2() 
@@ -127,12 +194,12 @@ ex= expr3()
 }
 }
 
-Pair<String, Expression> expr2(): {Expression e;} {
+Pair<String, Expression> expr2() throws Exception: {Expression e;} {
 "*" e=expr3() { return Pair.with("*", e); }
 | "/" e=expr3() { return Pair.with("/", e); }
 }
 
-Expression expr3(): {
+Expression expr3() throws Exception: {
 	Expression ex;
 	Pair<String, Expression> t;
 } {ex = expr5() t=expr4()
@@ -149,33 +216,33 @@ ex= expr5()
 }
 }
 
-Pair<String, Expression> expr4(): {
+Pair<String, Expression> expr4() throws Exception: {
 	Expression ex;
 } {
 	"%" ex = expr5() { return Pair.with("%", ex); }
 }
 
-Expression expr5(): {
+Expression expr5() throws Exception: {
 	Expression ex;
 } {
 "(" ex = expression() ")" {return ex;}
 | ex = operand() {return ex;}
 }
 
-ScalrNum num():
+ScalrNum num() throws Exception:
 {Token t;}
 {
 t=<INT> {return new ScalrNum(Integer.parseInt(t.image));}
 }
 
-Expression operand(): {
+Expression operand() throws Exception: {
 	Expression ex;
 	String t;
 	Sequence s;
 } {
 s = funcall() {return s;}
 | 
-t=id() {return SymbolTable.getMember("blah", t);}
+t=id() {return SymbolTable.getMember(SymbolTable.currentFunctionScope, t);}
 | ex = note() 
 {
 	return ex;
@@ -184,29 +251,42 @@ t=id() {return SymbolTable.getMember("blah", t);}
 | ex=num() {return ex;}
 }
 
-Sequence funcall(): {
+Sequence funcall() throws Exception: {
 	Sequence s;
 	String t;
 	ArrayList<Expression> ex;
+	System.out.println("called funcall");
 } { 
 t = id() "(" ex = parameters() ")" 
 {
-	Collections.reverse(ex);
+	System.out.println("funcall case 1");
 	Function f = SymbolTable.getFuncRef(t);
-	Expression[] temp = ex.toArray(new Expression[ex.size()]);
-	s = (Sequence) f.getValue(temp);
+	if(ex.isEmpty()){
+		s = (Sequence) f.getValue();
+
+	}
+	else{
+		Collections.reverse(ex);
+		Expression[] temp = ex.toArray(new Expression[ex.size()]);
+		s = (Sequence) f.getValue(temp);	
+	}
+	
 	return s;
 }
 |
-t = id() 
+t = id()  
 {
+	System.out.println("funcall case 2");
+	System.out.println("looking for a function with name "+ t);
 	Function f = SymbolTable.getFuncRef(t);
+	System.out.println("got the function");	
 	s = (Sequence) f.getValue();
+	System.out.println("s is " + s);	
 	return s;
 }
 }
 
-ArrayList<Expression> parameters(): {
+ArrayList<Expression> parameters() throws Exception: {
 	Expression ex;
 	ArrayList<Expression> ex2;
 } { 
@@ -221,13 +301,14 @@ ex= operand()
 	ex2.add(ex);
 	return ex2;
 }
+
 }
 
-ArrayList<Expression> parameters1(): {
+ArrayList<Expression> parameters1() throws Exception: {
 	ArrayList<Expression> out;
 } { "," out = parameters() {return out;}}
 
-Expression sequence(): {
+Expression sequence() throws Exception: {
 	Sequence s;
 	Note n;
 	String id;
@@ -235,22 +316,25 @@ Expression sequence(): {
 } {
 "[" "]"
 {
+	System.out.println("sequence case 1");
 	s = new Sequence();
 	return s;
 }
 | "[" n = note() s = sequence1() "]" 
 {
+	System.out.println("sequence case 2");
 	s.addNoteToStart(n);
 	return s;
 }
 | id = id() 
 {
-	Expression e = SymbolTable.getMember("blah", id);
+	System.out.println("sequence case 3");
+	Expression e = SymbolTable.getMember(SymbolTable.currentFunctionScope, id);
 	return e;
 }
 }
 
-Sequence sequence1(): {
+Sequence sequence1() throws Exception: {
 	Sequence s;
 	Note n;
 
@@ -267,7 +351,7 @@ Sequence sequence1(): {
 }
 }
 
-Note note(): {
+Note note() throws Exception: {
 	Note n;
 	Sequence s;
 	Expression e;
@@ -287,12 +371,12 @@ Note note(): {
 }
 | t = id() 
 {
-	n = (Note) SymbolTable.getMember("blah", t);
+	n = (Note) SymbolTable.getMember(SymbolTable.currentFunctionScope, t);
 	return n;
 }
 }
 
-Note note0(): {
+Note note0() throws Exception: {
 	String[] sa;
 	Note n;
 	Note out;
@@ -319,7 +403,7 @@ sa = note1() n = note0()
 }
 }
 
-String[] note1(): {
+String[] note1() throws Exception: {
 	Note n;
 	Expression ex;
 	Expression ex2;
@@ -358,9 +442,9 @@ String[] note1(): {
 	sa[1] = s;
 	return sa;
 }
-| "." (s = "quarter" | s = "half" | s = "whole" | s = "eighth" 
-	| s = "sixteenth" | s = "thirtysec" | s = "eightT" | s = "sixteenthT" 
-	| s = "thirtysecT")
+| "." (s = "quarter".image | s = "half".image | s = "whole".image | s = "eighth".image 
+	| s = "sixteenth".image | s = "thirtysec".image | s = "eightT".image | s = "sixteenthT".image 
+	| s = "thirtysecT".image)
 {
 	sa = new String[2];
 	sa[0] = "duration";
@@ -369,7 +453,7 @@ String[] note1(): {
 }
 }
 
-String degree():
+String degree() throws Exception:
 {Token t;}
 {
 t=<DEGREE> {return t.image;}
