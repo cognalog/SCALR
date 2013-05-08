@@ -111,6 +111,8 @@ Expression line() throws Exception: {
 	assignment() {
 		return null;
 	}
+	|
+	note() note1()
 
 }
 
@@ -384,7 +386,7 @@ Note note() throws Exception: {
 	return n;
 }
 }
-
+//NEED TO USE MARKS NOTEEXPRESSION CLASS
 Note note0() throws Exception: {
 	String[] sa;
 	Note n;
