@@ -1,2 +1,5 @@
-/* hi */
-x = note
+hello = -(5 + -2)
+y = note.pitch(As3).pitch(+5)
+z = note.volume(50).half.length(-1)
+i = hello++
+g = hello

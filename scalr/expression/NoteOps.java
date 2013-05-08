@@ -2,6 +2,9 @@
 package scalr.expression;
 
 import scalr.Degree;
+import scalr.Length;
+import scalr.variable.Note;
+import scalr.variable.ScalrNum;
 
 public class NoteOps implements Expression
 {
@@ -10,6 +13,7 @@ public class NoteOps implements Expression
 	private Expression	num;
 	private String	   mod;
 	private Degree	   deg;
+	private Length	   len;
 	
 	public NoteOps(String type)
 	{
@@ -36,10 +40,63 @@ public class NoteOps implements Expression
 		deg = Degree.valueOf(pit);
 	}
 	
+	public void addLength(String len)
+	{
+		for (Length l : Length.values()) {
+			if (l.duration.equals(len)) {
+				this.len = l;
+				return;
+			}
+		}
+		// If we didn't return, then we could have the actual length
+		this.len = Length.valueOf(len);
+	}
+	
 	@Override
 	public Expression getValue(Expression... expressions)
 	{
-		// TODO Auto-generated method stub
+		if (note.getType() == ExpressionType.NOTE) {
+			Note n = (Note) note.getValue(expressions);
+			if (type.equals("pit")) {
+				if (mod != null) {
+					ScalrNum sn = (ScalrNum) num.getValue(expressions);
+					if (mod.equals("+"))
+						n.modPitch(sn.getNum());
+					else if (mod.equals("-"))
+						n.modPitch(-sn.getNum());
+					return n;
+				}
+				else
+					return n.setPitch(deg);
+			}
+			else if (type.equals("len")) {
+				if (len != null)
+					return n.setLength(len);
+				else {
+					ScalrNum sn = (ScalrNum) num.getValue(expressions);
+					if (mod.equals("+"))
+						n.modLength(sn.getNum());
+					else if (mod.equals("-"))
+						n.modLength(-sn.getNum());
+					return n;
+				}
+			}
+			else if (type.equals("vol")) {
+				if (num.getType() != ExpressionType.NUMBER)
+					return null;
+				
+				ScalrNum sn = (ScalrNum) num.getValue(expressions);
+				if (mod != null) {
+					if (mod.equals("+"))
+						n.modVolume(sn.getNum());
+					else if (mod.equals("-"))
+						n.modVolume(-sn.getNum());
+				}
+				else
+					n.setVolume(sn.getNum());
+				return n;
+			}
+		}
 		return null;
 	}
 	
@@ -51,4 +108,9 @@ public class NoteOps implements Expression
 		return null;
 	}
 	
+	@Override
+	public String toString()
+	{
+		return getValue().toString();
+	}
 }

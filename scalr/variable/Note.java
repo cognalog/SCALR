@@ -67,13 +67,17 @@ public class Note implements Variable
 	
 	public Note pitch(String pit) throws IllegalArgumentException
 	{
+		System.out.println(pit);
 		// Remove all whitespace
 		pit = pit.replaceAll("\\s", "");
 		// Determine if they're modding the pitch or setting it
 		Pattern modPat = Pattern.compile("^[\\+\\-]\\d+$");
 		Matcher modMatch = modPat.matcher(pit);
-		if (modMatch.matches())
+		if (modMatch.matches()) {
+			if (pit.contains("+"))
+				pit = pit.substring(1);
 			return modPitch(Integer.parseInt(pit));
+		}
 		
 		// If we're here, then that means that they're setting the pitch
 		Degree pitch = null;

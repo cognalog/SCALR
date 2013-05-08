@@ -27,7 +27,13 @@ public class ScalrParserTest {
         ScalrParserTest parser = new ScalrParserTest(new java.io.StringReader(text));
         SymbolTable.addFunc(currentFunc);
         parser.statement();
-        System.out.println(SymbolTable.reference);
+        parser.statement();
+        parser.statement();
+        parser.statement();
+        parser.statement();
+       	ArrayList<Expression> exprs = new ArrayList<Expression>(SymbolTable.reference.get(currentFunc).values());
+       	for(Expression expr : exprs)
+       		System.out.println(expr.getValue());
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
@@ -40,21 +46,19 @@ PARSER_END(ScalrParserTest)
 
 SKIP : { " " | "\t" | <"/*" (~[])* "*/"> }
 TOKEN: {
-	"and" | "or" | "not" | "->" | "." /*"\n" |*/
-    | "," | "\"" | "+" | "-" | "%" | "(" | ")" | "[" | "]" | "note" | "pitch"
-    | "volume" |
-       	"duration" | "quarter" | "half" | "whole" |
-	"end" | "func" | "main" | "while" | "foreach" |
-	 "in" |	"if" | "else" | "import" | "track" | ".fscalr" |
-	<ASSIGN: "+=" | "-=" | "*=" | "/=" | "%="> |
+	"and" | "or" | "not" | "volume" | "duration" | "end" | "func" | "main" | "while" | "foreach" |
+	"import" | "track" | "in" |	"if" | "else" | "note" | "pitch" | 
+	"->" | "." | "," | "\"" | "%" | "(" | ")" | "[" | "]" |
+    <CREATE: "="> |
+    <ASSIGN: "+=" | "-=" | "*=" | "/=" | "%="> |
 	<RELN: "==" | "<" | ">" | ">=" "<="> |
-	<INT: ("0" | ["1"-"9"](["0"-"9"])*)> |
-	<ID: ["a"-"z"](["A"-"Z"] | ["a"-"z"] | <INT> | "_")*> |
-    	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "10")>
-    | <LENGTH: "whole" | "half" | "quarter" | "eighth" | "sixteenth" |
-    		"thirtysec" | "quarterT" | "eighthT" | "sixteenthT" | "thirtysecT">
-    | <PLUS: "+" | "-">
-	}
+	<POST: "--" | "++"> |
+	<LENGTH: "whole" | "half" | "quarter" | "eighth" | "sixteenth" | "thirtysec" | "quarterT" |
+		"eighthT" | "sixteenthT" | "thirtysecT"> |
+   	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "10")> |
+	<INT: (("0")+ | ("0")* ["1"-"9"] (["0"-"9"])*)> |
+	<ID: (["a"-"z"] | "_" | ["A" - "Z"]) (["A"-"Z"] | ["a"-"z"] | <INT> | "_")*>
+}
 
 void id(ArrayList<String> params): {
 	Token t;
@@ -71,7 +75,7 @@ void creation(): {
 	Token t1;
 	Expression expr;	
 } {
-	t1 = <ID> "=" expr = arithExpr() {
+	t1 = <ID> <CREATE> expr = arithExpr() {
 		try {
 			SymbolTable.addReference(currentFunc, t1.image, expr);
 		} catch (Exception e) {
@@ -88,7 +92,6 @@ Expression arithExpr(): {
 	// <PLUS> contains + and -
 	e1 = mulOrDiv() ((op = "+" | op = "-") e2 = arithExpr())? {
 		if (op != null) {
-			System.out.println("here");
 			BinaryOperator bo = new BinaryOperator(op.image);
 			bo.addOperand(e1);
 			bo.addOperand(e2);
@@ -124,21 +127,32 @@ Expression unary(): {
 	Expression base = null;
 	Token op = null;
 	Token post = null;
+	Token id = null;
 } {
-	(op = "-")? ("(" e = arithExpr() ")" | base = var() (post = "--" | post = "++")?) {
+	(op = "-")? ("(" e = arithExpr() ")" | id = <ID> post = <POST> | base = var()) {
 		if (e == null) {
-			Expression ret = base;
-			if (post != null) {
+			if (base != null) {
+				Expression ret = base;
+				if (op != null) {
+					UnaryOperator uo = new UnaryOperator(op.image);
+					uo.addOperand(ret);
+					ret = uo;
+				}
+				return ret;
+			}
+			else if (id != null) {
+				VariableReference ref = new VariableReference(id.image, currentFunc);
 				UnaryOperator uo = new UnaryOperator(post.image);
-				uo.addOperand(ret);
-				ret = uo;
+				uo.addOperand(ref);
+				uo.addFunc(currentFunc);
+				uo.addVar(id.image);
+				if (op != null) {
+					UnaryOperator uo2 = new UnaryOperator(op.image);
+					uo2.addOperand(uo);
+					uo = uo2;
+				}
+				return uo;
 			}
-			if (op != null) {
-				UnaryOperator uo = new UnaryOperator(op.image);
-				uo.addOperand(ret);
-				ret = uo;
-			}
-			return ret;
 		}
 		else {
 			if (op == null)
@@ -170,12 +184,23 @@ Expression note(): {
 	Token t;
 	Expression n = Note.note();
 } {
-	"note" (".pitch(" n = pitch(n) ")" | ".length(" n = length(n) ")" | ".volume(" n = volume(n) ")" | t = <LENGTH> { NoteOps no = new NoteOps("pit"); 
-		no})* { return n; }
+	("note" | t = <ID> { n = new VariableReference(t.image, currentFunc); }) 
+	(".pitch(" n = pitch(n) ")" | ".length(" n = length(n) ")" | ".volume(" n = volume(n) ")" | "." n = lenClass(n))* { return n; }
+}
+
+Expression lenClass(Expression n): {
+	Token len;
+} {
+	len = <LENGTH> {
+		NoteOps no = new NoteOps("len");
+		no.addOperand(n);
+		no.addLength(len.image);
+		return no;
+	}
 }
 
 Expression pitch(Expression n): {
-	Token mod = null;
+	Token mod;
 	Expression e;
 } {
 	mod = <DEGREE> {
@@ -184,12 +209,11 @@ Expression pitch(Expression n): {
 		no.addPitch(mod.image);
 		return no;
 	}
-	| (mod = "+" | mod = "-")? e = arithExpr() {
+	| (mod = "+" | mod = "-") e = arithExpr() {
 		NoteOps no = new NoteOps("pit");
 		no.addOperand(n);
 		no.addNum(e);
-		if(mod != null)
-			no.addMod(mod.image);
+		no.addMod(mod.image);
 		return no;
 	}
 }
@@ -197,13 +221,22 @@ Expression pitch(Expression n): {
 Expression length(Expression n): {
 	Expression e;
 	Token mod = null;
+	Token numer;
 } {
-	(mod = "+" | mod = "-")? e = arithExpr() {
+	(mod = "+" | mod = "-") e = arithExpr() {
 		NoteOps no = new NoteOps("len");
 		no.addOperand(n);
 		no.addNum(e);
-		if(mod != null)
-			no.addMod(mod.image);
+		no.addMod(mod.image);
+		return no;
+	}
+	| numer = <INT> ("/" mod = <INT>)? {
+		NoteOps no = new NoteOps("len");
+		no.addOperand(n);
+		if (mod != null)
+			no.addLength(numer.image + "/" + mod.image);
+		else
+			no.addLength(numer.image);
 		return no;
 	}
 }

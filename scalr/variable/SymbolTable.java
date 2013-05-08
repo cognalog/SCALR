@@ -3,10 +3,11 @@ package scalr.variable;
 
 import java.util.HashMap;
 
+import scalr.Exceptions.FunctionDoesNotExistError;
 import scalr.Exceptions.FunctionExistsError;
 import scalr.Exceptions.TypeError;
-import scalr.Exceptions.FunctionDoesNotExistError;
-import scalr.expression.*;
+import scalr.expression.Expression;
+import scalr.expression.Function;
 
 /**
  * This utility class contains a mapping of all IDs ({@linkplain String}) to their
@@ -15,10 +16,11 @@ import scalr.expression.*;
  */
 public final class SymbolTable
 {
-	public static String currentFunctionScope="";
-	public static final HashMap<String, Function> functionReferences= new HashMap<String, Function>();
-	public static final HashMap<String, HashMap<String, Expression>>	reference	=
-	                                                                                  new HashMap<String, HashMap<String, Expression>>();
+	public static String	                                         currentFunctionScope	= "";
+	public static final HashMap<String, Function>	                 functionReferences	  =
+	                                                                                              new HashMap<String, Function>();
+	public static final HashMap<String, HashMap<String, Expression>>	reference	      =
+	                                                                                              new HashMap<String, HashMap<String, Expression>>();
 	
 	private SymbolTable() throws AssertionError
 	{
@@ -27,19 +29,23 @@ public final class SymbolTable
 	
 	public static void addFunc(String func) throws FunctionExistsError
 	{
-		System.out.println("Adding function "+ func);
+		System.out.println("Adding function " + func);
 		if (reference.containsKey(func))
 			throw new FunctionExistsError(func);
 		HashMap<String, Expression> funcTable = new HashMap<String, Expression>();
 		reference.put(func, funcTable);
 	}
-	public static void addFuncRef(Function f){
+	
+	public static void addFuncRef(Function f)
+	{
 		functionReferences.put(f.getName(), f);
 	}
-	public static Function getFuncRef(String id) throws FunctionDoesNotExistError{
-		if(!functionReferences.containsKey(id))
+	
+	public static Function getFuncRef(String id) throws FunctionDoesNotExistError
+	{
+		if (!functionReferences.containsKey(id))
 			throw new FunctionDoesNotExistError(id);
-
+		
 		return (Function) functionReferences.get(id);
 	}
 	
@@ -67,18 +73,22 @@ public final class SymbolTable
 			return false;
 		}
 	}
-	public static Expression getMember(String func, String id){
-		HashMap<String, Expression> selfie= reference.get(func);
-
+	
+	public static Expression getMember(String func, String id)
+	{
+		HashMap<String, Expression> selfie = reference.get(func);
+		
 		return (Expression) selfie.get(id);
-
+		
 	}
-	public static boolean memberExists(String func, String id){
-		boolean out=false;
-		if(reference.containsKey(func)){
+	
+	public static boolean memberExists(String func, String id)
+	{
+		boolean out = false;
+		if (reference.containsKey(func)) {
 			HashMap<String, Expression> temp = reference.get(func);
-			if(temp.containsKey(id)){
-				out=true;
+			if (temp.containsKey(id)) {
+				out = true;
 			}
 		}
 		return out;

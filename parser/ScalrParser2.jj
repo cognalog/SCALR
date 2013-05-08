@@ -29,6 +29,8 @@ public class ScalrParser2 {
         SymbolTable.addFunc("test");
         SymbolTable.currentFunctionScope = "test";
         parser.assignment();
+        parser.assignment();
+        parser.assignment();
         System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
