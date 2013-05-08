@@ -1,7 +1,2 @@
-func hello()
-	seq= [ note.quarter ]
-	seq
-end
-
-hello
+x= note.pitch(+5)
 

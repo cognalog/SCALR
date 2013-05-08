@@ -130,10 +130,14 @@ e=line() out=line1(){
 }
 
 void assignment() throws Exception: {
+	System.out.println("called assignment");
 	String t1;
 	Expression t2;
 } 
 {
+	
+	t1=id() <ASSIGN> t2=note() { SymbolTable.addReference(SymbolTable.currentFunctionScope, t1, t2);}
+	|
 	t1=id() <ASSIGN> t2=sequence() {SymbolTable.addReference(SymbolTable.currentFunctionScope, t1, t2);}
 	|
 
@@ -362,6 +366,7 @@ Note note() throws Exception: {
 } {
 "note" n = note0() 
 {
+
 	return n;
 }
 | seq = sequence() "[" e=expression() "]" 
@@ -383,12 +388,14 @@ Note note0() throws Exception: {
 	Note n;
 	Note out;
 } {
-sa = note1() n = note0()
+sa = note1() {System.out.println("note1 returned properly");} n = note0()
 {
 	out = null;
 	String s = sa[0];
 	if(s.equals("pitch")){
+	System.out.println(" before switch to pitch "+ sa[1]);
 		out = n.pitch(sa[1]);
+		System.out.println("switch to pitch "+ sa[1]);
 	}
 	if(s.equals("volume")){
 		out = n.volume(sa[1]);
@@ -399,8 +406,8 @@ sa = note1() n = note0()
 	return out;
 }
 | 
-{}
 {
+	System.out.println("creating new note");
 	return Note.note();
 }
 }
@@ -414,11 +421,12 @@ String[] note1() throws Exception: {
 
 } {
 "." "pitch" "(" ( s = degree() {} 
-	| "+" ex = expr5() {ex2 = ex.getValue(); s = "+" + ex2.toString();}
+	| "+" ex = expr5() {ex2 = ex.getValue();  s = "+" + ex2.toString();}
 	| "-" ex = expr5() {ex2 = ex.getValue(); s = "-" + ex2.toString();}
 	| n = note() {s = n.pitch.toString();} 
 	| ex = expression() {ex2 = ex.getValue(); s = ex2.toString();}) ")"
 {
+	System.out.println(s);
 	sa = new String[2];
 	sa[0] = "pitch";
 	sa[1] = s;
