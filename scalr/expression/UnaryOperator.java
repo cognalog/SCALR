@@ -49,7 +49,6 @@ public class UnaryOperator implements Expression
 			else if (operator.equals("--")) {
 				ScalrNum num = (ScalrNum) expr.getValue(expressions);
 				num.setValue(num.getNum() - 1);
-				System.out.println(num);
 				// Put the modified variable back
 				try {
 					SymbolTable.addReference(func, var, num);

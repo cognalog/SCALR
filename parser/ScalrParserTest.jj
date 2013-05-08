@@ -10,7 +10,7 @@ import java.io.*;
 import scalr.variable.*;
 import scalr.expression.*;
 import scalr.Exceptions.*;
-import java.util.ArrayList;
+import java.util.*;
 
 public class ScalrParserTest {
 	public static String currentFunc = "test";
@@ -26,14 +26,11 @@ public class ScalrParserTest {
             }
         ScalrParserTest parser = new ScalrParserTest(new java.io.StringReader(text));
         SymbolTable.addFunc(currentFunc);
-        parser.statement();
-        parser.statement();
-        parser.statement();
-        parser.statement();
-        parser.statement();
-       	ArrayList<Expression> exprs = new ArrayList<Expression>(SymbolTable.reference.get(currentFunc).values());
-       	for(Expression expr : exprs)
-       		System.out.println(expr.getValue());
+        ArrayList<Expression> function = new ArrayList<Expression>();
+        function.add(parser.statement());
+		for(Expression e : function) {
+			System.out.println("Type: " + e.getType() + " | Value: " + e.getValue());
+		}
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
@@ -66,21 +63,24 @@ void id(ArrayList<String> params): {
 	t = <ID> { params.add(t.image); }
 }
 
-void statement(): {}
-{
-	("\n")* creation() "\n" { System.out.println("Assignment from function: " + currentFunc); }
+Expression statement(): {
+	Expression expr;
+} {
+	("\n")* expr = creation() "\n" {
+		System.out.println("Assignment from function: " + currentFunc);
+		return expr;
+	}
 }
 
-void creation(): {
+Expression creation(): {
 	Token t1;
 	Expression expr;	
 } {
 	t1 = <ID> <CREATE> expr = arithExpr() {
-		try {
-			SymbolTable.addReference(currentFunc, t1.image, expr);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		CreationOperator co = new CreationOperator(t1.image);
+		co.addOperand(expr);
+		co.addFunc(currentFunc);
+		return co;
 	}
 }
 
