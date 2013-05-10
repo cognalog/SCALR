@@ -1,0 +1,7 @@
+import assign
+
+main
+  seq = expand()
+end
+
+track -> [seq]

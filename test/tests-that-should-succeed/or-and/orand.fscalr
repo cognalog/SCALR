@@ -1,0 +1,19 @@
+func a_and_b()
+  seq = []
+  if(1==1 and 1==1)
+    seq += note.pitch(A3).volume(100)
+  else
+    seq += note.pitch(C3).volume(100)
+  end
+  seq
+end
+
+func c_or_d()
+  seq = []
+  if(0==1 or 1==1)
+    seq += note.pitch(A3).volume(100)
+  else
+    seq += note.pitch(C3).volume(100)
+  end
+  seq
+end
