@@ -1,4 +1,4 @@
 func hello ()
   n = note.pitch(A3).quarter
-  return n.pitch(+2)
+  n.pitch(+2)
 end

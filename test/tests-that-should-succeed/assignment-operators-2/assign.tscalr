@@ -4,5 +4,5 @@ func expand ()
   vol += 4 /* 104 */
   vol /= 2 /* 52 */
   vol -= 3 /* 49 */
-  return note.pitch(C3).volume(vol)
+  note.pitch(C3).volume(vol)
 end

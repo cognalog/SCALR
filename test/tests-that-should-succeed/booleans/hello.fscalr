@@ -5,5 +5,5 @@ func hello ()
   else
     seq = note.pitch(As3).quarter
   end
-  return seq
+  seq
 end
