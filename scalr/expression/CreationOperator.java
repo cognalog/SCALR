@@ -3,6 +3,7 @@ package scalr.expression;
 
 import scalr.Exceptions.TypeError;
 import scalr.variable.SymbolTable;
+import scalr.variable.Variable;
 
 public class CreationOperator implements Expression
 {
@@ -29,7 +30,8 @@ public class CreationOperator implements Expression
 	public Expression getValue(Expression... expressions)
 	{
 		// Compute the rval
-		Expression result = rval.getValue(expressions);
+		Variable inter = (Variable) rval.getValue(expressions);
+		Expression result = inter.getCopy();
 		try {
 			SymbolTable.addReference(func, var, result);
 		}
