@@ -28,7 +28,6 @@ public class ScalrParserTest {
         SymbolTable.addFunc(currentFunc);
         ArrayList<Expression> function = new ArrayList<Expression>();
         function.add(parser.statement());
-        function.add(parser.statement());
 		for(Expression e : function) {
 			System.out.println("Type: " + e.getType() + " | Value: " + e.getValue());
 		}
@@ -49,10 +48,14 @@ TOKEN: {
 	"->" | "." | "," | "\"" | "%" | "(" | ")" | "[" | "]" |
     <CREATE: "="> |
     <ASSIGN: "+=" | "-=" | "*=" | "/=" | "%="> |
-	<RELN: "==" | "<" | ">" | ">=" | "<=" | "!=" | "||" | "&&" > |
+	<NRELN: "<" | ">" | ">=" | "<="> |
+	<AND: "||" > |
+	<OR: "&&"> |
+	<URELN: "==" | "!="> |
 	<POST: "--" | "++"> |
 	<LENGTH: "whole" | "half" | "quarter" | "eighth" | "sixteenth" | "thirtysec" | "quarterT" |
 		"eighthT" | "sixteenthT" | "thirtysecT"> |
+	<BOOL: "true" | "false"> |
    	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "10")> |
 	<INT: (("0")+ | ("0")* ["1"-"9"] (["0"-"9"])*)> |
 	<ID: (["a"-"z"] | "_" | ["A" - "Z"]) (["A"-"Z"] | ["a"-"z"] | <INT> | "_")*>
@@ -63,6 +66,10 @@ Expression statement(): {
 } {
 	("\n")* expr = creation() "\n" {
 		System.out.println("Assignment from function: " + currentFunc);
+		return expr;
+	}
+	| ("\n")* expr = boolExpr() "\n" {
+		System.out.println(expr);
 		return expr;
 	}
 }
@@ -80,11 +87,77 @@ Expression creation(): {
 }
 
 Expression boolExpr(): {
-	Expression e;
-	Expression e;
+	Expression e1;
+	Expression e2 = null;
 	Token op = null;
 } {
-	
+	e1 = andExpr() (op = <OR> e2 = boolExpr())? {
+		if (op != null) {
+			BinaryOperator bo = new BinaryOperator(op.image);
+			bo.addOperand(e1);
+			bo.addOperand(e2);
+			return bo;
+		}
+		else
+			return e1;
+	}
+}
+
+Expression andExpr(): {
+	Expression e1;
+	Expression e2 = null;
+	Token op = null;
+} {
+	e1 = boolEqualExpr() (op = <AND> e2 = boolExpr())? {
+		if (op != null) {
+			BinaryOperator bo = new BinaryOperator(op.image);
+			bo.addOperand(e1);
+			bo.addOperand(e2);
+			return bo;
+		}
+		else
+			return e1;
+	}
+}
+
+Expression boolEqualExpr(): {
+	Expression e1;
+	Expression e2 = null;
+	Token op = null;
+} {
+	e1 = nrelExpr() (op = <URELN> e2 = boolExpr())? {
+		if (op != null) {
+			BinaryOperator bo = new BinaryOperator(op.image);
+			bo.addOperand(e1);
+			bo.addOperand(e2);
+			return bo;
+		}
+		else
+			return e1;
+	}
+}
+
+Expression nrelExpr(): {
+	Expression e1;
+	Expression e2 = null;
+	Token op = null;
+} {
+	e1 = arithExpr() (op = <NRELN> | op = <URELN>) e2 = arithExpr() {
+		if (op != null) {
+			BinaryOperator bo = new BinaryOperator(op.image);
+			bo.addOperand(e1);
+			bo.addOperand(e2);
+			return bo;
+		}
+		else
+			return e1;
+	}
+	| op = <BOOL> {
+		return new ScalrBoolean(Boolean.parseBoolean(op.image));
+	}
+	| "(" e1 = boolExpr() ")" {
+		return e1;
+	}
 }
 
 Expression arithExpr(): {
