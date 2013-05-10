@@ -40,6 +40,8 @@ public class BooleanOperator implements Expression
 		if (cachedResult != null)
 			return cachedResult;
 		
+		if (expr2 == null && expr1.getType() == ExpressionType.BOOLEAN)
+			return (cachedResult = expr1.getValue());
 		if (expr1.getType() != ExpressionType.NUMBER || expr2.getType() != ExpressionType.NUMBER) {
 			ScalrNum num1 = (ScalrNum) expr1.getValue();
 			ScalrNum num2 = (ScalrNum) expr2.getValue();
@@ -87,6 +89,8 @@ public class BooleanOperator implements Expression
 	{
 		if (exprType != null)
 			return exprType;
+		if (expr2 == null && expr1.getType() == ExpressionType.BOOLEAN)
+			return (exprType = ExpressionType.BOOLEAN);
 		if (expr1.getType() == ExpressionType.NUMBER && expr2.getType() == ExpressionType.NUMBER)
 			return (exprType = ExpressionType.BOOLEAN);
 		else if (expr1.getType() == ExpressionType.BOOLEAN
