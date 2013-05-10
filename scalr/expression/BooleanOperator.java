@@ -3,6 +3,7 @@ package scalr.expression;
 
 import scalr.variable.Note;
 import scalr.variable.ScalrNum;
+import scalr.variable.ScalrBoolean;
 import scalr.variable.Sequence;
 
 public class BooleanOperator implements Expression
