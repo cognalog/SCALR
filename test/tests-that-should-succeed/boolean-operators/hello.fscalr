@@ -1,0 +1,9 @@
+func hello ()
+  seq = []
+  if(3 < 2)
+    seq = note.pitch(A3).quarter
+  else
+    seq = note.pitch(As3).quarter
+  end
+  return seq
+end

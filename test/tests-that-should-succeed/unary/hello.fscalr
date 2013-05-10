@@ -2,5 +2,5 @@ func hello ()
   level = 100
   level2 = -30
   levelfinal = level + level2
-  note.pitch(A3).quarter.volume(levelfinal)
+  return note.pitch(A3).quarter.volume(levelfinal)
 end

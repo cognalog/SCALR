@@ -3,5 +3,5 @@ func seq1 (scale)
   myseq += note.pitch(scale[1]).quarter
   myseq += note.pitch(scale[2]).quarter
   myseq += note.pitch(scale[3]).quarter
-  myseq
+  return myseq
 end
