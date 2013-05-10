@@ -55,6 +55,23 @@ public class BooleanOperator implements Expression
 			else if (operator.equals(">=")) {
 				return (cachedResult = new ScalrBoolean(num1.getNum() >= num2.getNum()));
 			}
+			else if (operator.equals("!="))
+				return (cachedResult = new ScalrBoolean(num1.getNum() != num2.getNum()));
+			else if (operator.equals("=="))
+				return (cachedResult = new ScalrBoolean(num1.getNum() == num2.getNum()));
+		}
+		else if (expr1.getType() == ExpressionType.BOOLEAN
+		        && expr2.getType() == ExpressionType.BOOLEAN) {
+			ScalrBoolean bool1 = (ScalrBoolean) expr1.getValue();
+			ScalrBoolean bool2 = (ScalrBoolean) expr1.getValue();
+			if (operator.equals("=="))
+				return (cachedResult = new ScalrBoolean(bool1.getBool() == bool2.getBool()));
+			else if (operator.equals("||"))
+				return (cachedResult = new ScalrBoolean(bool1.getBool() || bool2.getBool()));
+			else if (operator.equals("&&"))
+				return (cachedResult = new ScalrBoolean(bool1.getBool() && bool2.getBool()));
+			else if (operator.equals("!="))
+				return (cachedResult = new ScalrBoolean(bool1.getBool() != bool2.getBool()));
 		}
 		// This should never be reached, but hopefully screws over some invalid syntax and causes an
 		// error
