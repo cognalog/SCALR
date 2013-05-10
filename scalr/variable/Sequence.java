@@ -42,17 +42,17 @@ public class Sequence implements Variable
 			theNotes.add(n);
 	}
 	
-	public void addNoteToEnd(Note e)
+	public void addNoteToEnd(Expression e)
 	{
-		theNotes.add(e.getCopy());
+		theNotes.add(e);
 	}
 	
-	public void addNoteToStart(Note e)
+	public void addNoteToStart(Expression e)
 	{
 		if (theNotes.size() > 0)
-			theNotes.add(0, e.getCopy());
+			theNotes.add(0, e);
 		else
-			theNotes.add(e.getCopy());
+			theNotes.add(e);
 	}
 	
 	public void deleteLeftmost()
