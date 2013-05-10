@@ -1,0 +1,8 @@
+import orand
+
+main
+  seq = c_or_d()
+  seq = a_and_b()
+end
+
+track -> [seq]
