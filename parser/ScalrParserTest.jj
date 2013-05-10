@@ -49,7 +49,7 @@ TOKEN: {
 	"->" | "." | "," | "\"" | "%" | "(" | ")" | "[" | "]" |
     <CREATE: "="> |
     <ASSIGN: "+=" | "-=" | "*=" | "/=" | "%="> |
-	<RELN: "==" | "<" | ">" | ">=" "<="> |
+	<RELN: "==" | "<" | ">" | ">=" | "<=" | "!=" | "||" | "&&" > |
 	<POST: "--" | "++"> |
 	<LENGTH: "whole" | "half" | "quarter" | "eighth" | "sixteenth" | "thirtysec" | "quarterT" |
 		"eighthT" | "sixteenthT" | "thirtysecT"> |
@@ -77,6 +77,14 @@ Expression creation(): {
 		co.addFunc(currentFunc);
 		return co;
 	}
+}
+
+Expression boolExpr(): {
+	Expression e;
+	Expression e;
+	Token op = null;
+} {
+	
 }
 
 Expression arithExpr(): {
