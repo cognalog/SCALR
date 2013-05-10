@@ -26,9 +26,10 @@ public class ScalrParser2 {
 
             }
         ScalrParser2 parser = new ScalrParser2(new java.io.StringReader(text));
-        SymbolTable.addFunc("test");
-        SymbolTable.currentFunctionScope = "test";
-        parser.assignment();
+        //SymbolTable.addFunc("test");
+        //SymbolTable.currentFunctionScope = "test";
+        parser.function();
+        parser.funcall();
         System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
@@ -89,6 +90,7 @@ void function() throws Exception: {
 
 	")" expressions = line1() {
 		for(Expression e: expressions){
+			System.out.println("adding statement");
 			f.addStatement(e);
 		}
 	}
@@ -103,7 +105,7 @@ void function() throws Exception: {
 	}
 }
 
-String track(): {String out;
+String track() throws Exception: {String out;
 				Expression e;}
 {
 	"track" "->" e=sequence() 
@@ -116,20 +118,24 @@ String track(): {String out;
 
 Expression line() throws Exception: {
 	Expression e;
+	System.out.println("calling LINE");
 } {
 //loop() {System.out.println("loop line matched");}
 //| conditional() {System.out.println("conditional line matched");}
 //| 
 	assignment() {
+		System.out.println("end of assignment");
 		return null;
 	}
 	|
-	note() {
-
-	}
-	|
+	//note() {
+	//	System.out.println("line consisting of note");
+	//	return null;
+	//}
+	//|
 	track() {
-
+		System.out.println("line consisting of track");
+		return null;
 	}
 
 }
@@ -142,9 +148,10 @@ ArrayList<Expression> line1() throws Exception: {
 	Expression e;
 } {
 e=line() out=line1(){
+	System.out.println("adding line");
 	if(e != null){
-	out.add(e);
-	return out;
+		out.add(e);
+		return out;
 	}
 	return out;
 }
@@ -156,20 +163,26 @@ e=line() out=line1(){
 void assignment() throws Exception: {
 	String t1;
 	Expression t2;
+	System.out.println("starting assignment");
 } 
 {
 	
-	t1=id() <ASSIGN> t2=note() { CreationOperator co = new CreationOperator(t1);
+	
+	t1=id() <ASSIGN> t2=sequence() {
+									System.out.println("assignment case sequence");
+									CreationOperator co = new CreationOperator(t1);
+									co.addOperand(t2);
+									co.addFunc(SymbolTable.currentFunctionScope);}
+	|
+	t1=id() <ASSIGN> t2=note() { 	System.out.println("assignment case note");
+									CreationOperator co = new CreationOperator(t1);
 									co.addOperand(t2);
 									co.addFunc(SymbolTable.currentFunctionScope);
 								}
 	|
-	t1=id() <ASSIGN> t2=sequence() {CreationOperator co = new CreationOperator(t1);
-									co.addOperand(t2);
-									co.addFunc(SymbolTable.currentFunctionScope);}
-	|
 
 	t1=id() <ASSIGN> t2=expression(){
+									System.out.println("assignment case expression");
 									CreationOperator co = new CreationOperator(t1);
 									co.addOperand(t2);
 									co.addFunc(SymbolTable.currentFunctionScope);
@@ -184,6 +197,7 @@ t=<ID> {return t.image;}  //blah should be changed with the string that shows in
 Expression expression() throws Exception: {
 	Expression ex;
 	Pair<String, Expression> t;
+	System.out.println("called expression!");	
 } 
 {
 ex=expr1() t=expr0()
@@ -305,6 +319,7 @@ t = id() "(" ex = parameters() ")"
 |
 t = id()  
 {
+	System.out.println("funcall ");
 	Function f = SymbolTable.getFuncRef(t);
 	s = (Sequence) f.getValue();
 	return s;
@@ -337,6 +352,7 @@ Expression sequence() throws Exception: {
 	Sequence s;
 	Expression n;
 	String id;
+	System.out.println("called sequence");
 
 } {
 "[" "]"
@@ -371,184 +387,119 @@ Sequence sequence1() throws Exception: {
 }
 | {}
 {
+	System.out.println("created new sequence");
 	s = new Sequence();
 	return s;
 }
 }
 
-Expression note(): {
-	Token t;
-	Expression n = Note.note();
-} {
-	("note" | t = <ID> { n = new VariableReference(t.image, SymbolTable.currentFunctionScope); }) 
-	(".pitch(" n = pitch(n) ")" | ".length(" n = length(n) ")" | ".volume(" n = volume(n) ")" | "." n = lenClass(n))* { return n; }
-}
-
-Expression lenClass(Expression n): {
-	Token len;
-} {
-	len = <LENGTH> {
-		NoteOps no = new NoteOps("len");
-		no.addOperand(n);
-		no.addLength(len.image);
-		return no;
-	}
-}
-
-Expression pitch(Expression n): {
-	Token mod;
+Note note() throws Exception: {
+	Note n;
+	Sequence s;
 	Expression e;
+	String t;
+	Expression seq;
 } {
-	mod = <DEGREE> {
-		NoteOps no = new NoteOps("pit");
-		no.addOperand(n);
-		no.addPitch(mod.image);
-		return no;
+"note" n = note0() 
+{
+
+	return n;
+}
+| seq = sequence() "[" e=expression() "]" 
+{
+	s = (Sequence) seq;
+	ScalrNum sn= (ScalrNum) e.getValue();
+	n= s.getNote(sn.toString());
+	return n;
+}
+| t = id() 
+{
+	n = (Note) SymbolTable.getMember(SymbolTable.currentFunctionScope, t);
+	return n;
+}
+}
+//NEED TO USE MARKS NOTEEXPRESSION CLASS
+Note note0() throws Exception: {
+	String[] sa;
+	Note n;
+	Note out;
+} {
+sa = note1() {System.out.println("note1 returned properly");} n = note0()
+{
+	out = null;
+	String s = sa[0];
+	if(s.equals("pitch")){
+	
+		out = n.pitch(sa[1]);
 	}
-	| (mod = "+" | mod = "-") e = arithExpr() {
-		NoteOps no = new NoteOps("pit");
-		no.addOperand(n);
-		no.addNum(e);
-		no.addMod(mod.image);
-		return no;
+	if(s.equals("volume")){
+		out = n.volume(sa[1]);
 	}
+	if(s.equals("duration")){
+		out = n.length(sa[1]);
+	}
+	return out;
+}
+| 
+{
+	System.out.println("creating new note");
+	return Note.note();
+}
 }
 
-Expression length(Expression n): {
-	Expression e;
-	Token mod = null;
-	Token numer;
+String[] note1() throws Exception: {
+	Note n;
+	Expression ex;
+	Expression ex2;
+	String s;
+	String[] sa;
+
 } {
-	(mod = "+" | mod = "-") e = arithExpr() {
-		NoteOps no = new NoteOps("len");
-		no.addOperand(n);
-		no.addNum(e);
-		no.addMod(mod.image);
-		return no;
-	}
-	| numer = <INT> ("/" mod = <INT>)? {
-		NoteOps no = new NoteOps("len");
-		no.addOperand(n);
-		if (mod != null)
-			no.addLength(numer.image + "/" + mod.image);
-		else
-			no.addLength(numer.image);
-		return no;
-	}
+"." "pitch" "(" ( s = degree() {} 
+	| "+" ex = expr5() {ex2 = ex.getValue();  s = "+" + ex2.toString();}
+	| "-" ex = expr5() {ex2 = ex.getValue(); s = "-" + ex2.toString();}
+	| n = note() {s = n.pitch.toString();} 
+	| ex = expression() {ex2 = ex.getValue(); s = ex2.toString();}) ")"
+{
+	System.out.println(s);
+	sa = new String[2];
+	sa[0] = "pitch";
+	sa[1] = s;
+	return sa;
+}
+| "." "volume" "(" (
+	"+" ex = expr5() {ex2 = ex.getValue(); s = "+" + ex2.toString();}
+	| "-" ex = expr5() {ex2 = ex.getValue(); s = "-" + ex2.toString();} 
+	| ex = expression() {ex2 = ex.getValue(); s = ex2.toString();}) ")"
+{
+	sa = new String[2];
+	sa[0] = "volume";
+	sa[1] = s;
+	return sa;
+}
+| "." "duration" "(" (
+	"+" ex = expr5() {ex2 = ex.getValue(); s = "+" + ex2.toString();}
+	| "-" ex = expr5() {ex2 = ex.getValue(); s = "-" + ex2.toString();} 
+	| ex = expression() {ex2 = ex.getValue(); s = ex2.toString();}) ")"
+{
+	sa = new String[2];
+	sa[0] = "duration";
+	sa[1] = s;
+	return sa;
+}
+| "." (s = "quarter".image | s = "half".image | s = "whole".image | s = "eighth".image 
+	| s = "sixteenth".image | s = "thirtysec".image | s = "eightT".image | s = "sixteenthT".image 
+	| s = "thirtysecT".image)
+{
+	sa = new String[2];
+	sa[0] = "duration";
+	sa[1] = s;
+	return sa;
+}
 }
 
-Expression volume(Expression n): {
-	Expression e;
-	Token mod = null;
-} {
-	(mod = "+" | mod = "-")? e = arithExpr() {
-		NoteOps no = new NoteOps("vol");
-		no.addOperand(n);
-		no.addNum(e);
-		if(mod != null)
-			no.addMod(mod.image);
-		return no;
-	}
+String degree() throws Exception:
+{Token t;}
+{
+t=<DEGREE> {return t.image;}
 }
-
-Expression arithExpr(): {
-	Expression e1;
-	Expression e2 = null;
-	Token op = null;
-} {
-	// <PLUS> contains + and -
-	e1 = mulOrDiv() ((op = "+" | op = "-") e2 = arithExpr())? {
-		if (op != null) {
-			BinaryOperator bo = new BinaryOperator(op.image);
-			bo.addOperand(e1);
-			bo.addOperand(e2);
-			return bo;
-		}
-		else
-			return e1;
-	}
-}
-
-Expression mulOrDiv(): {
-	Expression e1;
-	Expression e2 = null;
-	Token op = null;
-} {
-	// PORD contains *, %, and /
-	e1 = unary() ((op = "*" | op = "%" | op = "/") e2 = arithExpr())? {
-		if (op != null) {
-			BinaryOperator bo = new BinaryOperator(op.image);
-			bo.addOperand(e1);
-			bo.addOperand(e2);
-			return bo;
-		}
-		else
-			return e1;
-	}
-}
-
-
-
-Expression unary(): {
-	Expression e = null;
-	Expression base = null;
-	Token op = null;
-	Token post = null;
-	Token id = null;
-} {
-	(op = "-")? ("(" e = arithExpr() ")" | id = <ID> post = <POST> | base = var()) {
-		if (e == null) {
-			if (base != null) {
-				Expression ret = base;
-				if (op != null) {
-					UnaryOperator uo = new UnaryOperator(op.image);
-					uo.addOperand(ret);
-					ret = uo;
-				}
-				return ret;
-			}
-			else if (id != null) {
-				VariableReference ref = new VariableReference(id.image, SymbolTable.currentFunctionScope);
-				UnaryOperator uo = new UnaryOperator(post.image);
-				uo.addOperand(ref);
-				uo.addFunc(SymbolTable.currentFunctionScope);
-				uo.addVar(id.image);
-				if (op != null) {
-					UnaryOperator uo2 = new UnaryOperator(op.image);
-					uo2.addOperand(uo);
-					uo = uo2;
-				}
-				return uo;
-			}
-		}
-		else {
-			if (op == null)
-				return e;
-			else {
-				UnaryOperator uo = new UnaryOperator(op.image);
-				uo.addOperand(e);
-				return uo;
-			}
-		}
-	}
-}
-
-Expression var(): {
-	Token t;
-	Expression expr;
-} {
-	t = <INT> { return new ScalrNum(Integer.parseInt(t.image)); }
-	| (expr = sequence() | expr = note()) { return expr; }
-	| t = <ID> { return new VariableReference(t.image, SymbolTable.currentFunctionScope); }
-}
-
-
-
-
-
-
-
-
-
-
-

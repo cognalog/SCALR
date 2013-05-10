@@ -1,2 +1,7 @@
-x= note.pitch(+5)
+func hello()
+	x= note.pitch(+5)
+	seq = [ x, x ]
+	seq
+end
 
+hello()
