@@ -1,0 +1,4 @@
+func hello ()
+  n = note.pitch(A3).quarter
+  n.pitch(+2)
+end
