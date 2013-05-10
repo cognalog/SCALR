@@ -5,7 +5,7 @@ func a_and_b()
   else
     seq += note.pitch(C3).volume(100)
   end
-  seq
+  return seq
 end
 
 func c_or_d()
@@ -15,5 +15,5 @@ func c_or_d()
   else
     seq += note.pitch(C3).volume(100)
   end
-  seq
+  return seq
 end

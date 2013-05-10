@@ -9,4 +9,5 @@ func nth_different( nth)
     end
     i+=1
   end
+  return myseq
 end
