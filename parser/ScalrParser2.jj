@@ -28,8 +28,8 @@ public class ScalrParser2 {
         ScalrParser2 parser = new ScalrParser2(new java.io.StringReader(text));
         //SymbolTable.addFunc("test");
         //SymbolTable.currentFunctionScope = "test";
-        parser.note();
-       // System.out.println(parser.funcall());
+       parser.function();
+       System.out.println(parser.funcall());
         //System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
@@ -407,7 +407,19 @@ Expression note() throws Exception: {
 	Expression n = Note.note();
 } {
 	("note" | t = <ID> { n = new VariableReference(t.image, SymbolTable.currentFunctionScope); }) 
-	(".pitch(" n = pitch(n) ")" | ".length(" n = length(n) ")" | ".volume(" n = volume(n) ")" | "." n = lenClass(n))* { return n; }
+	(".pitch(" n = pitch(n) ")" | ".length(" n = length(n) ")" | ".volume(" n = volume(n) ")" 
+	| ".half" {NoteOps no = new NoteOps("len"); no.addOperand(n); no.addLength("half"); n=no;}
+	| ".whole" {NoteOps no = new NoteOps("len"); no.addOperand(n); no.addLength("whole"); n=no;}
+	| ".quarter" {NoteOps no = new NoteOps("len"); no.addOperand(n); no.addLength("quarter"); n=no;}
+	| ".eighth" {NoteOps no = new NoteOps("len"); no.addOperand(n); no.addLength("eighth"); n=no;}
+	| ".sixteenth" {NoteOps no = new NoteOps("len"); no.addOperand(n); no.addLength("sixteenth"); n=no;}
+	| ".thirtysec" {NoteOps no = new NoteOps("len"); no.addOperand(n); no.addLength("thirtysec"); n=no;}
+	| ".quarterT" {NoteOps no = new NoteOps("len"); no.addOperand(n); no.addLength("quarterT"); n=no;}
+	| ".eighthT" {NoteOps no = new NoteOps("len"); no.addOperand(n); no.addLength("eighthT"); n=no;}
+	| ".sixteenthT" {NoteOps no = new NoteOps("len"); no.addOperand(n); no.addLength("sixteenthT"); n=no;}
+	| ".thirtysecT" {NoteOps no = new NoteOps("len"); no.addOperand(n); no.addLength("thirtysecT"); n=no;}
+
+	)* { return n; }
 }
 
 Expression lenClass(Expression n) throws Exception: {

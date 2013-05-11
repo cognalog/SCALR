@@ -1,1 +1,6 @@
-note.half.pitch(A5)
+func hello()
+	x = [ note.pitch(A5).quarter , note.pitch(A5).half  ]
+	y
+end
+
+hello()
