@@ -190,7 +190,7 @@ String track() throws Exception: {String out;
 	"track" "->" e=sequence() 
 	{
 		Sequence temp = (Sequence) e.getValue();
-		out = temp.toString();
+		out = temp.flattenedToString();
 		return out;
 	}
 }

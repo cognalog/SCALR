@@ -2,7 +2,7 @@ import hello
 
 main
   k= note.half
-  seq = hello(y)
+  seq = hello()
 end
 
 track -> [ seq ]
