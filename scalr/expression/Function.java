@@ -2,17 +2,19 @@
 package scalr.expression;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import scalr.Exceptions.FunctionExistsError;
 import scalr.Exceptions.TypeError;
+import scalr.variable.Sequence;
 import scalr.variable.SymbolTable;
 
 public class Function implements Expression
 {
 	
-	private String	              id;
-	private ArrayList<String>	  parameterName;
-	private ArrayList<Expression>	statements;
+	private String	             id;
+	private ArrayList<String>	 parameterName;
+	public ArrayList<Expression>	statements;
 	
 	public Function(String name) throws FunctionExistsError
 	{
@@ -73,11 +75,21 @@ public class Function implements Expression
 				System.exit(1);
 			}
 		}
-		for (int i = 0; i < statements.size() - 1; i++)
+		// Reverse all the expressions but the last
+		Collections.reverse(statements);
+		Expression returnExpr = statements.get(0);
+		statements.remove(0);
+		statements.add(returnExpr);
+		for (int i = 0; i < statements.size() - 1; i++) {
+			System.out.println(statements.get(i).getClass());
 			statements.get(i).getValue(expressions);
+		}
 		Expression lastExpr = statements.get(statements.size() - 1);
+		System.out.println(lastExpr.getClass());
 		if (lastExpr.getType() == ExpressionType.SEQUENCE || id.equals("main"))
 			return statements.get(statements.size() - 1).getValue(expressions);
+		else if (lastExpr.getType() == ExpressionType.NOTE)
+			return new Sequence(lastExpr);
 		else
 			return null;
 	}

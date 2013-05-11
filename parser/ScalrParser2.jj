@@ -35,9 +35,9 @@ public class ScalrParser2 {
         //SymbolTable.addFunc("test");
         //SymbolTable.currentFunctionScope = "test";
 
-        parser.tscalr();
-       //parser.function();
-       //System.out.println(parser.funcall());
+//        parser.tscalr();
+       parser.function();
+       System.out.println(parser.funcall());
         //System.out.println(SymbolTable.reference);
 	    	logger.log("grats, your program compiled alright");
         } catch (Throwable e) {
@@ -198,7 +198,7 @@ ArrayList<Expression> block() throws Exception: {
 	ArrayList<Expression> stmts = new ArrayList<Expression>();
 } 
 { 
-stmts = line1() "end" {System.out.println("block matched"); return stmts}}
+stmts = line1() "end" {System.out.println("block matched"); return stmts; }}
 	
 
 void mainFunc() throws Exception:{

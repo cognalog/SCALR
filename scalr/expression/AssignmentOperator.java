@@ -44,8 +44,8 @@ public class AssignmentOperator implements Expression
 			        || (lval.getType() == ExpressionType.SEQUENCE && rval.getType() == ExpressionType.NOTE)
 			        || (lval.getType() == ExpressionType.SEQUENCE && rval.getType() == ExpressionType.SEQUENCE)) {
 				BinaryOperator bo = new BinaryOperator("+");
-				bo.addOperand(rval);
 				bo.addOperand(lval);
+				bo.addOperand(rval);
 				Expression result = bo.getValue(expressions);
 				// If the new type isn't the same as the old type, this will throw an error (Type
 				// checking!).
@@ -63,8 +63,8 @@ public class AssignmentOperator implements Expression
 			if ((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)
 			        || (lval.getType() == ExpressionType.SEQUENCE && rval.getType() == ExpressionType.NUMBER)) {
 				BinaryOperator bo = new BinaryOperator("*");
-				bo.addOperand(rval);
 				bo.addOperand(lval);
+				bo.addOperand(rval);
 				Expression result = bo.getValue(expressions);
 				// If the new type isn't the same as the old type, this will throw an error (Type
 				// checking!).
@@ -81,8 +81,8 @@ public class AssignmentOperator implements Expression
 		else if (operator.equals("-=")) {
 			if ((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)) {
 				BinaryOperator bo = new BinaryOperator("-");
-				bo.addOperand(rval);
 				bo.addOperand(lval);
+				bo.addOperand(rval);
 				Expression result = bo.getValue(expressions);
 				// If the new type isn't the same as the old type, this will throw an error (Type
 				// checking!).
@@ -99,8 +99,8 @@ public class AssignmentOperator implements Expression
 		else if (operator.equals("%=")) {
 			if ((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)) {
 				BinaryOperator bo = new BinaryOperator("%");
-				bo.addOperand(rval);
 				bo.addOperand(lval);
+				bo.addOperand(rval);
 				Expression result = bo.getValue(expressions);
 				// If the new type isn't the same as the old type, this will throw an error (Type
 				// checking!).
@@ -117,8 +117,8 @@ public class AssignmentOperator implements Expression
 		else if (operator.equals("/=")) {
 			if ((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)) {
 				BinaryOperator bo = new BinaryOperator("/");
-				bo.addOperand(rval);
 				bo.addOperand(lval);
+				bo.addOperand(rval);
 				Expression result = bo.getValue(expressions);
 				// If the new type isn't the same as the old type, this will throw an error (Type
 				// checking!).
@@ -135,8 +135,8 @@ public class AssignmentOperator implements Expression
 		else if (operator.equals("%=")) {
 			if ((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)) {
 				BinaryOperator bo = new BinaryOperator("%");
-				bo.addOperand(rval);
 				bo.addOperand(lval);
+				bo.addOperand(rval);
 				Expression result = bo.getValue(expressions);
 				// If the new type isn't the same as the old type, this will throw an error (Type
 				// checking!).
