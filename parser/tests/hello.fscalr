@@ -1,7 +1,0 @@
-func hello( )
-
-  x = []
-  i = 0
-  x+= [ note.half ]
-  x
-end
