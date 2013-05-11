@@ -74,10 +74,10 @@ public class Function implements Expression
 			}
 		}
 		for (int i = 0; i < statements.size() - 1; i++)
-			statements.get(i).getValue();
+			statements.get(i).getValue(expressions);
 		Expression lastExpr = statements.get(statements.size() - 1);
 		if (lastExpr.getType() == ExpressionType.SEQUENCE || id.equals("main"))
-			return statements.get(statements.size() - 1).getValue();
+			return statements.get(statements.size() - 1).getValue(expressions);
 		else
 			return null;
 	}
