@@ -28,8 +28,8 @@ public class ScalrParser2 {
         ScalrParser2 parser = new ScalrParser2(new java.io.StringReader(text));
         //SymbolTable.addFunc("test");
         //SymbolTable.currentFunctionScope = "test";
-       parser.function();
-       System.out.println(parser.funcall());
+       parser.tscalr();
+       //System.out.println(parser.funcall());
         //System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
@@ -42,7 +42,7 @@ PARSER_END(ScalrParser2)
 
 SKIP : { " " | "\t" | <"/*" (~[])* "*/"> | "\n"}
 TOKEN: {
-       "and" | "or" | "not" | "->" | "." | /*"\n" |*/
+       "and" | "or" | "not" | "->" | "." |
         "," | "\"" | "+" | "-" | "%" | "(" | ")" | "[" | "]" |
 	"note" | "pitch" | "volume" | 
        	"duration" | "quarter" | "half" | "whole" |
@@ -57,19 +57,91 @@ TOKEN: {
 	<ID: ["a"-"z"](["A"-"Z"] | ["a"-"z"] | <INT> | "_")*> |
     	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "1""0")>
 	}
+
+/*********************************NEW SHIT STARTS*************************************/
+void tscalr() throws Exception: {} { imp1() tfunc() track() track1()
+{System.out.println("WE HERE");}
+}
+
+void imp() throws Exception: {} { 
+"import" fscalrFile() {System.out.println("import statement matched");}
+}
+
+void imp1() throws Exception: {} { 
+imp() imp1()
+| {}
+}
+
+void tfunc() throws Exception: {} { "main" block() {System.out.println("finished tfunc()");}}
+
+void fscalrFile() throws Exception: {
+	String s;
+	String fname;
+	BufferedReader br2;
+	String text2;
+	String line2;
+	ScalrParser2 parser2; 
+
+} { s = id()
+
+{
+	fname = "../" + s + ".fscalr";
+
+	System.out.println(fname);
+
+
+	br2 = null;
+        text2 = "";
+        try {
+			br2 = new BufferedReader(new FileReader(fname));
+            line2 = "";
+            while ((line2 = br2.readLine()) != null) {
+                text2 += line2 + "\n";
+
+            }
+
+            System.out.println("*********");
+
+            System.out.println(text2.trim());
+
+            System.out.println("*********");
+
+        parser2 = new ScalrParser2(new java.io.StringReader(text2.trim()));
+        parser2.function();
+		} catch (Throwable e) {
+            // Catching Throwable is ugly but JavaCC throws Error objects!
+            System.out.println("Syntax check failed: " + e.getMessage());
+        }
+
+}
+}
+
+void block() throws Exception: {System.out.println("matching block:");} { 
+/*line1()*/ "end" {System.out.println("block matched");}}
 	
 
+void main() throws Exception:{
+	System.out.println("starting main def");
+	String funcName = "main";
+	Function f;
+	ArrayList<Expression> expressions = new ArrayList<Expression>();
+	Expression returnSeq;
+} {
+	"main" {SymbolTable.currentFunctionScope= funcName; f= new Function(funcName); } 
+	//get all the statements using line
+	 expressions = line1() {
+		for(Expression e: expressions){
+			//add the statements to the function object with the name main
+			f.addStatement(e);
+		}
+	}
+	
+	"end" {
+		f.getValue();
+	}
+}
 
-
-
-
-// *** FUNCTIONS ARE A MASSIVE PROBLEM ***
-// on return assign the name of the function to the expressions underneath it
-
-
-
-
-
+/*****************************END OF NEW SHIT*********************************/
 
 void idDefs(ArrayList<String> params): {
 	Token t;
@@ -120,6 +192,11 @@ String track() throws Exception: {String out;
 	}
 }
 
+void track1() throws Exception: {} { 
+track() track1()
+| {}
+}
+
 Expression line() throws Exception: {
 	Expression e;
 	System.out.println("calling LINE");
@@ -143,8 +220,6 @@ Expression line() throws Exception: {
 	}
 
 }
-
-
 
 
 ArrayList<Expression> line1() throws Exception: {
