@@ -265,7 +265,8 @@ public class Note implements Variable
 		if (duration.equals("1"))
 			return duration;
 		String[] frac = duration.split("/");
-		return "" + (4.0 * (Integer.parseInt(frac[0]) / Double.parseDouble(frac[1])));
+		double temp = (4.0 * (Integer.parseInt(frac[0]) / Double.parseDouble(frac[1])));
+		return "" + String.format("%.5f",temp);
 	}
 	
 	@Override
