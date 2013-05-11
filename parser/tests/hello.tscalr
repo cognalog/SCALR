@@ -1,1 +1,7 @@
-note.half.pitch(A5)
+import hello
+
+main
+  seq = hello()
+end
+
+track -> [seq]
