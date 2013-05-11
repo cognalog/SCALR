@@ -48,4 +48,11 @@ public class CreationOperator implements Expression
 		return rval.getType();
 	}
 	
+	@Override
+	public String toString()
+	{
+		return "(" + func + "." + var + " = Type: " + rval.getType() + " | Value: "
+		        + rval.toString() + ")";
+	}
+	
 }

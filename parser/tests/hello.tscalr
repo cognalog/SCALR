@@ -1,7 +1,8 @@
 func hello( )
   y= note.half
   y.pitch(+3)
-  x = [ y ]
+  x = [ note ]
+  x += [ y ]
   x
 end
 
