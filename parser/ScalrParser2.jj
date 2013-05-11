@@ -35,9 +35,9 @@ public class ScalrParser2 {
         //SymbolTable.addFunc("test");
         //SymbolTable.currentFunctionScope = "test";
 
-        //parser.tscalr();
-       parser.function();
-       System.out.println(parser.funcall());
+        parser.tscalr();
+       //parser.function();
+       //System.out.println(parser.funcall());
         //System.out.println(SymbolTable.reference);
 	    	logger.log("grats, your program compiled alright");
         } catch (Throwable e) {
