@@ -1,7 +1,6 @@
-import assign
-
-main
-  seq = expand()
+func expand ( )
+  seq = [note.pitch(A3).quarter]
+  seq += note.pitch(A3).quarter
+  seq *= 2
+  seq
 end
-
-track -> [seq]
