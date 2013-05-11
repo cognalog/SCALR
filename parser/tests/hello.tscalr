@@ -1,7 +1,1 @@
-func hello()
-	x= note.pitch(+5)
-	seq = [ x, x ]
-	seq
-end
-
-hello()
+note.half.pitch(A5)

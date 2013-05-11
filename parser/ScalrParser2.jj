@@ -28,8 +28,8 @@ public class ScalrParser2 {
         ScalrParser2 parser = new ScalrParser2(new java.io.StringReader(text));
         //SymbolTable.addFunc("test");
         //SymbolTable.currentFunctionScope = "test";
-        parser.function();
-        System.out.println(parser.funcall());
+        parser.note();
+       // System.out.println(parser.funcall());
         //System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
@@ -65,6 +65,9 @@ TOKEN: {
 
 // *** FUNCTIONS ARE A MASSIVE PROBLEM ***
 // on return assign the name of the function to the expressions underneath it
+
+
+
 
 
 
@@ -404,11 +407,12 @@ Expression note() throws Exception: {
 	Expression n = Note.note();
 } {
 	("note" | t = <ID> { n = new VariableReference(t.image, SymbolTable.currentFunctionScope); }) 
-	(".pitch(" n = pitch(n) ")" | ".length(" n = length(n) ")" | ".volume(" n = volume(n) ")" | "." n = lenClass(n))* { return n; }
+	("." n = lenClass(n) | ".pitch(" n = pitch(n) ")" | ".length(" n = length(n) ")" | ".volume(" n = volume(n) ")" )* { return n; }
 }
 
 Expression lenClass(Expression n) throws Exception: {
 	Token len;
+	System.out.println("lenClass");
 } {
 	len = <LENGTH> {
 		NoteOps no = new NoteOps("len");
@@ -421,6 +425,7 @@ Expression lenClass(Expression n) throws Exception: {
 Expression pitch(Expression n) throws Exception: {
 	Token mod;
 	Expression e;
+	System.out.println("pitch of the note");
 } {
 	mod = <DEGREE> {
 		NoteOps no = new NoteOps("pit");
@@ -441,6 +446,7 @@ Expression length(Expression n) throws Exception: {
 	Expression e;
 	Token mod = null;
 	Token numer;
+	System.out.println("called length");
 } {
 	(mod = "+" | mod = "-") e = arithExpr() {
 		NoteOps no = new NoteOps("len");
