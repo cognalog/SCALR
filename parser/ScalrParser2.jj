@@ -30,6 +30,7 @@ public class ScalrParser2 {
         //SymbolTable.currentFunctionScope = "test";
 
        parser.tscalr();
+       // parser.function();
        //System.out.println(parser.funcall());
         //System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
@@ -61,8 +62,8 @@ TOKEN: {
 	}
 
 /*********************************NEW SHIT STARTS*************************************/
-void tscalr() throws Exception: {} { imp1() mainFunc() track() track1()
-{System.out.println("WE HERE");}
+void tscalr() throws Exception: { String out;} { imp1() mainFunc() out=track1()
+{System.out.println(out);}
 }
 
 void imp() throws Exception: {} { 
@@ -194,9 +195,9 @@ String track() throws Exception: {String out;
 	}
 }
 
-void track1() throws Exception: {} { 
-track() track1()
-| {}
+String track1() throws Exception: {String one; String out= "";} { 
+one=track() out=track1() {out=one+out; return out;}
+| {return out;}
 }
 
 Expression line() throws Exception: {
@@ -210,16 +211,13 @@ Expression line() throws Exception: {
 		System.out.println("end of assignment");
 		return e;
 	}
-	|
+	
 	//note() {
 	//	System.out.println("line consisting of note");
 	//	return null;
 	//}
 	//|
-	track() {
-		System.out.println("line consisting of track");
-		return null;
-	}
+	
 
 }
 
@@ -245,10 +243,20 @@ Expression assignment() throws Exception: {
 	String t1;
 	Expression t2;
 	System.out.println("starting assignment");
+	System.out.println(SymbolTable.reference);
 } 
 {
 	
-	
+	t1= id() <ASSIGN> t2= funcall() {
+									
+									System.out.println("assignment of a funcall!!!");
+									CreationOperator co = new CreationOperator(t1);
+									co.addOperand(t2);
+									co.addFunc(SymbolTable.currentFunctionScope);
+
+									return co;
+	}
+	|
 	t1=id() <ASSIGN> t2=sequence() {
 									System.out.println("assignment case sequence");
 									CreationOperator co = new CreationOperator(t1);
@@ -364,12 +372,15 @@ t=<INT> {return new ScalrNum(Integer.parseInt(t.image));}
 
 Expression operand() throws Exception: {
 	Expression ex;
-	String t;
+	Token t;
 	Sequence s;
 } {
-s = funcall() {return s;}
+t=<ID> {VariableReference e = new VariableReference(t.image, SymbolTable.currentFunctionScope);
+	return e;}
 | 
-t=id() {return SymbolTable.getMember(SymbolTable.currentFunctionScope, t);}
+s = funcall() {return s;}
+
+
 | ex = note() 
 {
 	return ex;
@@ -387,13 +398,17 @@ Sequence funcall() throws Exception: {
 t = id() "(" ex = parameters() ")" 
 {
 	System.out.println("funcall case 1 ");
+	
 	Function f = SymbolTable.getFuncRef(t);
+	System.out.println(SymbolTable.functionReferences);
 	if(ex.isEmpty()){
 		s = (Sequence) f.getValue();
 
 	}
 	else{
 		Collections.reverse(ex);
+
+		
 		Expression[] temp = ex.toArray(new Expression[ex.size()]);
 		s = (Sequence) f.getValue(temp);	
 	}
@@ -401,7 +416,7 @@ t = id() "(" ex = parameters() ")"
 	return s;
 }
 |
-t = id()  
+t = id() "()" 
 {
 	System.out.println("funcall case 2 ");
 	Function f = SymbolTable.getFuncRef(t);
@@ -415,6 +430,7 @@ t = id()
 ArrayList<Expression> parameters() throws Exception: {
 	Expression ex;
 	ArrayList<Expression> ex2;
+	System.out.println("parameters called");
 } { 
 ex = operand() ex2 = parameters1() 
 {
@@ -483,12 +499,12 @@ Expression note() throws Exception: {
 	Token t;
 	Expression n = Note.note();
 } {
-	("break.half" {System.out.println("caught that break!!");})
-	|("break.quarter" {System.out.println("caught that break!!");})
-	|("break.whole" {System.out.println("caught that break!!");})
-	|("break.eighth" {System.out.println("caught that break!!");})
-	|("break.sixteenth" {System.out.println("caught that break!!");})
-	|("break.thirtysec" {System.out.println("caught that break!!");})
+	("break.half" {return Note.getBreak("half");})
+	|("break.quarter" {return Note.getBreak("quarter");})
+	|("break.whole" {return Note.getBreak("whole");})
+	|("break.eighth" {return Note.getBreak("eighth");})
+	|("break.sixteenth" {return Note.getBreak("sixteenth");})
+	|("break.thirtysec" {return Note.getBreak("thirtysec");})
 	|
 	(("note" | t = <ID> { n = new VariableReference(t.image, SymbolTable.currentFunctionScope); }) 
 	(".pitch(" n = pitch(n) ")" | ".length(" n = length(n) ")" | ".volume(" n = volume(n) ")" 

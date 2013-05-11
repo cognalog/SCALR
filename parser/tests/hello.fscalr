@@ -1,4 +1,4 @@
-func hello ()
-  x = [ note.half ]
+func hello( y )
+  x = [ note.half, y]
   x
 end
