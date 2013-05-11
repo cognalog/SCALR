@@ -1,6 +1,7 @@
-func hello()
-	x = [ note.pitch(A5).quarter , note.pitch(A5).half  ]
-	y
+import hello
+
+main
+  seq = hello()
 end
 
-hello()
+track -> [seq]
