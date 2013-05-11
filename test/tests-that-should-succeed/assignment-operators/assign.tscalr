@@ -1,4 +1,4 @@
-func expand ()
+func expand ( )
   seq = note.pitch(A3).quarter
   seq += note.pitch(A3).quarter
   seq *= 2

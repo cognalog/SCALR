@@ -1,4 +1,4 @@
-func hello ()
+func hello ( )
   seq = []
   if(3 < 2)
     seq = note.pitch(A3).quarter

@@ -1,3 +1,3 @@
-func seq1()
+func seq1( )
   [note.pitch(A3).quarter break.half note.pitch(A3).quarter]
 end

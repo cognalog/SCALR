@@ -1,4 +1,4 @@
-func expand ()
+func expand ( )
   vol = 50
   vol *= 2 /* 100 */
   vol += 4 /* 104 */
