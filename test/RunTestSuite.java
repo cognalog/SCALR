@@ -1,11 +1,17 @@
 import java.io.*;
 public class RunTestSuite {
+  static String end = "\033[0m\n";
+  static  String green = "\033[92m";
+  static  String red = "\033[91m";
   public static void main (String[] args) {
     File dir = new File("tests-that-should-succeed");
-    String end = "\033[0m\n";
-    String green = "\033[92m";
-    String red = "\033[91m";
-    System.out.println("\033[95m" + "Starting tests that should succeed.. "+end);
+    testsDir(dir);
+    dir = new File("tests-that-should-raise-exceptions");
+    testsDir(dir);
+  }
+
+  public static void testsDir(File dir) {
+    System.out.println("\033[95m" + "Starting " +dir.getPath()+end);
     for (File child : dir.listFiles()) {
       for(File child2 : child.listFiles()){
         String filename = child2.toString();
@@ -54,6 +60,7 @@ public class RunTestSuite {
             System.out.println(red + "Expected output: " + lastLine);
             System.out.println(red + "Got: " + output);
           }
+          System.out.println("\n");
         }
       }
     } 
