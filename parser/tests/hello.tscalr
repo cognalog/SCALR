@@ -1,6 +1,11 @@
 func hello( )
   y= note.half
   y.pitch(+3)
+  i = 0
+  while (i < 10)
+  	i = i + 1
+  	x += [ note ]
+  end
   x = [ note ]
   x += [ y ]
   x

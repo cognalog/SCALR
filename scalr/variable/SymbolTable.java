@@ -7,6 +7,7 @@ import scalr.Exceptions.FunctionDoesNotExistError;
 import scalr.Exceptions.FunctionExistsError;
 import scalr.Exceptions.TypeError;
 import scalr.expression.Expression;
+import scalr.expression.ExpressionType;
 import scalr.expression.Function;
 
 /**
@@ -16,11 +17,14 @@ import scalr.expression.Function;
  */
 public final class SymbolTable
 {
-	public static String	                                         currentFunctionScope	= "";
-	public static final HashMap<String, Function>	                 functionReferences	  =
-	                                                                                              new HashMap<String, Function>();
-	public static final HashMap<String, HashMap<String, Expression>>	reference	      =
-	                                                                                              new HashMap<String, HashMap<String, Expression>>();
+	public static String	                                             currentFunctionScope	=
+	                                                                                                  "";
+	public static final HashMap<String, Function>	                     functionReferences	  =
+	                                                                                                  new HashMap<String, Function>();
+	public static final HashMap<String, HashMap<String, Expression>>	 reference	          =
+	                                                                                                  new HashMap<String, HashMap<String, Expression>>();
+	public static final HashMap<String, HashMap<String, ExpressionType>>	referenceType	  =
+	                                                                                                  new HashMap<String, HashMap<String, ExpressionType>>();
 	
 	private SymbolTable() throws AssertionError
 	{
@@ -33,7 +37,9 @@ public final class SymbolTable
 		if (reference.containsKey(func))
 			throw new FunctionExistsError(func);
 		HashMap<String, Expression> funcTable = new HashMap<String, Expression>();
+		HashMap<String, ExpressionType> typeTable = new HashMap<String, ExpressionType>();
 		reference.put(func, funcTable);
+		referenceType.put(func, typeTable);
 	}
 	
 	public static void addFuncRef(Function f)
@@ -60,8 +66,10 @@ public final class SymbolTable
 	public static boolean addReference(String func, String id, Expression var) throws TypeError
 	{
 		HashMap<String, Expression> locRef = reference.get(func);
+		HashMap<String, ExpressionType> locRefType = referenceType.get(func);
 		if (!locRef.containsKey(id)) {
 			locRef.put(id, var);
+			locRefType.put(id, var.getType());
 			return true;
 		}
 		else {
@@ -70,8 +78,16 @@ public final class SymbolTable
 				throw new TypeError(id);
 			locRef.remove(id);
 			locRef.put(id, var);
+			locRefType.put(id, var.getType());
 			return false;
 		}
+	}
+	
+	public static boolean addTypeReference(String func, String id, ExpressionType type)
+	{
+		HashMap<String, ExpressionType> locRefType = referenceType.get(func);
+		locRefType.put(id, type);
+		return true;
 	}
 	
 	public static Expression getMember(String func, String id)
@@ -80,6 +96,12 @@ public final class SymbolTable
 		
 		return (Expression) selfie.get(id);
 		
+	}
+	
+	public static ExpressionType getMemberType(String func, String id)
+	{
+		HashMap<String, ExpressionType> funcTypeRef = referenceType.get(func);
+		return funcTypeRef.get(id);
 	}
 	
 	public static boolean memberExists(String func, String id)

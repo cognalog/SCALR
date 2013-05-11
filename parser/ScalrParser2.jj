@@ -437,8 +437,8 @@ Expression assignment() throws Exception: {
 									System.out.println("assignment of a funcall!!!");
 									if(op.image.equals("=")){
 										CreationOperator co = new CreationOperator(t1);
-										co.addOperand(t2);
 										co.addFunc(SymbolTable.currentFunctionScope);
+										co.addOperand(t2);
 										return co;
 									}
 									else{
@@ -456,8 +456,8 @@ Expression assignment() throws Exception: {
 									System.out.println("assignment of a sequence!!!");
 									if(op.image.equals("=")){
 										CreationOperator co = new CreationOperator(t1);
-										co.addOperand(t2);
 										co.addFunc(SymbolTable.currentFunctionScope);
+										co.addOperand(t2);
 										return co;
 									}
 									else{
@@ -473,8 +473,8 @@ Expression assignment() throws Exception: {
 	t1=id() op=<ASSIGN> t2=note() { 	System.out.println("assignment of a note!!");
 									if(op.image.equals("=")){
 										CreationOperator co = new CreationOperator(t1);
-										co.addOperand(t2);
 										co.addFunc(SymbolTable.currentFunctionScope);
+										co.addOperand(t2);
 										return co;
 									}
 									else{
@@ -493,8 +493,8 @@ Expression assignment() throws Exception: {
 									System.out.println("assignment of a expression!!!");
 									if(op.image.equals("=")){
 										CreationOperator co = new CreationOperator(t1);
-										co.addOperand(t2);
 										co.addFunc(SymbolTable.currentFunctionScope);
+										co.addOperand(t2);
 										return co;
 									}
 									else{

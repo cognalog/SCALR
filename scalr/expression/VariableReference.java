@@ -37,7 +37,7 @@ public class VariableReference implements Expression
 	@Override
 	public ExpressionType getType()
 	{
-		return SymbolTable.getMember(func, ID).getType();
+		return SymbolTable.getMemberType(func, ID);
 	}
 	
 	@Override
