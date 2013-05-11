@@ -99,7 +99,7 @@ public class Sequence implements Variable
 		// for(int i = 0; i < theNotes.size(); i++)
 		for (Expression n : theNotes) {
 			result += n.getValue().toString() + "|";
-
+			
 		}
 		// remove the last bar (if there is a note)
 		if (theNotes.size() > 0)
@@ -107,7 +107,7 @@ public class Sequence implements Variable
 		// And it closes with a bracket
 		return result + "]";
 	}
-
+	
 	public String flattenedToString()
 	{
 		// A track opens with a bracket
@@ -116,11 +116,11 @@ public class Sequence implements Variable
 		// for(int i = 0; i < theNotes.size(); i++)
 		for (Expression n : theNotes) {
 			String temp = n.getValue().toString();
-			if(n.getType() == ExpressionType.SEQUENCE) {
+			if (n.getType() == ExpressionType.SEQUENCE) {
 				temp = temp.substring(1, temp.length() - 1);
 			}
 			result += temp + "|";
-
+			
 		}
 		// remove the last bar (if there is a note)
 		if (theNotes.size() > 0)

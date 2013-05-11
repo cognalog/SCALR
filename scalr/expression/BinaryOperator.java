@@ -45,41 +45,41 @@ public class BinaryOperator implements Expression
 			// They're both numbers
 			if (expr1.getType() == ExpressionType.NUMBER
 			        && expr2.getType() == ExpressionType.NUMBER) {
-				ScalrNum num1 = (ScalrNum) expr1.getValue();
-				ScalrNum num2 = (ScalrNum) expr2.getValue();
+				ScalrNum num1 = (ScalrNum) expr1.getValue(expressions);
+				ScalrNum num2 = (ScalrNum) expr2.getValue(expressions);
 				return (cachedResult = new ScalrNum(num1.getNum() + num2.getNum()));
 			}
 			// They're both sequences (or notes)
 			else if (expr1.getType() == ExpressionType.SEQUENCE) {
-				Sequence s = (Sequence) ((Sequence) expr1.getValue()).getCopy();
+				Sequence s = (Sequence) ((Sequence) expr1.getValue(expressions)).getCopy();
 				if (expr2.getType() == ExpressionType.NOTE) {
-					Note n = (Note) ((Note) expr2.getValue()).getCopy();
+					Note n = (Note) ((Note) expr2.getValue(expressions)).getCopy();
 					s.addNoteToEnd(n);
 					return (cachedResult = s);
 				}
 				else if (expr2.getType() == ExpressionType.SEQUENCE) {
-					Sequence s2 = (Sequence) ((Sequence) expr2.getValue()).getCopy();
+					Sequence s2 = (Sequence) ((Sequence) expr2.getValue(expressions)).getCopy();
 					s.addSequence(s2);
 					return (cachedResult = s);
 				}
 			}
 			else if (expr2.getType() == ExpressionType.SEQUENCE) {
-				Sequence s = (Sequence) ((Sequence) expr2.getValue()).getCopy();
+				Sequence s = (Sequence) ((Sequence) expr2.getValue(expressions)).getCopy();
 				if (expr1.getType() == ExpressionType.NOTE) {
-					Note n = (Note) ((Note) expr1.getValue()).getCopy();
+					Note n = (Note) ((Note) expr1.getValue(expressions)).getCopy();
 					s.addNoteToEnd(n);
 					return (cachedResult = s);
 				}
 				else if (expr1.getType() == ExpressionType.SEQUENCE) {
-					Sequence s2 = (Sequence) ((Sequence) expr1.getValue()).getCopy();
+					Sequence s2 = (Sequence) ((Sequence) expr1.getValue(expressions)).getCopy();
 					s.addSequence(s2);
 					return (cachedResult = s);
 				}
 			}
 			else if (expr1.getType() == ExpressionType.NOTE
 			        && expr2.getType() == ExpressionType.NOTE) {
-				Note n1 = (Note) expr1.getValue();
-				Note n2 = (Note) expr2.getValue();
+				Note n1 = (Note) expr1.getValue(expressions);
+				Note n2 = (Note) expr2.getValue(expressions);
 				return (cachedResult = new Sequence(n1.getCopy(), n2.getCopy()));
 			}
 		}
@@ -87,8 +87,8 @@ public class BinaryOperator implements Expression
 			// Only valid for numbers
 			if (expr1.getType() == ExpressionType.NUMBER
 			        && expr2.getType() == ExpressionType.NUMBER) {
-				ScalrNum num1 = (ScalrNum) expr1.getValue();
-				ScalrNum num2 = (ScalrNum) expr2.getValue();
+				ScalrNum num1 = (ScalrNum) expr1.getValue(expressions);
+				ScalrNum num2 = (ScalrNum) expr2.getValue(expressions);
 				return (cachedResult = new ScalrNum(num1.getNum() - num2.getNum()));
 			}
 		}
@@ -96,22 +96,22 @@ public class BinaryOperator implements Expression
 			// If they're both numbers:
 			if (expr1.getType() == ExpressionType.NUMBER
 			        && expr2.getType() == ExpressionType.NUMBER) {
-				ScalrNum num1 = (ScalrNum) expr1.getValue();
-				ScalrNum num2 = (ScalrNum) expr2.getValue();
+				ScalrNum num1 = (ScalrNum) expr1.getValue(expressions);
+				ScalrNum num2 = (ScalrNum) expr2.getValue(expressions);
 				return (cachedResult = new ScalrNum(num1.getNum() * num2.getNum()));
 			}
 			// One is a number and the other is a sequence
 			else if (expr1.getType() == ExpressionType.SEQUENCE
 			        && expr2.getType() == ExpressionType.NUMBER) {
-				Sequence s = (Sequence) ((Sequence) expr1.getValue()).getCopy();
-				ScalrNum num = (ScalrNum) expr2.getValue();
+				Sequence s = (Sequence) ((Sequence) expr1.getValue(expressions)).getCopy();
+				ScalrNum num = (ScalrNum) expr2.getValue(expressions);
 				s.extend(num.getNum());
 				return (cachedResult = s);
 			}
 			else if (expr1.getType() == ExpressionType.NUMBER
 			        && expr2.getType() == ExpressionType.SEQUENCE) {
-				Sequence s = (Sequence) ((Sequence) expr2.getValue()).getCopy();
-				ScalrNum num = (ScalrNum) expr1.getValue();
+				Sequence s = (Sequence) ((Sequence) expr2.getValue(expressions)).getCopy();
+				ScalrNum num = (ScalrNum) expr1.getValue(expressions);
 				s.extend(num.getNum());
 				return (cachedResult = s);
 			}
@@ -120,8 +120,8 @@ public class BinaryOperator implements Expression
 			// Only valid for numbers
 			if (expr1.getType() == ExpressionType.NUMBER
 			        && expr2.getType() == ExpressionType.NUMBER) {
-				ScalrNum num1 = (ScalrNum) expr1.getValue();
-				ScalrNum num2 = (ScalrNum) expr2.getValue();
+				ScalrNum num1 = (ScalrNum) expr1.getValue(expressions);
+				ScalrNum num2 = (ScalrNum) expr2.getValue(expressions);
 				return (cachedResult = new ScalrNum(Math.round(num1.getNum() / num2.getNum())));
 			}
 		}
@@ -129,8 +129,8 @@ public class BinaryOperator implements Expression
 			// Only valid for numbers
 			if (expr1.getType() == ExpressionType.NUMBER
 			        && expr2.getType() == ExpressionType.NUMBER) {
-				ScalrNum num1 = (ScalrNum) expr1.getValue();
-				ScalrNum num2 = (ScalrNum) expr2.getValue();
+				ScalrNum num1 = (ScalrNum) expr1.getValue(expressions);
+				ScalrNum num2 = (ScalrNum) expr2.getValue(expressions);
 				return (cachedResult = new ScalrNum(num1.getNum() % num2.getNum()));
 			}
 		}
@@ -184,6 +184,6 @@ public class BinaryOperator implements Expression
 	@Override
 	public String toString()
 	{
-		return expr1.getValue().toString() + " " + operator + " " + expr2.getValue().toString();
+		return expr1.toString() + " " + operator + " " + expr2.toString();
 	}
 }

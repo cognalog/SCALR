@@ -36,10 +36,10 @@ public class BooleanOperator implements Expression
 	public Expression getValue(Expression... expressions)
 	{
 		if (expr2 == null && expr1.getType() == ExpressionType.BOOLEAN)
-			return expr1.getValue();
+			return expr1.getValue(expressions);
 		if (expr1.getType() == ExpressionType.NUMBER && expr2.getType() == ExpressionType.NUMBER) {
-			ScalrNum num1 = (ScalrNum) expr1.getValue();
-			ScalrNum num2 = (ScalrNum) expr2.getValue();
+			ScalrNum num1 = (ScalrNum) expr1.getValue(expressions);
+			ScalrNum num2 = (ScalrNum) expr2.getValue(expressions);
 			if (operator.equals(">"))
 				return new ScalrBoolean(num1.getNum() > num2.getNum());
 			else if (operator.equals("<"))
@@ -55,8 +55,8 @@ public class BooleanOperator implements Expression
 		}
 		else if (expr1.getType() == ExpressionType.BOOLEAN
 		        && expr2.getType() == ExpressionType.BOOLEAN) {
-			ScalrBoolean bool1 = (ScalrBoolean) expr1.getValue();
-			ScalrBoolean bool2 = (ScalrBoolean) expr2.getValue();
+			ScalrBoolean bool1 = (ScalrBoolean) expr1.getValue(expressions);
+			ScalrBoolean bool2 = (ScalrBoolean) expr2.getValue(expressions);
 			if (operator.equals("=="))
 				return new ScalrBoolean(bool1.getBool() == bool2.getBool());
 			else if (operator.equals("or"))
@@ -91,6 +91,6 @@ public class BooleanOperator implements Expression
 	@Override
 	public String toString()
 	{
-		return expr1.getValue().toString() + " " + operator + " " + expr2.getValue().toString();
+		return expr1.toString() + " " + operator + " " + expr2.toString();
 	}
 }

@@ -1,9 +1,8 @@
-import hello
-
-main
+func hello( )
   y= note.half
-  seq = hello()
+  y.pitch(+3)
+  x = [ y ]
+  x
 end
 
-track -> [ seq ]
-track -> [ seq, seq ]
+hello()
