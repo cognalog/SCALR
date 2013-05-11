@@ -30,6 +30,7 @@ public class ScalrParser2 {
         //SymbolTable.currentFunctionScope = "test";
 
        parser.tscalr();
+       // parser.function();
        //System.out.println(parser.funcall());
         //System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
@@ -210,16 +211,13 @@ Expression line() throws Exception: {
 		System.out.println("end of assignment");
 		return e;
 	}
-	|
+	
 	//note() {
 	//	System.out.println("line consisting of note");
 	//	return null;
 	//}
 	//|
-	track() {
-		System.out.println("line consisting of track");
-		return null;
-	}
+	
 
 }
 
@@ -255,7 +253,7 @@ Expression assignment() throws Exception: {
 									CreationOperator co = new CreationOperator(t1);
 									co.addOperand(t2);
 									co.addFunc(SymbolTable.currentFunctionScope);
-									System.out.println(SymbolTable.reference);
+
 									return co;
 	}
 	|
@@ -377,7 +375,8 @@ Expression operand() throws Exception: {
 	Token t;
 	Sequence s;
 } {
-t=<ID> {return SymbolTable.getMember(SymbolTable.currentFunctionScope, t.image);}
+t=<ID> {VariableReference e = new VariableReference(t.image, SymbolTable.currentFunctionScope);
+	return e;}
 | 
 s = funcall() {return s;}
 
@@ -399,13 +398,17 @@ Sequence funcall() throws Exception: {
 t = id() "(" ex = parameters() ")" 
 {
 	System.out.println("funcall case 1 ");
+	
 	Function f = SymbolTable.getFuncRef(t);
+	System.out.println(SymbolTable.functionReferences);
 	if(ex.isEmpty()){
 		s = (Sequence) f.getValue();
 
 	}
 	else{
 		Collections.reverse(ex);
+
+		
 		Expression[] temp = ex.toArray(new Expression[ex.size()]);
 		s = (Sequence) f.getValue(temp);	
 	}

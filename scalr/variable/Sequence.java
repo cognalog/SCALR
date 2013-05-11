@@ -92,12 +92,14 @@ public class Sequence implements Variable
 	@Override
 	public String toString()
 	{
+		
 		// A track opens with a bracket
 		String result = "[";
 		// Append each note to the string
 		// for(int i = 0; i < theNotes.size(); i++)
 		for (Expression n : theNotes) {
 			result += n.getValue().toString() + "|";
+
 		}
 		// remove the last bar (if there is a note)
 		if (theNotes.size() > 0)
