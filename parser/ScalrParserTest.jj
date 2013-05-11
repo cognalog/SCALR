@@ -68,7 +68,7 @@ Expression statement(): {
 		System.out.println("Assignment from function: " + currentFunc);
 		return expr;
 	}
-	| ("\n")* expr = boolExpr() "\n" {
+	| ("\n")* expr = note() "\n" {
 		return expr;
 	}
 }

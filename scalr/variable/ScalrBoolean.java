@@ -11,7 +11,6 @@ public class ScalrBoolean implements Variable
 	public ScalrBoolean(boolean i)
 	{
 		val = i;
-		System.out.println(i);
 	}
 	
 	public void setValue(boolean i)

@@ -1,0 +1,73 @@
+Expression boolExpr(): {
+	Expression e1;
+	Expression e2 = null;
+	Token op = null;
+} {
+	e1 = andExpr() (op = <OR> e2 = boolExpr())? {
+		if (op != null) {
+			BooleanOperator bo = new BooleanOperator(op.image);
+			bo.addOperand(e1);
+			bo.addOperand(e2);
+			return bo;
+		}
+		else
+			return e1;
+	}
+}
+
+Expression andExpr(): {
+	Expression e1;
+	Expression e2 = null;
+	Token op = null;
+} {
+	e1 = boolEqualExpr() (op = <AND> e2 = boolExpr())? {
+		if (op != null) {
+			BooleanOperator bo = new BooleanOperator(op.image);
+			bo.addOperand(e1);
+			bo.addOperand(e2);
+			return bo;
+		}
+		else
+			return e1;
+	}
+}
+
+Expression boolEqualExpr(): {
+	Expression e1;
+	Expression e2 = null;
+	Token op = null;
+} {
+	e1 = nrelExpr() (op = <URELN> e2 = boolExpr())? {
+		if (op != null) {
+			BooleanOperator bo = new BooleanOperator(op.image);
+			bo.addOperand(e1);
+			bo.addOperand(e2);
+			return bo;
+		}
+		else
+			return e1;
+	}
+}
+
+Expression nrelExpr(): {
+	Expression e1;
+	Expression e2 = null;
+	Token op = null;
+} {
+	e1 = arithExpr() (op = <NRELN> | op = <URELN>) e2 = arithExpr() {
+		if (op != null) {
+			BooleanOperator bo = new BooleanOperator(op.image);
+			bo.addOperand(e1);
+			bo.addOperand(e2);
+			return bo;
+		}
+		else
+			return e1;
+	}
+	| op = <BOOL> {
+		return new ScalrBoolean(Boolean.parseBoolean(op.image));
+	}
+	| "(" e1 = boolExpr() ")" {
+		return e1;
+	}
+}

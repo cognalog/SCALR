@@ -1,0 +1,188 @@
+Expression arithExpr(): {
+	Expression e1;
+	Expression e2 = null;
+	Token op = null;
+} {
+	// <PLUS> contains + and -
+	e1 = mulOrDiv() ((op = "+" | op = "-") e2 = arithExpr())? {
+		if (op != null) {
+			BinaryOperator bo = new BinaryOperator(op.image);
+			bo.addOperand(e1);
+			bo.addOperand(e2);
+			return bo;
+		}
+		else
+			return e1;
+	}
+}
+
+Expression mulOrDiv(): {
+	Expression e1;
+	Expression e2 = null;
+	Token op = null;
+} {
+	// PORD contains *, %, and /
+	e1 = unary() ((op = "*" | op = "%" | op = "/") e2 = arithExpr())? {
+		if (op != null) {
+			BinaryOperator bo = new BinaryOperator(op.image);
+			bo.addOperand(e1);
+			bo.addOperand(e2);
+			return bo;
+		}
+		else
+			return e1;
+	}
+}
+
+
+
+Expression unary(): {
+	Expression e = null;
+	Expression base = null;
+	Token op = null;
+	Token post = null;
+	Token id = null;
+} {
+	(op = "-")? ("(" e = arithExpr() ")" | id = <ID> post = <POST> | base = var()) {
+		if (e == null) {
+			if (base != null) {
+				Expression ret = base;
+				if (op != null) {
+					UnaryOperator uo = new UnaryOperator(op.image);
+					uo.addOperand(ret);
+					ret = uo;
+				}
+				return ret;
+			}
+			else if (id != null) {
+				VariableReference ref = new VariableReference(id.image, currentFunc);
+				UnaryOperator uo = new UnaryOperator(post.image);
+				uo.addOperand(ref);
+				uo.addFunc(currentFunc);
+				uo.addVar(id.image);
+				if (op != null) {
+					UnaryOperator uo2 = new UnaryOperator(op.image);
+					uo2.addOperand(uo);
+					uo = uo2;
+				}
+				return uo;
+			}
+		}
+		else {
+			if (op == null)
+				return e;
+			else {
+				UnaryOperator uo = new UnaryOperator(op.image);
+				uo.addOperand(e);
+				return uo;
+			}
+		}
+	}
+}
+
+Expression var(): {
+	Token t;
+	Expression expr;
+} {
+	t = <INT> { return new ScalrNum(Integer.parseInt(t.image)); }
+	| (expr = sequence() | expr = note()) { return expr; }
+	| t = <ID> { return new VariableReference(t.image, currentFunc); }
+}
+
+void track(): {}
+{
+	"track" "->" "[" sequence() "]"
+}
+
+Expression note(): {
+	Token t;
+	Expression n = Note.note();
+} {
+	("note" | t = <ID> { n = new VariableReference(t.image, currentFunc); }) 
+	(".pitch(" n = pitch(n) ")" | ".length(" n = length(n) ")" | ".volume(" n = volume(n) ")" | "." n = lenClass(n))* { return n; }
+}
+
+Expression lenClass(Expression n): {
+	Token len;
+} {
+	len = <LENGTH> {
+		NoteOps no = new NoteOps("len");
+		no.addOperand(n);
+		no.addLength(len.image);
+		return no;
+	}
+}
+
+Expression pitch(Expression n): {
+	Token mod;
+	Expression e;
+} {
+	mod = <DEGREE> {
+		NoteOps no = new NoteOps("pit");
+		no.addOperand(n);
+		no.addPitch(mod.image);
+		return no;
+	}
+	| (mod = "+" | mod = "-") e = arithExpr() {
+		NoteOps no = new NoteOps("pit");
+		no.addOperand(n);
+		no.addNum(e);
+		no.addMod(mod.image);
+		return no;
+	}
+}
+
+Expression length(Expression n): {
+	Expression e;
+	Token mod = null;
+	Token numer;
+} {
+	(mod = "+" | mod = "-") e = arithExpr() {
+		NoteOps no = new NoteOps("len");
+		no.addOperand(n);
+		no.addNum(e);
+		no.addMod(mod.image);
+		return no;
+	}
+	| numer = <INT> ("/" mod = <INT>)? {
+		NoteOps no = new NoteOps("len");
+		no.addOperand(n);
+		if (mod != null)
+			no.addLength(numer.image + "/" + mod.image);
+		else
+			no.addLength(numer.image);
+		return no;
+	}
+}
+
+Expression volume(Expression n): {
+	Expression e;
+	Token mod = null;
+} {
+	(mod = "+" | mod = "-")? e = arithExpr() {
+		NoteOps no = new NoteOps("vol");
+		no.addOperand(n);
+		no.addNum(e);
+		if(mod != null)
+			no.addMod(mod.image);
+		return no;
+	}
+}
+
+Sequence sequence() : {
+	Sequence s = new Sequence();
+} {
+	"[" ((seqNote(s) | seqID(s)) ("," <ID>)*)? "]" { return s; }
+}
+
+void seqNote(Sequence s): {
+	Expression e;
+} {
+	e = note() { s.addNoteToEnd(e); }
+}
+
+void seqID(Sequence s): {
+	Token t;
+} {
+	t = <ID> {}
+}
