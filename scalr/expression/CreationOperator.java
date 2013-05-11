@@ -24,7 +24,10 @@ public class CreationOperator implements Expression
 	public void addOperand(Expression expr)
 	{
 		rval = expr;
-		SymbolTable.addTypeReference(func, var, expr.getType());
+		if (func != null)
+			SymbolTable.addTypeReference(func, var, expr.getType());
+		else
+			SymbolTable.addTypeReference(SymbolTable.currentFunctionScope, var, expr.getType());
 	}
 	
 	@Override

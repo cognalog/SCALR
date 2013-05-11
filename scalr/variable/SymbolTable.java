@@ -38,6 +38,7 @@ public final class SymbolTable
 			throw new FunctionExistsError(func);
 		HashMap<String, Expression> funcTable = new HashMap<String, Expression>();
 		HashMap<String, ExpressionType> typeTable = new HashMap<String, ExpressionType>();
+		currentFunctionScope = func;
 		reference.put(func, funcTable);
 		referenceType.put(func, typeTable);
 	}
