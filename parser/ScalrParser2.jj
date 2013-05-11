@@ -1,7 +1,7 @@
 options
 {
   LOOKAHEAD=3;
-
+  STATIC = false; 
 }
 
 PARSER_BEGIN(ScalrParser2)
@@ -59,7 +59,7 @@ TOKEN: {
 	}
 
 /*********************************NEW SHIT STARTS*************************************/
-void tscalr() throws Exception: {} { imp1() tfunc() track1()
+void tscalr() throws Exception: {} { imp1() tfunc() track() track1()
 {System.out.println("WE HERE");}
 }
 
@@ -85,7 +85,7 @@ void fscalrFile() throws Exception: {
 } { s = id()
 
 {
-	fname = "../" + s + ".fscalr";
+	fname = "tests/" + s + ".fscalr";
 
 	System.out.println(fname);
 
