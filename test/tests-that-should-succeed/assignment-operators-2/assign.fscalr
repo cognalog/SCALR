@@ -1,7 +1,8 @@
-import assign
-
-main
-  seq = expand()
+func expand ( )
+  vol = 50
+  vol *= 2 /* 100 */
+  vol += 4 /* 104 */
+  vol /= 2 /* 52 */
+  vol -= 3 /* 49 */
+  [note.pitch(C3).volume(vol)]
 end
-
-track -> [seq]

@@ -1,9 +1,9 @@
-func hello ( )
+func hello( )
   seq = []
   if(false)
-    seq = note.pitch(A3).quarter
+    seq += note.pitch(A3).quarter
   else
-    seq = note.pitch(As3).quarter
+    seq += note.pitch(As3).quarter
   end
   seq
 end
