@@ -9,14 +9,18 @@ package parser;
 import java.io.*;
 import scalr.variable.*;
 import scalr.Exceptions.*;
+import scalr.misc.ScalrLogger;
 import tuple.*;
 import scalr.expression.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class ScalrParser2 {
+	static ScalrLogger logger;
 	public static String fileName = "";
     public static void main(String[] args) throws TypeError {
+    	logger = new ScalrLogger();
+			//logger.setLogMode(1);
     	fileName = args[0];
 		BufferedReader br = null;
         String text = "";
@@ -35,7 +39,7 @@ public class ScalrParser2 {
        //parser.function();
        //System.out.println(parser.funcall());
         //System.out.println(SymbolTable.reference);
-	    System.out.println("grats, your program compiled alright");
+	    	logger.log("grats, your program compiled alright");
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed:");
