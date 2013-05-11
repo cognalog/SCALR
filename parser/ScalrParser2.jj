@@ -62,6 +62,26 @@ TOKEN: {
 	}
 
 /*********************************NEW SHIT STARTS*************************************/
+Expression foreach() throws Exception: {
+	Expression seq;
+	ArrayList<Expression> statements = new ArrayList<Expression>();
+	ForEachStatement fes;
+}
+{
+	"foreach" "Note" <ID> "in" seq = sequence()  
+	statements = line1()
+	{
+		System.out.println("for each plz");
+		fes = new ForEachStatement(seq);
+		for(Expression s : statements){
+			fes.addStatement(s);
+		}
+		return fes.getValue();
+	}
+	"end"
+}
+
+
 void tscalr() throws Exception: { String out;} { imp1() mainFunc() out=track1()
 {System.out.println(out);}
 }
