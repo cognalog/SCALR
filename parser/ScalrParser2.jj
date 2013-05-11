@@ -28,7 +28,11 @@ public class ScalrParser2 {
         ScalrParser2 parser = new ScalrParser2(new java.io.StringReader(text));
         //SymbolTable.addFunc("test");
         //SymbolTable.currentFunctionScope = "test";
+<<<<<<< HEAD
        parser.tscalr();
+=======
+       parser.note();
+>>>>>>> add breaks
        //System.out.println(parser.funcall());
         //System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
@@ -481,7 +485,14 @@ Expression note() throws Exception: {
 	Token t;
 	Expression n = Note.note();
 } {
-	("note" | t = <ID> { n = new VariableReference(t.image, SymbolTable.currentFunctionScope); }) 
+	("break.half" {System.out.println("caught that break!!");})
+	|("break.quarter" {System.out.println("caught that break!!");})
+	|("break.whole" {System.out.println("caught that break!!");})
+	|("break.eighth" {System.out.println("caught that break!!");})
+	|("break.sixteenth" {System.out.println("caught that break!!");})
+	|("break.thirtysec" {System.out.println("caught that break!!");})
+	|
+	(("note" | t = <ID> { n = new VariableReference(t.image, SymbolTable.currentFunctionScope); }) 
 	(".pitch(" n = pitch(n) ")" | ".length(" n = length(n) ")" | ".volume(" n = volume(n) ")" 
 	| ".half" {NoteOps no = new NoteOps("len"); no.addOperand(n); no.addLength("half"); n=no;}
 	| ".whole" {NoteOps no = new NoteOps("len"); no.addOperand(n); no.addLength("whole"); n=no;}
@@ -494,7 +505,7 @@ Expression note() throws Exception: {
 	| ".sixteenthT" {NoteOps no = new NoteOps("len"); no.addOperand(n); no.addLength("sixteenthT"); n=no;}
 	| ".thirtysecT" {NoteOps no = new NoteOps("len"); no.addOperand(n); no.addLength("thirtysecT"); n=no;}
 
-	)* { return n; }
+	)* { return n; })
 }
 
 Expression lenClass(Expression n) throws Exception: {
