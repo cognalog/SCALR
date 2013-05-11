@@ -73,7 +73,8 @@ TOKEN: {
 	}
 
 /*********************************NEW SHIT STARTS*************************************/
-Expression conditional() throws Exception: {
+/*
+void conditional() throws Exception: {
 	System.out.println("matching conditional:");
 	IfElseStatement iestmt;
 	Expression ex;
@@ -96,6 +97,7 @@ Expression conditional() throws Exception: {
 		for(Expression s2 : stmts2){
 			iestmt.addStatement(s2);
 		}
+		//return iestmt;
 	}
 | "if" "(" ex = boolExpr() ")" stmts = block()
 	{
@@ -106,10 +108,11 @@ Expression conditional() throws Exception: {
 		f = SymbolTable.getFuncRef(SymbolTable.currentFunctionScope);
 		f.addStatement(iestmt);
 		SymbolTable.addFuncRef(f);
+		//return iestmt;
 	}
 }
 
-ArrayList<Expression> els3() throws Exception: {
+void els3() throws Exception: {
 	System.out.println("matching else");
 	IfElseStatement iestmt;
 	ArrayList<Expression> stmts = new ArrayList<Expression>();
@@ -120,14 +123,14 @@ ArrayList<Expression> els3() throws Exception: {
 "else" ex = conditional()
 	{
 		stmts.add(ex);
-		return stmts;
+		//return stmts;
 	}
 | "else" stmts = block()
 	{
-		return stmts;
+		//return stmts;
 	}
 }
-
+*/
 
 
 
@@ -139,7 +142,7 @@ Expression foreach() throws Exception: {
 }
 {
 	"foreach" "Note" <ID> "in" seq = sequence()  
-	statements = block()
+	statements = line1()
 	{
 		System.out.println("for each plz");
 		fes = new ForEachStatement(seq);
@@ -148,6 +151,7 @@ Expression foreach() throws Exception: {
 		}
 		return fes.getValue();
 	}
+	"end"
 }
 
 
@@ -209,12 +213,8 @@ void fscalrFile() throws Exception: {
 }
 }
 
-ArrayList<Expression> block() throws Exception: {
-	System.out.println("matching block:");
-	ArrayList<Expression> stmts = new ArrayList<Expression>();
-} 
-{ 
-stmts = line1() "end" {System.out.println("block matched"); return stmts; }}
+void block() throws Exception: {System.out.println("matching block:");} { 
+line1() "end" {System.out.println("block matched");}}
 	
 
 void mainFunc() throws Exception:{
