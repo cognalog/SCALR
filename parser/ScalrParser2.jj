@@ -35,7 +35,8 @@ public class ScalrParser2 {
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
-            System.out.println("Syntax check failed: " + e.getMessage());
+            System.out.println("Syntax check failed:");
+            e.printStackTrace();
         }
     }
 }
