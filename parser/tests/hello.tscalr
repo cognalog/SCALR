@@ -1,7 +1,11 @@
 import hello
 
 main
+<<<<<<< HEAD
   k= note.half
+=======
+  y= note.half
+>>>>>>> while trial
   seq = hello()
 end
 

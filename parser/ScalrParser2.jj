@@ -29,8 +29,8 @@ public class ScalrParser2 {
         //SymbolTable.addFunc("test");
         //SymbolTable.currentFunctionScope = "test";
 
-       parser.tscalr();
-       // parser.function();
+        parser.tscalr();
+       //parser.function();
        //System.out.println(parser.funcall());
         //System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
@@ -45,15 +45,20 @@ PARSER_END(ScalrParser2)
 
 SKIP : { " " | "\t" | <"/*" (~[])* "*/"> | "\n"}
 TOKEN: {
-       "and" | "or" | "not" | "->" | "." |
+       "not" | "->" | "." |
         "," | "\"" | "+" | "-" | "%" | "(" | ")" | "[" | "]" |
 	"note" | "pitch" | "volume" | 
        	"duration" | "quarter" | "half" | "whole" |
 	"end" | "func" | "main" | "while" | "foreach" |
 	 "in" |	"if" | "else" | "import" | "track" | ".fscalr" |
+	<NRELN: "<" | ">" | ">=" | "<="> |
+	<AND: "and"> |
+	<OR: "or"> |
+	<URELN: "==" | "!="> |
 	<POST: "--" | "++"> |
 	<LENGTH: "whole" | "half" | "quarter" | "eighth" | "sixteenth" | "thirtysec" | "quarterT" |
 		"eighthT" | "sixteenthT" | "thirtysecT"> |
+	<BOOL: "true" | "false"> |
 	<ASSIGN: "=" | "+=" | "-=" | "*=" | "/=" | "%="> |
 	<RELN: "==" | "<" | ">" | ">=" "<="> |
 	<INT: "0" | ["1"-"9"](["0"-"9"])*> |
@@ -224,9 +229,10 @@ Expression line() throws Exception: {
 	Expression e;
 	System.out.println("calling LINE");
 } {
-//loop() {System.out.println("loop line matched");}
+	e=whileExpr() { System.out.println("end of while");
+					return e;}
 //| conditional() {System.out.println("conditional line matched");}
-//| 
+	| 
 	e= assignment() {
 		System.out.println("end of assignment");
 		return e;
@@ -258,6 +264,95 @@ e=line() out=line1(){
 	return new ArrayList<Expression>();
 }
 }
+
+Expression whileExpr() throws Exception: {
+	ArrayList<Expression> expressions = new ArrayList<Expression>();
+	Expression ex;
+	Expression arith;
+	WhileStatement whileObj;
+	System.out.println("while started");
+}{
+	"while" "(" ex=boolExpr() { whileObj = new WhileStatement(ex); } ")"
+	(arith = line())+ { whileObj.addStatement(arith); } 
+	"end" {
+		System.out.println("while returned");
+		return whileObj;
+	}
+}
+Expression boolExpr() throws Exception: {
+	Expression e1;
+	Expression e2 = null;
+	Token op = null;
+} {
+	e1 = andExpr() (op = <OR> e2 = boolExpr())? {
+		if (op != null) {
+			BooleanOperator bo = new BooleanOperator(op.image);
+			bo.addOperand(e1);
+			bo.addOperand(e2);
+			return bo;
+		}
+		else
+			return e1;
+	}
+}
+
+Expression andExpr() throws Exception: {
+	Expression e1;
+	Expression e2 = null;
+	Token op = null;
+} {
+	e1 = boolEqualExpr() (op = <AND> e2 = boolExpr())? {
+		if (op != null) {
+			BooleanOperator bo = new BooleanOperator(op.image);
+			bo.addOperand(e1);
+			bo.addOperand(e2);
+			return bo;
+		}
+		else
+			return e1;
+	}
+}
+
+Expression boolEqualExpr() throws Exception: {
+	Expression e1;
+	Expression e2 = null;
+	Token op = null;
+} {
+	e1 = nrelExpr() (op = <URELN> e2 = boolExpr())? {
+		if (op != null) {
+			BooleanOperator bo = new BooleanOperator(op.image);
+			bo.addOperand(e1);
+			bo.addOperand(e2);
+			return bo;
+		}
+		else
+			return e1;
+	}
+}
+
+Expression nrelExpr() throws Exception: {
+	Expression e1;
+	Expression e2 = null;
+	Token op = null;
+} {
+	e1 = arithExpr() (op = <NRELN> | op = <URELN>) e2 = arithExpr() {
+		if (op != null) {
+			BooleanOperator bo = new BooleanOperator(op.image);
+			bo.addOperand(e1);
+			bo.addOperand(e2);
+			return bo;
+		}
+		else
+			return e1;
+	}
+	| op = <BOOL> {
+		return new ScalrBoolean(Boolean.parseBoolean(op.image));
+	}
+	| "(" e1 = boolExpr() ")" {
+		return e1;
+	}
+}
+
 
 Expression assignment() throws Exception: {
 	String t1;

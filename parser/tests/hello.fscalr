@@ -1,4 +1,13 @@
 func hello( )
+<<<<<<< HEAD
   x = [ note.half]
+=======
+  x = []
+  i = 0
+  while(i<5)
+  	i= i+1
+  	x+= note.half
+  end
+>>>>>>> while trial
   x
 end
