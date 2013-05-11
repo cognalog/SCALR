@@ -73,23 +73,29 @@ TOKEN: {
 	}
 
 /*********************************NEW SHIT STARTS*************************************/
-void conditional() throws Exception: {
+Expression conditional() throws Exception: {
 	System.out.println("matching conditional:");
 	IfElseStatement iestmt;
 	Expression ex;
+	Expression ex2;
 	ArrayList<Expression> stmts = new ArrayList<Expression>();
+	ArrayList<Expression> stmts2 = new ArrayList<Expression>();
 	Function f;
 } 
 {
-"if" "(" ex = boolExpr() ")" stmts = line1() els3()
+"if" "(" ex = boolExpr() ")" stmts = line1() 
 	{
 		iestmt = new IfElseStatement(ex);
 		for(Expression s : stmts){
 			iestmt.addStatement(s);
 		}
-
-
-
+	}
+	stmts2 = els3()
+	{
+		iestmt.addEl();
+		for(Expression s2 : stmts2){
+			iestmt.addStatement(s2);
+		}
 	}
 | "if" "(" ex = boolExpr() ")" stmts = block()
 	{
@@ -103,13 +109,23 @@ void conditional() throws Exception: {
 	}
 }
 
-void els3() throws Exception: {
-
+ArrayList<Expression> els3() throws Exception: {
 	System.out.println("matching else");
+	IfElseStatement iestmt;
+	ArrayList<Expression> stmts = new ArrayList<Expression>();
+	Function f;
+	Expresison ex;
 } 
 {
-"else" conditional()
-| "else" block()
+"else" ex = conditional()
+	{
+		stmts.add(ex);
+		return stmts;
+	}
+| "else" stmts = block()
+	{
+		return stmts;
+	}
 }
 
 
