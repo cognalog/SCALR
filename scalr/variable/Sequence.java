@@ -95,8 +95,10 @@ public class Sequence implements Variable
 		// A track opens with a bracket
 		String result = "[";
 		// Append each note to the string
-		for (Expression n : theNotes)
+		// for(int i = 0; i < theNotes.size(); i++)
+		for (Expression n : theNotes) {
 			result += n.getValue().toString() + "|";
+		}
 		// remove the last bar (if there is a note)
 		if (theNotes.size() > 0)
 			result = result.substring(0, result.length() - 1);

@@ -43,14 +43,14 @@ PARSER_END(ScalrParserTest)
 
 SKIP : { " " | "\t" | <"/*" (~[])* "*/"> }
 TOKEN: {
-	"and" | "or" | "not" | "volume" | "duration" | "end" | "func" | "main" | "while" | "foreach" |
+	"not" | "volume" | "duration" | "end" | "func" | "main" | "while" | "foreach" |
 	"import" | "track" | "in" |	"if" | "else" | "note" | "pitch" | 
 	"->" | "." | "," | "\"" | "%" | "(" | ")" | "[" | "]" |
     <CREATE: "="> |
     <ASSIGN: "+=" | "-=" | "*=" | "/=" | "%="> |
 	<NRELN: "<" | ">" | ">=" | "<="> |
-	<AND: "||" > |
-	<OR: "&&"> |
+	<AND: "and"> |
+	<OR: "or"> |
 	<URELN: "==" | "!="> |
 	<POST: "--" | "++"> |
 	<LENGTH: "whole" | "half" | "quarter" | "eighth" | "sixteenth" | "thirtysec" | "quarterT" |
@@ -69,7 +69,6 @@ Expression statement(): {
 		return expr;
 	}
 	| ("\n")* expr = boolExpr() "\n" {
-		System.out.println(expr);
 		return expr;
 	}
 }
@@ -93,7 +92,7 @@ Expression boolExpr(): {
 } {
 	e1 = andExpr() (op = <OR> e2 = boolExpr())? {
 		if (op != null) {
-			BinaryOperator bo = new BinaryOperator(op.image);
+			BooleanOperator bo = new BooleanOperator(op.image);
 			bo.addOperand(e1);
 			bo.addOperand(e2);
 			return bo;
@@ -110,7 +109,7 @@ Expression andExpr(): {
 } {
 	e1 = boolEqualExpr() (op = <AND> e2 = boolExpr())? {
 		if (op != null) {
-			BinaryOperator bo = new BinaryOperator(op.image);
+			BooleanOperator bo = new BooleanOperator(op.image);
 			bo.addOperand(e1);
 			bo.addOperand(e2);
 			return bo;
@@ -127,7 +126,7 @@ Expression boolEqualExpr(): {
 } {
 	e1 = nrelExpr() (op = <URELN> e2 = boolExpr())? {
 		if (op != null) {
-			BinaryOperator bo = new BinaryOperator(op.image);
+			BooleanOperator bo = new BooleanOperator(op.image);
 			bo.addOperand(e1);
 			bo.addOperand(e2);
 			return bo;
@@ -144,7 +143,7 @@ Expression nrelExpr(): {
 } {
 	e1 = arithExpr() (op = <NRELN> | op = <URELN>) e2 = arithExpr() {
 		if (op != null) {
-			BinaryOperator bo = new BinaryOperator(op.image);
+			BooleanOperator bo = new BooleanOperator(op.image);
 			bo.addOperand(e1);
 			bo.addOperand(e2);
 			return bo;

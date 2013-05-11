@@ -42,21 +42,17 @@ public class BooleanOperator implements Expression
 		
 		if (expr2 == null && expr1.getType() == ExpressionType.BOOLEAN)
 			return (cachedResult = expr1.getValue());
-		if (expr1.getType() != ExpressionType.NUMBER || expr2.getType() != ExpressionType.NUMBER) {
+		if (expr1.getType() == ExpressionType.NUMBER && expr2.getType() == ExpressionType.NUMBER) {
 			ScalrNum num1 = (ScalrNum) expr1.getValue();
 			ScalrNum num2 = (ScalrNum) expr2.getValue();
-			if (operator.equals(">")) {
+			if (operator.equals(">"))
 				return (cachedResult = new ScalrBoolean(num1.getNum() > num2.getNum()));
-			}
-			else if (operator.equals("<")) {
+			else if (operator.equals("<"))
 				return (cachedResult = new ScalrBoolean(num1.getNum() < num2.getNum()));
-			}
-			else if (operator.equals("<=")) {
+			else if (operator.equals("<="))
 				return (cachedResult = new ScalrBoolean(num1.getNum() <= num2.getNum()));
-			}
-			else if (operator.equals(">=")) {
+			else if (operator.equals(">="))
 				return (cachedResult = new ScalrBoolean(num1.getNum() >= num2.getNum()));
-			}
 			else if (operator.equals("!="))
 				return (cachedResult = new ScalrBoolean(num1.getNum() != num2.getNum()));
 			else if (operator.equals("=="))
@@ -65,12 +61,12 @@ public class BooleanOperator implements Expression
 		else if (expr1.getType() == ExpressionType.BOOLEAN
 		        && expr2.getType() == ExpressionType.BOOLEAN) {
 			ScalrBoolean bool1 = (ScalrBoolean) expr1.getValue();
-			ScalrBoolean bool2 = (ScalrBoolean) expr1.getValue();
+			ScalrBoolean bool2 = (ScalrBoolean) expr2.getValue();
 			if (operator.equals("=="))
 				return (cachedResult = new ScalrBoolean(bool1.getBool() == bool2.getBool()));
-			else if (operator.equals("||"))
+			else if (operator.equals("or"))
 				return (cachedResult = new ScalrBoolean(bool1.getBool() || bool2.getBool()));
-			else if (operator.equals("&&"))
+			else if (operator.equals("and"))
 				return (cachedResult = new ScalrBoolean(bool1.getBool() && bool2.getBool()));
 			else if (operator.equals("!="))
 				return (cachedResult = new ScalrBoolean(bool1.getBool() != bool2.getBool()));

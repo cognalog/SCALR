@@ -6,13 +6,12 @@ import scalr.expression.ExpressionType;
 
 public class ScalrBoolean implements Variable
 {
-	private boolean	                  val;
-	private static final ScalrBoolean	FALSE	= new ScalrBoolean(false);
-	private static final ScalrBoolean	TRUE	= new ScalrBoolean(true);
+	private boolean	val;
 	
 	public ScalrBoolean(boolean i)
 	{
 		val = i;
+		System.out.println(i);
 	}
 	
 	public void setValue(boolean i)
@@ -58,15 +57,5 @@ public class ScalrBoolean implements Variable
 	public String toString()
 	{
 		return Boolean.toString(val);
-	}
-	
-	public ScalrBoolean getFalse()
-	{
-		return (ScalrBoolean) FALSE.getCopy();
-	}
-	
-	public ScalrBoolean getTrue()
-	{
-		return (ScalrBoolean) TRUE.getCopy();
 	}
 }
