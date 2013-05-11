@@ -14,13 +14,14 @@ import tuple.*;
 import scalr.expression.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import scalr.Degree;
 
 public class ScalrParser2 {
 	static ScalrLogger logger;
 	public static String fileName = "";
     public static void main(String[] args) throws TypeError {
     	logger = new ScalrLogger();
-			//logger.setLogMode(1);
+			logger.setLogMode(1);
     	fileName = args[0];
 		BufferedReader br = null;
         String text = "";
@@ -35,9 +36,9 @@ public class ScalrParser2 {
         //SymbolTable.addFunc("test");
         //SymbolTable.currentFunctionScope = "test";
 
-//        parser.tscalr();
-       parser.function();
-       System.out.println(parser.funcall());
+				parser.tscalr();
+       //parser.function();
+       //System.out.println(parser.funcall());
         //System.out.println(SymbolTable.reference);
 	    	logger.log("grats, your program compiled alright");
         } catch (Throwable e) {
@@ -722,6 +723,46 @@ Sequence sequence1() throws Exception: {
 	return s;
 }
 }
+
+Expression scale() throws Exception: {
+	Scale s;
+	Token d;
+	String id;
+	System.out.println("called scale");
+
+} {
+"{" d = <DEGREE> s = scale1() "}" 
+{
+	System.out.println("scale case 1");
+	s.addDegreeToStart(Degree.valueOf(d.image));
+	return s;
+}
+| id = id() 
+{
+	System.out.println("scale case 2");
+	VariableReference e = new VariableReference(id, SymbolTable.currentFunctionScope);
+	return e;
+}
+}
+
+Scale scale1() throws Exception: {
+	Scale s;
+	Token d;
+
+} {
+"," d = <DEGREE> s = scale1()
+{
+	s.addDegreeToStart(Degree.valueOf(d.image));
+	return s;
+}
+| {}
+{
+	System.out.println("created new scale");
+	s = new Scale();
+	return s;
+}
+}
+
 Expression noteModifier() throws Exception:{
 	Token t;
 	Expression n = Note.note();
