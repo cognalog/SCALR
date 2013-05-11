@@ -59,7 +59,7 @@ TOKEN: {
 	}
 
 /*********************************NEW SHIT STARTS*************************************/
-void tscalr() throws Exception: {} { imp1() tfunc() track() track1()
+void tscalr() throws Exception: {} { imp1() tfunc() track1()
 {System.out.println("WE HERE");}
 }
 
@@ -117,7 +117,7 @@ void fscalrFile() throws Exception: {
 }
 
 void block() throws Exception: {System.out.println("matching block:");} { 
-/*line1()*/ "end" {System.out.println("block matched");}}
+line1() "end" {System.out.println("block matched");}}
 	
 
 void main() throws Exception:{
