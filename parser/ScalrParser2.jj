@@ -29,7 +29,7 @@ public class ScalrParser2 {
         //SymbolTable.addFunc("test");
         //SymbolTable.currentFunctionScope = "test";
         parser.function();
-        parser.funcall();
+        System.out.println(parser.funcall());
         System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
@@ -89,8 +89,9 @@ void function() throws Exception: {
 	} 
 
 	")" expressions = line1() {
+	System.out.println("!!!!!!!!!!!!!!!!! exp size is "+ expressions.size());
 		for(Expression e: expressions){
-			System.out.println("adding statement");
+			System.out.println("!!!!!!!!!!!!!!adding statement");
 			f.addStatement(e);
 		}
 	}
@@ -123,9 +124,9 @@ Expression line() throws Exception: {
 //loop() {System.out.println("loop line matched");}
 //| conditional() {System.out.println("conditional line matched");}
 //| 
-	assignment() {
+	e= assignment() {
 		System.out.println("end of assignment");
-		return null;
+		return e;
 	}
 	|
 	//note() {
@@ -148,7 +149,7 @@ ArrayList<Expression> line1() throws Exception: {
 	Expression e;
 } {
 e=line() out=line1(){
-	System.out.println("adding line");
+	
 	if(e != null){
 		out.add(e);
 		return out;
@@ -160,7 +161,7 @@ e=line() out=line1(){
 }
 }
 
-void assignment() throws Exception: {
+Expression assignment() throws Exception: {
 	String t1;
 	Expression t2;
 	System.out.println("starting assignment");
@@ -172,12 +173,14 @@ void assignment() throws Exception: {
 									System.out.println("assignment case sequence");
 									CreationOperator co = new CreationOperator(t1);
 									co.addOperand(t2);
-									co.addFunc(SymbolTable.currentFunctionScope);}
+									co.addFunc(SymbolTable.currentFunctionScope);
+									return co;}
 	|
 	t1=id() <ASSIGN> t2=note() { 	System.out.println("assignment case note");
 									CreationOperator co = new CreationOperator(t1);
 									co.addOperand(t2);
 									co.addFunc(SymbolTable.currentFunctionScope);
+									return co;
 								}
 	|
 
@@ -186,6 +189,7 @@ void assignment() throws Exception: {
 									CreationOperator co = new CreationOperator(t1);
 									co.addOperand(t2);
 									co.addFunc(SymbolTable.currentFunctionScope);
+									return co;
 	}
 }
 String id() throws Exception:
