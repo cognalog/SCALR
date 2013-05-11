@@ -255,7 +255,12 @@ public class Note implements Variable
 	@Override
 	public String toString()
 	{
-		return pitch + "," + Double.parseDouble(length.duration) + "," + volume;
+		return pitch.getMidi() + "," + fractionToDouble(length.duration) + "," + volume;
+	}
+	
+	private Degree fractionToDouble(String duration)
+	{
+		return null;
 	}
 	
 	@Override
