@@ -116,7 +116,7 @@ void fscalrFile() throws Exception: {
 
 {
 	File f = new File(fileName);
-	fname = f.getParent() + "/" + s + ".fscalr";
+	fname = f.getParent() + System.getProperty("file.separator") + s + ".fscalr";
 
 	System.out.println(fname);
 
