@@ -3,18 +3,42 @@ package scalr.expression;
 
 import java.util.ArrayList;
 
+import scalr.variable.ScalrBoolean;
+
 public class IfElseStatement implements Expression
 {
+	/**
+	 * This list represents the condition of an if or else if. In the case of an else, it contains a
+	 * null expression.
+	 */
 	ArrayList<Expression>	         checks	       = new ArrayList<Expression>();
+	/**
+	 * This list represents the list of statements of an if or else if. It is the same size as
+	 * checks.
+	 */
 	ArrayList<ArrayList<Expression>>	statements	= new ArrayList<ArrayList<Expression>>();
+	/**
+	 * Although we can simply check to see if the last elements of checks is null, it is much
+	 * quicker and clearer to simply use a boolean
+	 */
 	private boolean	                 elseAdded	   = false;
 	
+	/**
+	 * Constructs a set of if/else if/else statements. The constructor takes an
+	 * {@linkplain Expression} that represents the if check condition for a block, and also prepares
+	 * the class to receive statements for that if expression.
+	 * @param expr
+	 *            The check {@linkplain Expression} for the if statement. It should be of
+	 *            {@linkplain ExpressionType}.BOOLEAN.
+	 */
 	public IfElseStatement(Expression expr)
 	{
 		if (expr != null) {
 			checks.add(expr);
 			statements.add(new ArrayList<Expression>());
 		}
+		// Decided that rather than throwing an error, I would simulate one, since we exit when an
+		// error is thrown anyway.
 		else {
 			System.err.println("Attempted to add a null check statement.");
 			StackTraceElement[] stack = Thread.currentThread().getStackTrace();
@@ -24,16 +48,25 @@ public class IfElseStatement implements Expression
 		}
 	}
 	
+	/**
+	 * Functions similarly to the constructor of this class. Adds an else if to this block whose
+	 * check condition is <code>expr</code>.
+	 * @param expr
+	 *            The {@linkplain Expression} to check to see if this else if should be executed.
+	 */
 	public void addElIf(Expression expr)
 	{
-		if (checks.size() > 0 && !elseAdded && expr != null) {
+		if (!elseAdded && expr != null) {
 			checks.add(expr);
 			statements.add(new ArrayList<Expression>());
 		}
 		else {
-			if (expr != null)
+			// Technically, expr could also be null, in this condition, but that doesn't really
+			// change the fact that we should throw an error, and it clearly doesn't change the fact
+			// that there is already an else.
+			if (elseAdded)
 				System.err
-				        .println("Attempted to add an \"else if\" statement before adding an if.");
+				        .println("Attempted to add an \"else if\" statement after adding an else.");
 			else
 				System.err.println("Attempted to add a null check statement.");
 			StackTraceElement[] stack = Thread.currentThread().getStackTrace();
@@ -43,18 +76,21 @@ public class IfElseStatement implements Expression
 		}
 	}
 	
-	public void addEl(Expression expr)
+	/**
+	 * As you know, elses don't have a check expression. They are executed when all else fails. As
+	 * such, once an else has been added, no other else(s | ifs) can be added.
+	 */
+	public void addEl()
 	{
-		if (checks.size() > 0 && !elseAdded && expr != null) {
-			checks.add(expr);
+		// The else is signified by having a null check.
+		if (!elseAdded) {
+			checks.add(null);
 			statements.add(new ArrayList<Expression>());
 			elseAdded = true;
 		}
 		else {
-			if (expr != null)
-				System.err.println("Attempted to add an \"else\" statement after adding an else.");
-			else
-				System.err.println("Attempted to add a null check statement.");
+			System.err
+			        .println("Attempted to add an \"else\" statement after already adding an else.");
 			StackTraceElement[] stack = Thread.currentThread().getStackTrace();
 			for (StackTraceElement elem : stack)
 				System.err.println(elem);
@@ -62,31 +98,53 @@ public class IfElseStatement implements Expression
 		}
 	}
 	
+	/**
+	 * Adds a statement belonging to the latest if/else if/else added to this object. This class
+	 * automatically assigns it to the right one (it's nothing special, really).
+	 * @param expr
+	 *            The {@linkplain Expression} to add.
+	 */
 	public void addStatement(Expression expr)
 	{
 		// Add a non-null expression to the last if/else if/else list of statements
-		try {
-			if (expr != null)
-				statements.get(statements.size() - 1).add(expr);
-		}
-		catch (IndexOutOfBoundsException e) {
-			System.err.println("Attempted to add a statement before declaring an if/else if/else.");
-			e.printStackTrace();
-			System.exit(1);
-		}
-		catch (NullPointerException e) {
-			System.err.println("Attempted to add a statement before declaring an if/else if/else.");
-			e.printStackTrace();
-			System.exit(1);
-		}
+		if (expr != null)
+			statements.get(statements.size() - 1).add(expr);
 	}
 	
+	/**
+	 * Evaluates the first if/else if that is true. If none are, then it evaluates the given else
+	 * (if it exists). Like a {@link WhileStatement}, an {@link IfElseStatement} is returns nothing
+	 * from its getValue method, thus it is inappropriate to use this class in another expression
+	 * that requires a return.
+	 */
 	@Override
 	public Expression getValue(Expression... expressions)
 	{
+		int blockIndex = 0;
+		for (Expression check : checks) {
+			if (check != null) {
+				// Execute if its true
+				if (((ScalrBoolean) check.getValue(expressions)).getBool()) {
+					for (Expression stmt : statements.get(blockIndex))
+						stmt.getValue(expressions);
+					break;
+				}
+				// Go on to the next if/else if/else otherwise
+			}
+			// Here, we have reached an else (no pun intended)
+			else {
+				// Just execute all the statements.
+				for (Expression stmt : statements.get(blockIndex))
+					stmt.getValue(expressions);
+			}
+			blockIndex++;
+		}
 		return null;
 	}
 	
+	/**
+	 * Like a {@linkplain WhileStatement}, an {@link IfElseStatement} is type-less.
+	 */
 	@Override
 	public ExpressionType getType()
 	{
