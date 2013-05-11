@@ -2,27 +2,23 @@
 package scalr.expression;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import scalr.Exceptions.FunctionExistsError;
 import scalr.Exceptions.TypeError;
 import scalr.variable.SymbolTable;
-import scalr.variable.Variable;
 
 public class Function implements Expression
 {
 	
-	private String	                  id;
-	private HashMap<String, Variable>	parameterValue;
-	private ArrayList<String>	      parameterName;
-	private ArrayList<Expression>	  statements;
+	private String	              id;
+	private ArrayList<String>	  parameterName;
+	private ArrayList<Expression>	statements;
 	
 	public Function(String name) throws FunctionExistsError
 	{
 		id = name;
 		SymbolTable.addFunc(name);
 		parameterName = new ArrayList<String>();
-		parameterValue = new HashMap<String, Variable>();
 		statements = new ArrayList<Expression>();
 	}
 	
@@ -31,11 +27,6 @@ public class Function implements Expression
 		if (parameterName.contains(name))
 			throw new TypeError(name);
 		parameterName.add(name);
-	}
-	
-	public void setParameter(String name, Variable var)
-	{
-		parameterValue.put(name, var);
 	}
 	
 	public void addStatement(Expression expr)
@@ -63,6 +54,25 @@ public class Function implements Expression
 	@Override
 	public Expression getValue(Expression... expressions)
 	{
+		// Checking to make sure we got the proper number of arguments
+		if (expressions.length != parameterName.size()) {
+			System.err.println("Incorrect number of arguments for function: " + id + parameterName
+			        + ".");
+			StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+			for (StackTraceElement elem : stack)
+				System.err.println(elem);
+			System.exit(1);
+		}
+		// Add the expressions to the symbol table
+		for (int i = 0; i < expressions.length; i++) {
+			try {
+				SymbolTable.addReference(id, parameterName.get(i), expressions[i]);
+			}
+			catch (TypeError e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+		}
 		for (int i = 0; i < statements.size() - 1; i++)
 			statements.get(i).getValue();
 		Expression lastExpr = statements.get(statements.size() - 1);

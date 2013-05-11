@@ -262,8 +262,10 @@ public class Note implements Variable
 	
 	private String fractionToDouble(String duration)
 	{
+		if (duration.equals("1"))
+			return duration;
 		String[] frac = duration.split("/");
-		return "" + Integer.parseInt(frac[0]) / Double.parseDouble(frac[1]);
+		return "" + (4.0 * (Integer.parseInt(frac[0]) / Double.parseDouble(frac[1])));
 	}
 	
 	@Override
