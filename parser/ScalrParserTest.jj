@@ -15,23 +15,23 @@ import java.util.*;
 public class ScalrParserTest {
 	public static String currentFunc = "test";
     public static void main(String[] args) throws Exception {
-		BufferedReader br = null;
+		Scanner in = null;
         String text = "";
         try {
-			br = new BufferedReader(new FileReader(args[0]));
-            String line = "";
-            while ((line = br.readLine()) != null) {
-                text += line + "\n";
-
-            }
-        ScalrParserTest parser = new ScalrParserTest(new java.io.StringReader(text));
-        SymbolTable.addFunc(currentFunc);
-        ArrayList<Expression> function = new ArrayList<Expression>();
-        function.add(parser.statement());
-		for(Expression e : function) {
-			System.out.println("Type: " + e.getType() + " | Value: " + e.getValue());
-		}
-	    System.out.println("grats, your program compiled alright");
+		    in = new Scanner(new File(args[0]));
+		    String line = "";
+		    while (in.hasNextLine())
+		    	text += in.nextLine() + "\n";
+                
+		    ScalrParserTest parser = new ScalrParserTest(new java.io.StringReader(text));
+		    SymbolTable.addFunc(currentFunc);
+		    ArrayList<Expression> function = new ArrayList<Expression>();
+		    function.add(parser.statement());
+		    function.add(parser.statement());
+			for(Expression e : function) {
+				System.out.println("Type: " + e.getType() + " | Value: " + e.getValue());
+			}
+			System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: ");
@@ -61,16 +61,23 @@ TOKEN: {
 	<ID: (["a"-"z"] | "_" | ["A" - "Z"]) (["A"-"Z"] | ["a"-"z"] | <INT> | "_")*>
 }
 
-Expression statement(): {
+Expression statement() throws Exception: {
 	Expression expr;
 } {
-	("\n")* expr = creation() "\n" {
-		System.out.println("Assignment from function: " + currentFunc);
-		return expr;
-	}
-	| ("\n")* expr = note() "\n" {
-		return expr;
-	}
+	("\n")* 
+	(
+		expr = creation() {
+			System.out.println("Assignment from function: " + currentFunc);
+			return expr;
+		}
+		| expr = note() {
+			return expr;
+		} 
+		| expr = whileExpr() {
+			return expr;
+		}
+	)
+	"\n"
 }
 
 Expression creation(): {
@@ -346,4 +353,17 @@ void seqID(Sequence s): {
 	Token t;
 } {
 	t = <ID> {}
+}
+
+Expression whileExpr() throws Exception: {
+	ArrayList<Expression> expressions = new ArrayList<Expression>();
+	Expression ex;
+	Expression arith;
+	WhileStatement whileObj;
+}{
+	"while" "(" ex=boolExpr() { whileObj = new WhileStatement(ex); } ")" ("\n")*
+	(arith = statement())+ ("\n")* { whileObj.addStatement(arith); } 
+	"end" ("\n")* {
+		return whileObj;
+	}
 }

@@ -6,11 +6,9 @@ import scalr.variable.ScalrNum;
 
 public class BooleanOperator implements Expression
 {
-	ExpressionType	exprType;
-	Expression	   expr1;
-	Expression	   expr2;
-	String	       operator;
-	Expression	   cachedResult;
+	Expression	expr1;
+	Expression	expr2;
+	String	   operator;
 	
 	/**
 	 * As defined in section 7.7 of our LRM, the boolean operators are defined ONLY for numbers.
@@ -37,39 +35,36 @@ public class BooleanOperator implements Expression
 	@Override
 	public Expression getValue(Expression... expressions)
 	{
-		if (cachedResult != null)
-			return cachedResult;
-		
 		if (expr2 == null && expr1.getType() == ExpressionType.BOOLEAN)
-			return (cachedResult = expr1.getValue());
+			return expr1.getValue();
 		if (expr1.getType() == ExpressionType.NUMBER && expr2.getType() == ExpressionType.NUMBER) {
 			ScalrNum num1 = (ScalrNum) expr1.getValue();
 			ScalrNum num2 = (ScalrNum) expr2.getValue();
 			if (operator.equals(">"))
-				return (cachedResult = new ScalrBoolean(num1.getNum() > num2.getNum()));
+				return new ScalrBoolean(num1.getNum() > num2.getNum());
 			else if (operator.equals("<"))
-				return (cachedResult = new ScalrBoolean(num1.getNum() < num2.getNum()));
+				return new ScalrBoolean(num1.getNum() < num2.getNum());
 			else if (operator.equals("<="))
-				return (cachedResult = new ScalrBoolean(num1.getNum() <= num2.getNum()));
+				return new ScalrBoolean(num1.getNum() <= num2.getNum());
 			else if (operator.equals(">="))
-				return (cachedResult = new ScalrBoolean(num1.getNum() >= num2.getNum()));
+				return new ScalrBoolean(num1.getNum() >= num2.getNum());
 			else if (operator.equals("!="))
-				return (cachedResult = new ScalrBoolean(num1.getNum() != num2.getNum()));
+				return new ScalrBoolean(num1.getNum() != num2.getNum());
 			else if (operator.equals("=="))
-				return (cachedResult = new ScalrBoolean(num1.getNum() == num2.getNum()));
+				return new ScalrBoolean(num1.getNum() == num2.getNum());
 		}
 		else if (expr1.getType() == ExpressionType.BOOLEAN
 		        && expr2.getType() == ExpressionType.BOOLEAN) {
 			ScalrBoolean bool1 = (ScalrBoolean) expr1.getValue();
 			ScalrBoolean bool2 = (ScalrBoolean) expr2.getValue();
 			if (operator.equals("=="))
-				return (cachedResult = new ScalrBoolean(bool1.getBool() == bool2.getBool()));
+				return new ScalrBoolean(bool1.getBool() == bool2.getBool());
 			else if (operator.equals("or"))
-				return (cachedResult = new ScalrBoolean(bool1.getBool() || bool2.getBool()));
+				return new ScalrBoolean(bool1.getBool() || bool2.getBool());
 			else if (operator.equals("and"))
-				return (cachedResult = new ScalrBoolean(bool1.getBool() && bool2.getBool()));
+				return new ScalrBoolean(bool1.getBool() && bool2.getBool());
 			else if (operator.equals("!="))
-				return (cachedResult = new ScalrBoolean(bool1.getBool() != bool2.getBool()));
+				return new ScalrBoolean(bool1.getBool() != bool2.getBool());
 		}
 		// This should never be reached, but hopefully screws over some invalid syntax and causes an
 		// error
@@ -83,15 +78,13 @@ public class BooleanOperator implements Expression
 	@Override
 	public ExpressionType getType()
 	{
-		if (exprType != null)
-			return exprType;
 		if (expr2 == null && expr1.getType() == ExpressionType.BOOLEAN)
-			return (exprType = ExpressionType.BOOLEAN);
+			return ExpressionType.BOOLEAN;
 		if (expr1.getType() == ExpressionType.NUMBER && expr2.getType() == ExpressionType.NUMBER)
-			return (exprType = ExpressionType.BOOLEAN);
+			return ExpressionType.BOOLEAN;
 		else if (expr1.getType() == ExpressionType.BOOLEAN
 		        && expr2.getType() == ExpressionType.BOOLEAN)
-			return (exprType = ExpressionType.BOOLEAN);
+			return ExpressionType.BOOLEAN;
 		return null;
 	}
 	

@@ -1,1 +1,4 @@
-note.pitch(A3).quarterT
+x = 5
+while (x++ < 10)
+	x = x
+end

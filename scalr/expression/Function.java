@@ -66,7 +66,7 @@ public class Function implements Expression
 		for (int i = 0; i < statements.size() - 1; i++)
 			statements.get(i).getValue();
 		Expression lastExpr = statements.get(statements.size() - 1);
-		if (lastExpr.getType() == ExpressionType.SEQUENCE)
+		if (lastExpr.getType() == ExpressionType.SEQUENCE || id.equals("main"))
 			return statements.get(statements.size() - 1).getValue();
 		else
 			return null;

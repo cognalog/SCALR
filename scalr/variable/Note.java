@@ -247,10 +247,15 @@ public class Note implements Variable
 		return new Note(pitch, volume, length);
 	}
 	
+	public Note getBreak()
+	{
+		return new Note(Degree.br, 100, Length.quarter);
+	}
+	
 	@Override
 	public String toString()
 	{
-		return pitch + "," + length.duration + "," + volume;
+		return pitch + "," + Double.parseDouble(length.duration) + "," + volume;
 	}
 	
 	@Override
