@@ -357,42 +357,86 @@ Expression nrelExpr() throws Exception: {
 Expression assignment() throws Exception: {
 	String t1;
 	Expression t2;
+	Token op;
 	System.out.println("starting assignment");
 	System.out.println(SymbolTable.reference);
 } 
 {
 	
-	t1= id() <ASSIGN> t2= funcall() {
+	t1= id() op=<ASSIGN> t2= funcall() {
 									
 									System.out.println("assignment of a funcall!!!");
-									CreationOperator co = new CreationOperator(t1);
-									co.addOperand(t2);
-									co.addFunc(SymbolTable.currentFunctionScope);
-
-									return co;
+									if(op.image.equals("=")){
+										CreationOperator co = new CreationOperator(t1);
+										co.addOperand(t2);
+										co.addFunc(SymbolTable.currentFunctionScope);
+										return co;
+									}
+									else{
+										AssignmentOperator co= new AssignmentOperator( op.image);
+										co.addOperand(t2);
+										co.setVar(t1);
+										co.setFunc(SymbolTable.currentFunctionScope);
+										return co;
+									}
+									
+									
 	}
 	|
-	t1=id() <ASSIGN> t2=sequence() {
-									System.out.println("assignment case sequence");
-									CreationOperator co = new CreationOperator(t1);
-									co.addOperand(t2);
-									co.addFunc(SymbolTable.currentFunctionScope);
-									return co;}
+	t1=id() op=<ASSIGN> t2=sequence() {
+									System.out.println("assignment of a sequence!!!");
+									if(op.image.equals("=")){
+										CreationOperator co = new CreationOperator(t1);
+										co.addOperand(t2);
+										co.addFunc(SymbolTable.currentFunctionScope);
+										return co;
+									}
+									else{
+										AssignmentOperator co= new AssignmentOperator( op.image);
+										co.addOperand(t2);
+										co.setVar(t1);
+										co.setFunc(SymbolTable.currentFunctionScope);
+										return co;
+									}
+									
+									}
 	|
-	t1=id() <ASSIGN> t2=note() { 	System.out.println("assignment case note");
-									CreationOperator co = new CreationOperator(t1);
-									co.addOperand(t2);
-									co.addFunc(SymbolTable.currentFunctionScope);
-									return co;
+	t1=id() op=<ASSIGN> t2=note() { 	System.out.println("assignment of a note!!");
+									if(op.image.equals("=")){
+										CreationOperator co = new CreationOperator(t1);
+										co.addOperand(t2);
+										co.addFunc(SymbolTable.currentFunctionScope);
+										return co;
+									}
+									else{
+										AssignmentOperator co= new AssignmentOperator( op.image);
+										co.addOperand(t2);
+										co.setVar(t1);
+										co.setFunc(SymbolTable.currentFunctionScope);
+										return co;
+									}
+									
+									
 								}
 	|
 
-	t1=id() <ASSIGN> t2=expression(){
-									System.out.println("assignment case expression");
-									CreationOperator co = new CreationOperator(t1);
-									co.addOperand(t2);
-									co.addFunc(SymbolTable.currentFunctionScope);
-									return co;
+	t1=id() op=<ASSIGN> t2=expression(){
+									System.out.println("assignment of a expression!!!");
+									if(op.image.equals("=")){
+										CreationOperator co = new CreationOperator(t1);
+										co.addOperand(t2);
+										co.addFunc(SymbolTable.currentFunctionScope);
+										return co;
+									}
+									else{
+										AssignmentOperator co= new AssignmentOperator( op.image);
+										co.addOperand(t2);
+										co.setVar(t1);
+										co.setFunc(SymbolTable.currentFunctionScope);
+										return co;
+									}
+									
+									
 	}
 }
 String id() throws Exception:
