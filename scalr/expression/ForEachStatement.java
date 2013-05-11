@@ -4,23 +4,27 @@ package scalr.expression;
 import java.util.ArrayList;
 
 import scalr.Exceptions.TypeError;
-import scalr.variable.*;
+import scalr.variable.Note;
+import scalr.variable.Sequence;
+import scalr.variable.SymbolTable;
 
+/**
+ * Represent the foreach statement in our language. A sample statements is: foreach (n) in seq ...
+ * end
+ * @author kugurst and Kofi
+ */
 public class ForEachStatement implements Expression
 {
-	ArrayList<Expression>	stmts 		= new ArrayList<Expression>();				;
-	ArrayList<Expression>	theNotes	= new ArrayList<Expression>();
+	/** The stmts to execute as we iterate through this for each */
+	ArrayList<Expression>	stmts	= new ArrayList<Expression>();
+	/** The sequence to iterate over */
+	Expression	          sequence;
+	/** The name of the note to assign when we are iterating. */
+	String	              noteName;
 	
-	public ForEachStatement(Expression seq) throws TypeError
+	public ForEachStatement(String var)
 	{
-			Sequence s = (Sequence) seq;
-			int i = 0;
-			String temp = ""+i;
-			while (s.getNote(temp) != null){
-				temp = ""+i;
-				theNotes.add(s.getNote(temp));
-				i++;
-			}
+		noteName = var;
 	}
 	
 	public void addStatement(Expression expr)
@@ -28,7 +32,12 @@ public class ForEachStatement implements Expression
 		if (expr != null)
 			stmts.add(expr);
 	}
-
+	
+	public void addSequence(Expression expr)
+	{
+		sequence = expr;
+	}
+	
 	/**
 	 * ForEach statements return nothing. It is improper to use them in another expression that
 	 * requires a value.
@@ -36,21 +45,27 @@ public class ForEachStatement implements Expression
 	@Override
 	public Expression getValue(Expression... expressions)
 	{
-		Expression[] notes = new Expression[theNotes.size()];
-		for(int i = 0; i < theNotes.size(); i++){
-			Expression n = theNotes.get(i);
-			for(Expression s : stmts){
-				n = s.getValue(n);
+		// At this point, we should be able to evaluate the sequence
+		Sequence seq = (Sequence) sequence.getValue(expressions);
+		// Iterate through the sequence (note, the getValue of a sequence automatically evaluates
+		// all the notes)
+		for (Expression e : seq.getSequence()) {
+			Note n = (Note) e;
+			// Add the current note to the symbol table as this note value
+			try {
+				SymbolTable.addReference(SymbolTable.currentFunctionScope, noteName, n);
 			}
-			notes[i] = n;
+			catch (TypeError e1) {
+				e1.printStackTrace();
+				System.exit(1);
+			}
+			
 		}
-
-		Sequence s = new Sequence(notes);
-		return s;
+		return null;
 	}
 	
 	/**
-	 * Like wise, this has no ExpressionType
+	 * Likewise, this has no ExpressionType
 	 */
 	@Override
 	public ExpressionType getType()

@@ -42,6 +42,11 @@ public class Sequence implements Variable
 			notes.add(n);
 	}
 	
+	public ArrayList<Expression> getSequence()
+	{
+		return notes;
+	}
+	
 	public void addNoteToEnd(Expression e)
 	{
 		notes.add(e);

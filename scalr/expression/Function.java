@@ -11,7 +11,7 @@ import scalr.variable.SymbolTable;
 
 public class Function implements Expression
 {
-	
+	/** The name of the function */
 	private String	             id;
 	private ArrayList<String>	 parameterName;
 	public ArrayList<Expression>	statements;
@@ -80,18 +80,28 @@ public class Function implements Expression
 		Expression returnExpr = statements.get(0);
 		statements.remove(0);
 		statements.add(returnExpr);
+		// Change the current function scope to us
+		String prevScope = SymbolTable.currentFunctionScope;
+		SymbolTable.currentFunctionScope = id;
+		// Execute the stataments
 		for (int i = 0; i < statements.size() - 1; i++) {
 			System.out.println(statements.get(i).getClass());
 			statements.get(i).getValue(expressions);
 		}
 		Expression lastExpr = statements.get(statements.size() - 1);
 		System.out.println(lastExpr.getClass());
-		if (lastExpr.getType() == ExpressionType.SEQUENCE || id.equals("main"))
+		if (lastExpr.getType() == ExpressionType.SEQUENCE || id.equals("main")) {
+			SymbolTable.currentFunctionScope = prevScope;
 			return statements.get(statements.size() - 1).getValue(expressions);
-		else if (lastExpr.getType() == ExpressionType.NOTE)
+		}
+		else if (lastExpr.getType() == ExpressionType.NOTE) {
+			SymbolTable.currentFunctionScope = prevScope;
 			return new Sequence(lastExpr);
-		else
+		}
+		else {
+			SymbolTable.currentFunctionScope = prevScope;
 			return null;
+		}
 	}
 	
 	@Override

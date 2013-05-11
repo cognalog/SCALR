@@ -76,6 +76,9 @@ Expression statement() throws Exception: {
 		| expr = whileExpr() {
 			return expr;
 		}
+		| expr = ifExpr() {
+			return expr;
+		}
 	)
 	"\n"
 }
