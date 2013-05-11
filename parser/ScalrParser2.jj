@@ -30,7 +30,7 @@ public class ScalrParser2 {
         //SymbolTable.currentFunctionScope = "test";
         parser.function();
         System.out.println(parser.funcall());
-        System.out.println(SymbolTable.reference);
+        //System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
