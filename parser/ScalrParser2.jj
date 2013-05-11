@@ -28,11 +28,8 @@ public class ScalrParser2 {
         ScalrParser2 parser = new ScalrParser2(new java.io.StringReader(text));
         //SymbolTable.addFunc("test");
         //SymbolTable.currentFunctionScope = "test";
-<<<<<<< HEAD
+
        parser.tscalr();
-=======
-       parser.note();
->>>>>>> add breaks
        //System.out.println(parser.funcall());
         //System.out.println(SymbolTable.reference);
 	    System.out.println("grats, your program compiled alright");
