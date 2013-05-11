@@ -247,9 +247,11 @@ public class Note implements Variable
 		return new Note(pitch, volume, length);
 	}
 	
-	public Note getBreak()
+	public static Note getBreak(String... length)
 	{
-		return new Note(Degree.br, 100, Length.quarter);
+		Note n = new Note(Degree.br, 100, Length.quarter);
+		n.length(length[0]);
+		return n;
 	}
 	
 	@Override
@@ -258,9 +260,10 @@ public class Note implements Variable
 		return pitch.getMidi() + "," + fractionToDouble(length.duration) + "," + volume;
 	}
 	
-	private Degree fractionToDouble(String duration)
+	private String fractionToDouble(String duration)
 	{
-		return null;
+		String[] frac = duration.split("/");
+		return "" + Integer.parseInt(frac[0]) / Double.parseDouble(frac[1]);
 	}
 	
 	@Override
