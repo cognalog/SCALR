@@ -40,4 +40,10 @@ public class VariableReference implements Expression
 		return SymbolTable.getMember(func, ID).getType();
 	}
 	
+	@Override
+	public String toString()
+	{
+		return "ID: " + ID + " | Type: " + getType();
+	}
+	
 }

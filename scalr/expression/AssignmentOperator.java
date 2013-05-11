@@ -34,14 +34,15 @@ public class AssignmentOperator implements Expression
 		func = name;
 	}
 	
-	// Don't worry about expressions, I may get rid of this argument in the future.
 	@Override
 	public Expression getValue(Expression... expressions)
 	{
 		// Get the variable from the SymbolTable
 		Expression lval = SymbolTable.getMember(func, var);
 		if (operator.equals("+=")) {
-			if ((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER) || (lval.getType() == ExpressionType.SEQUENCE && rval.getType() == ExpressionType.NOTE)|| (lval.getType() == ExpressionType.SEQUENCE && rval.getType() == ExpressionType.NOTE)) {
+			if ((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)
+			        || (lval.getType() == ExpressionType.SEQUENCE && rval.getType() == ExpressionType.NOTE)
+			        || (lval.getType() == ExpressionType.SEQUENCE && rval.getType() == ExpressionType.SEQUENCE)) {
 				BinaryOperator bo = new BinaryOperator("+");
 				bo.addOperand(rval);
 				bo.addOperand(lval);
@@ -59,7 +60,8 @@ public class AssignmentOperator implements Expression
 			}
 		}
 		else if (operator.equals("*=")) {
-			if ((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER) || (lval.getType() == ExpressionType.SEQUENCE && rval.getType() == ExpressionType.NOTE)|| (lval.getType() == ExpressionType.SEQUENCE && rval.getType() == ExpressionType.NOTE)) {
+			if ((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)
+			        || (lval.getType() == ExpressionType.SEQUENCE && rval.getType() == ExpressionType.NUMBER)) {
 				BinaryOperator bo = new BinaryOperator("*");
 				bo.addOperand(rval);
 				bo.addOperand(lval);
@@ -77,7 +79,7 @@ public class AssignmentOperator implements Expression
 			}
 		}
 		else if (operator.equals("-=")) {
-			if((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)){
+			if ((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)) {
 				BinaryOperator bo = new BinaryOperator("-");
 				bo.addOperand(rval);
 				bo.addOperand(lval);
@@ -95,7 +97,7 @@ public class AssignmentOperator implements Expression
 			}
 		}
 		else if (operator.equals("%=")) {
-			if((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)){
+			if ((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)) {
 				BinaryOperator bo = new BinaryOperator("%");
 				bo.addOperand(rval);
 				bo.addOperand(lval);
@@ -113,7 +115,7 @@ public class AssignmentOperator implements Expression
 			}
 		}
 		else if (operator.equals("/=")) {
-			if((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)){
+			if ((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)) {
 				BinaryOperator bo = new BinaryOperator("/");
 				bo.addOperand(rval);
 				bo.addOperand(lval);
@@ -131,7 +133,7 @@ public class AssignmentOperator implements Expression
 			}
 		}
 		else if (operator.equals("%=")) {
-			if((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)){
+			if ((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)) {
 				BinaryOperator bo = new BinaryOperator("%");
 				bo.addOperand(rval);
 				bo.addOperand(lval);
