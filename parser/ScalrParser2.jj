@@ -376,7 +376,7 @@ Expression sequence() throws Exception: {
 | id = id() 
 {
 	System.out.println("sequence case 3");
-	Expression e = SymbolTable.getMember(SymbolTable.currentFunctionScope, id);
+	VariableReference e = new VariableReference(id, SymbolTable.currentFunctionScope);
 	return e;
 }
 }
