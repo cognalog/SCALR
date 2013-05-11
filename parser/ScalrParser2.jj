@@ -60,7 +60,7 @@ TOKEN: {
 	}
 
 /*********************************NEW SHIT STARTS*************************************/
-void tscalr() throws Exception: {} { imp1() tfunc() track() track1()
+void tscalr() throws Exception: {} { imp1() mainFunc() track() track1()
 {System.out.println("WE HERE");}
 }
 
@@ -73,7 +73,7 @@ imp() imp1()
 | {}
 }
 
-void tfunc() throws Exception: {} { "main" block() {System.out.println("finished tfunc()");}}
+
 
 void fscalrFile() throws Exception: {
 	String s;
@@ -121,7 +121,7 @@ void block() throws Exception: {System.out.println("matching block:");} {
 line1() "end" {System.out.println("block matched");}}
 	
 
-void main() throws Exception:{
+void mainFunc() throws Exception:{
 	System.out.println("starting main def");
 	String funcName = "main";
 	Function f;

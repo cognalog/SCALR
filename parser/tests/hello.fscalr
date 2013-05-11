@@ -1,3 +1,4 @@
 func hello ()
-  x = [ break.quarter ]
+  x = [ note.half ]
+  x
 end
