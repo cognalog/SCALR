@@ -245,10 +245,20 @@ Expression assignment() throws Exception: {
 	String t1;
 	Expression t2;
 	System.out.println("starting assignment");
+	System.out.println(SymbolTable.reference);
 } 
 {
 	
-	
+	t1= id() <ASSIGN> t2= funcall() {
+									
+									System.out.println("assignment of a funcall!!!");
+									CreationOperator co = new CreationOperator(t1);
+									co.addOperand(t2);
+									co.addFunc(SymbolTable.currentFunctionScope);
+									System.out.println(SymbolTable.reference);
+									return co;
+	}
+	|
 	t1=id() <ASSIGN> t2=sequence() {
 									System.out.println("assignment case sequence");
 									CreationOperator co = new CreationOperator(t1);
@@ -364,12 +374,14 @@ t=<INT> {return new ScalrNum(Integer.parseInt(t.image));}
 
 Expression operand() throws Exception: {
 	Expression ex;
-	String t;
+	Token t;
 	Sequence s;
 } {
-s = funcall() {return s;}
+t=<ID> {return SymbolTable.getMember(SymbolTable.currentFunctionScope, t.image);}
 | 
-t=id() {return SymbolTable.getMember(SymbolTable.currentFunctionScope, t);}
+s = funcall() {return s;}
+
+
 | ex = note() 
 {
 	return ex;
@@ -401,7 +413,7 @@ t = id() "(" ex = parameters() ")"
 	return s;
 }
 |
-t = id()  
+t = id() "()" 
 {
 	System.out.println("funcall case 2 ");
 	Function f = SymbolTable.getFuncRef(t);
@@ -415,6 +427,7 @@ t = id()
 ArrayList<Expression> parameters() throws Exception: {
 	Expression ex;
 	ArrayList<Expression> ex2;
+	System.out.println("parameters called");
 } { 
 ex = operand() ex2 = parameters1() 
 {

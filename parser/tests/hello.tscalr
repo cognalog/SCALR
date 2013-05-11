@@ -1,7 +1,8 @@
 import hello
 
 main
-  seq = [note.half, note.quarter]
+  k= note.half
+  seq = hello(y)
 end
 
 track -> [ seq ]
