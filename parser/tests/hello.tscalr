@@ -1,1 +1,7 @@
-break.whole
+import hello
+
+main
+  seq = [note.half, note.quarter]
+end
+
+track -> [seq]
