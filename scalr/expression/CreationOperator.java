@@ -24,6 +24,7 @@ public class CreationOperator implements Expression
 	public void addOperand(Expression expr)
 	{
 		rval = expr;
+		SymbolTable.addTypeReference(func, var, expr.getType());
 	}
 	
 	@Override
