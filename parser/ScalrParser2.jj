@@ -61,8 +61,8 @@ TOKEN: {
 	}
 
 /*********************************NEW SHIT STARTS*************************************/
-void tscalr() throws Exception: {} { imp1() mainFunc() track() track1()
-{System.out.println("WE HERE");}
+void tscalr() throws Exception: { String out;} { imp1() mainFunc() out=track1()
+{System.out.println(out);}
 }
 
 void imp() throws Exception: {} { 
@@ -194,9 +194,9 @@ String track() throws Exception: {String out;
 	}
 }
 
-void track1() throws Exception: {} { 
-track() track1()
-| {}
+String track1() throws Exception: {String one; String out= "";} { 
+one=track() out=track1() {out=one+out; return out;}
+| {return out;}
 }
 
 Expression line() throws Exception: {
@@ -483,12 +483,12 @@ Expression note() throws Exception: {
 	Token t;
 	Expression n = Note.note();
 } {
-	("break.half" {System.out.println("caught that break!!");})
-	|("break.quarter" {System.out.println("caught that break!!");})
-	|("break.whole" {System.out.println("caught that break!!");})
-	|("break.eighth" {System.out.println("caught that break!!");})
-	|("break.sixteenth" {System.out.println("caught that break!!");})
-	|("break.thirtysec" {System.out.println("caught that break!!");})
+	("break.half" {return Note.getBreak("half");})
+	|("break.quarter" {return Note.getBreak("quarter");})
+	|("break.whole" {return Note.getBreak("whole");})
+	|("break.eighth" {return Note.getBreak("eighth");})
+	|("break.sixteenth" {return Note.getBreak("sixteenth");})
+	|("break.thirtysec" {return Note.getBreak("thirtysec");})
 	|
 	(("note" | t = <ID> { n = new VariableReference(t.image, SymbolTable.currentFunctionScope); }) 
 	(".pitch(" n = pitch(n) ")" | ".length(" n = length(n) ")" | ".volume(" n = volume(n) ")" 
