@@ -777,7 +777,7 @@ Degree scaleGetter() throws Exception:{
 	Expression index;
 }
 {
-	(t= <ID> {n = (Scale) new VariableReference(t.image, SymbolTable.currentFunctionScope); }
+	(t= <ID> {n = new VariableReference(t.image, SymbolTable.currentFunctionScope); }
 	("[" i = <ID> "]")+ { index = new VariableReference(i.image, SymbolTable.currentFunctionScope); return n.getDegree(i.image); })
 
 }
