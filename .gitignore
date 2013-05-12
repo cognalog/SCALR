@@ -23,6 +23,7 @@
 *scratch.java
 *Scratch.java
 *classCleaner
+*.DS_Store
 
 
 # A file I often create that contains scratch work not interesting to anyone

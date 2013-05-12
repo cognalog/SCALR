@@ -516,6 +516,17 @@ Expression assignment() throws Exception: {
 									
 									
 	}
+	|
+	
+	t1 = id() op=<ASSIGN> t2 = scale() {
+									System.out.println("assignment of a scale");
+									if(op.image.equals("=")) {
+										CreationOperator co = new CreationOperator(t1);
+										co.addFunc(SymbolTable.currentFunctionScope);
+										co.addOperand(t2);
+										return co;
+									}
+	}
 }
 String id() throws Exception:
 {Token t;}

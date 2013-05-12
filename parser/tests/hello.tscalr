@@ -2,7 +2,8 @@ import hello
 
 main
 	y= note.half
-	seq= hello(y)
+	sc = {A3}
+	seq= [ note.pitch(sc[0]) ]
 end
 
 track-> seq
