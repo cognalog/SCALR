@@ -1,8 +1,11 @@
 import whileloops
 
 main
-  scale1 = {C3 D3 E3 F3 G3 A3 B3}
+  scale1 = {C4 D4 E4 F4 G4 A4 B4}
   something = seq1(scale1)
+  scale2 = {E4 F4 G4 A4 B4}
+  something2 = seq1(scale2)
 end
 
 track -> [something something]
+track -> [something2 something2]
