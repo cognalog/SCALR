@@ -869,7 +869,7 @@ Expression pitch(Expression n) throws Exception: {
 		if (val != null)
 			no.addIndex(new VariableReference(val.image, SymbolTable.currentFunctionScope));
 		else if (index != null)
-			no.addIndex(new ScalrNum(index.image));
+			no.addIndex(new ScalrNum(Integer.parseInt(index.image)));
 		no.addScale(new VariableReference(mod.image, SymbolTable.currentFunctionScope));
 		return no;
 	}
