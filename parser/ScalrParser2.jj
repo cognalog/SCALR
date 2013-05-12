@@ -584,16 +584,16 @@ s = funcall() {return s;}
 Sequence funcall() throws Exception: {
 	Sequence s;
 	String t;
-	ArrayList<Expression> ex;
+	ArrayList<Expression> ex = null;
 	System.out.println("called funcall");
 } { 
-t = id() "(" ex = parameters() ")" 
+t = id() "(" (ex = parameters())? ")" 
 {
 	System.out.println("funcall case 1 ");
 	
 	Function f = SymbolTable.getFuncRef(t);
 	System.out.println(SymbolTable.functionReferences);
-	if(ex.isEmpty()){
+	if(ex == null) {
 		s = (Sequence) f.getValue();
 
 	}
@@ -605,16 +605,6 @@ t = id() "(" ex = parameters() ")"
 		s = (Sequence) f.getValue(temp);	
 	}
 	
-	return s;
-}
-|
-t = id() "()" 
-{
-	System.out.println("funcall case 2 ");
-	Function f = SymbolTable.getFuncRef(t);
-	System.out.println("funcall case 3 ");
-	s = (Sequence) f.getValue();
-	System.out.println("funcall case 4");
 	return s;
 }
 }

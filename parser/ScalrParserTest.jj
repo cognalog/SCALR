@@ -76,9 +76,9 @@ Expression statement() throws Exception: {
 		| expr = whileExpr() {
 			return expr;
 		}
-		| expr = ifExpr() {
-			return expr;
-		}
+//		| expr = ifExpr() {
+//			return expr;
+//		}
 	)
 	"\n"
 }
@@ -355,7 +355,7 @@ void seqNote(Sequence s): {
 void seqID(Sequence s): {
 	Token t;
 } {
-	t = <ID> {}
+	t = <ID> { s.addNoteToEnd(new VariableReference(t.image, currentFunc)); }
 }
 
 Expression whileExpr() throws Exception: {
