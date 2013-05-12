@@ -7,5 +7,5 @@ main
   something2 = seq1(scale2)
 end
 
-track -> [something something]
-track -> [something2 something2]
+track -> [something, something]
+track -> [something2, something2]
