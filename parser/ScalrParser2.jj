@@ -437,7 +437,6 @@ Expression assignment() throws Exception: {
 	Expression t2;
 	Token op;
 	System.out.println("starting assignment");
-	System.out.println(SymbolTable.reference);
 } 
 {
 	
@@ -769,7 +768,7 @@ Scale scale1() throws Exception: {
 	Token d;
 
 } {
-"," d = <DEGREE> s = scale1()
+d = <DEGREE> s = scale1()
 {
 	s.addDegreeToStart(Degree.valueOf(d.image));
 	return s;
@@ -863,13 +862,10 @@ Expression pitch(Expression n) throws Exception: {
 		no.addMod(mod.image);
 		return no;
 	}
-	| mod = <ID> "[" (val = <ID> | index = <INT>) "]" {
+	| mod = <ID> "[" e = arithExpr() "]" {
 		NoteOps no = new NoteOps("pit");
 		no.addOperand(n);
-		if (val != null)
-			no.addIndex(new VariableReference(val.image, SymbolTable.currentFunctionScope));
-		else if (index != null)
-			no.addIndex(new ScalrNum(Integer.parseInt(index.image)));
+		no.addIndex(e);
 		no.addScale(new VariableReference(mod.image, SymbolTable.currentFunctionScope));
 		return no;
 	}
