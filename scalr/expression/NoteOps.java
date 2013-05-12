@@ -4,6 +4,7 @@ package scalr.expression;
 import scalr.Degree;
 import scalr.Length;
 import scalr.variable.Note;
+import scalr.variable.Scale;
 import scalr.variable.ScalrNum;
 
 public class NoteOps implements Expression
@@ -77,6 +78,11 @@ public class NoteOps implements Expression
 					else if (mod.equals("-"))
 						n.modPitch(-sn.getNum());
 					return n;
+				}
+				else if (scale != null) {
+					Scale s = (Scale) scale.getValue(expressions);
+					ScalrNum sn = (ScalrNum) index.getValue(expressions);
+					return n.setPitch(s.getDegree(sn.getNum()));
 				}
 				else
 					return n.setPitch(deg);
