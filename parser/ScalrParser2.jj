@@ -351,7 +351,7 @@ Expression whileExpr() throws Exception: {
 	System.out.println("while started");
 }{
 	"while" "(" ex=boolExpr() { whileObj = new WhileStatement(ex); } ")"
-	(arith = line())+ { whileObj.addStatement(arith); } 
+	(arith = line() { whileObj.addStatement(arith); })+ 
 	"end" {
 		System.out.println("while returned");
 		return whileObj;
@@ -885,11 +885,12 @@ Expression mulOrDiv() throws Exception: {
 Expression unary() throws Exception: {
 	Expression e = null;
 	Expression base = null;
+	ArrayList<Expression> params = null;
 	Token op = null;
 	Token post = null;
 	Token id = null;
 } {
-	(op = "-")? ("(" e = arithExpr() ")" | id = <ID> post = <POST> | base = var()) {
+	(op = "-")? ("(" e = arithExpr() ")" | id = <ID> (post = <POST> | "(" (params = parameters())? ")") | base = var()) {
 		if (e == null) {
 			if (base != null) {
 				Expression ret = base;
@@ -901,17 +902,30 @@ Expression unary() throws Exception: {
 				return ret;
 			}
 			else if (id != null) {
-				VariableReference ref = new VariableReference(id.image, SymbolTable.currentFunctionScope);
-				UnaryOperator uo = new UnaryOperator(post.image);
-				uo.addOperand(ref);
-				uo.addFunc(SymbolTable.currentFunctionScope);
-				uo.addVar(id.image);
-				if (op != null) {
-					UnaryOperator uo2 = new UnaryOperator(op.image);
-					uo2.addOperand(uo);
-					uo = uo2;
+				if (post != null) {
+					VariableReference ref = new VariableReference(id.image, SymbolTable.currentFunctionScope);
+					UnaryOperator uo = new UnaryOperator(post.image);
+					uo.addOperand(ref);
+					uo.addFunc(SymbolTable.currentFunctionScope);
+					uo.addVar(id.image);
+					if (op != null) {
+						UnaryOperator uo2 = new UnaryOperator(op.image);
+						uo2.addOperand(uo);
+						uo = uo2;
+					}
+					return uo;
 				}
-				return uo;
+				// This is a function call
+				else {
+					Function f = SymbolTable.getFuncRef(id.image);
+					System.out.println(f);
+					if (params == null)
+						return f.getValue(new Expression[0]);
+					else {
+						Collections.reverse(params);
+						return f.getValue(params.toArray(new Expression[params.size()]));
+					}
+				}
 			}
 		}
 		else {
@@ -924,7 +938,6 @@ Expression unary() throws Exception: {
 			}
 		}
 	}
-	| e = funcall() { return e; }
 }
 
 Expression var() throws Exception: {

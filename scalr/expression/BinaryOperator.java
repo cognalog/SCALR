@@ -11,7 +11,6 @@ public class BinaryOperator implements Expression
 	Expression	   expr1;
 	Expression	   expr2;
 	String	       operator;
-	Expression	   cachedResult;
 	
 	/**
 	 * As defined in section 7.5 of our LRM, the plus operator is defined for numbers, sequences
@@ -39,15 +38,13 @@ public class BinaryOperator implements Expression
 	@Override
 	public Expression getValue(Expression... expressions)
 	{
-		if (cachedResult != null)
-			return cachedResult;
 		if (operator.equals("+")) {
 			// They're both numbers
 			if (expr1.getType() == ExpressionType.NUMBER
 			        && expr2.getType() == ExpressionType.NUMBER) {
 				ScalrNum num1 = (ScalrNum) expr1.getValue(expressions);
 				ScalrNum num2 = (ScalrNum) expr2.getValue(expressions);
-				return (cachedResult = new ScalrNum(num1.getNum() + num2.getNum()));
+				return new ScalrNum(num1.getNum() + num2.getNum());
 			}
 			// They're both sequences (or notes)
 			else if (expr1.getType() == ExpressionType.SEQUENCE) {
@@ -55,12 +52,12 @@ public class BinaryOperator implements Expression
 				if (expr2.getType() == ExpressionType.NOTE) {
 					Note n = (Note) ((Note) expr2.getValue(expressions)).getCopy();
 					s.addNoteToEnd(n);
-					return (cachedResult = s);
+					return s;
 				}
 				else if (expr2.getType() == ExpressionType.SEQUENCE) {
 					Sequence s2 = (Sequence) ((Sequence) expr2.getValue(expressions)).getCopy();
 					s.addSequence(s2);
-					return (cachedResult = s);
+					return s;
 				}
 			}
 			else if (expr2.getType() == ExpressionType.SEQUENCE) {
@@ -68,19 +65,19 @@ public class BinaryOperator implements Expression
 				if (expr1.getType() == ExpressionType.NOTE) {
 					Note n = (Note) ((Note) expr1.getValue(expressions)).getCopy();
 					s.addNoteToEnd(n);
-					return (cachedResult = s);
+					return s;
 				}
 				else if (expr1.getType() == ExpressionType.SEQUENCE) {
 					Sequence s2 = (Sequence) ((Sequence) expr1.getValue(expressions)).getCopy();
 					s.addSequence(s2);
-					return (cachedResult = s);
+					return s;
 				}
 			}
 			else if (expr1.getType() == ExpressionType.NOTE
 			        && expr2.getType() == ExpressionType.NOTE) {
 				Note n1 = (Note) expr1.getValue(expressions);
 				Note n2 = (Note) expr2.getValue(expressions);
-				return (cachedResult = new Sequence(n1.getCopy(), n2.getCopy()));
+				return new Sequence(n1.getCopy(), n2.getCopy());
 			}
 		}
 		else if (operator.equals("-")) {
@@ -89,7 +86,7 @@ public class BinaryOperator implements Expression
 			        && expr2.getType() == ExpressionType.NUMBER) {
 				ScalrNum num1 = (ScalrNum) expr1.getValue(expressions);
 				ScalrNum num2 = (ScalrNum) expr2.getValue(expressions);
-				return (cachedResult = new ScalrNum(num1.getNum() - num2.getNum()));
+				return new ScalrNum(num1.getNum() - num2.getNum());
 			}
 		}
 		else if (operator.equals("*")) {
@@ -98,7 +95,7 @@ public class BinaryOperator implements Expression
 			        && expr2.getType() == ExpressionType.NUMBER) {
 				ScalrNum num1 = (ScalrNum) expr1.getValue(expressions);
 				ScalrNum num2 = (ScalrNum) expr2.getValue(expressions);
-				return (cachedResult = new ScalrNum(num1.getNum() * num2.getNum()));
+				return new ScalrNum(num1.getNum() * num2.getNum());
 			}
 			// One is a number and the other is a sequence
 			else if (expr1.getType() == ExpressionType.SEQUENCE
@@ -106,14 +103,14 @@ public class BinaryOperator implements Expression
 				Sequence s = (Sequence) ((Sequence) expr1.getValue(expressions)).getCopy();
 				ScalrNum num = (ScalrNum) expr2.getValue(expressions);
 				s.extend(num.getNum());
-				return (cachedResult = s);
+				return s;
 			}
 			else if (expr1.getType() == ExpressionType.NUMBER
 			        && expr2.getType() == ExpressionType.SEQUENCE) {
 				Sequence s = (Sequence) ((Sequence) expr2.getValue(expressions)).getCopy();
 				ScalrNum num = (ScalrNum) expr1.getValue(expressions);
 				s.extend(num.getNum());
-				return (cachedResult = s);
+				return s;
 			}
 		}
 		else if (operator.equals("/")) {
@@ -122,7 +119,7 @@ public class BinaryOperator implements Expression
 			        && expr2.getType() == ExpressionType.NUMBER) {
 				ScalrNum num1 = (ScalrNum) expr1.getValue(expressions);
 				ScalrNum num2 = (ScalrNum) expr2.getValue(expressions);
-				return (cachedResult = new ScalrNum(Math.round(num1.getNum() / num2.getNum())));
+				return new ScalrNum(Math.round(num1.getNum() / num2.getNum()));
 			}
 		}
 		else if (operator.equals("%")) {
@@ -131,7 +128,7 @@ public class BinaryOperator implements Expression
 			        && expr2.getType() == ExpressionType.NUMBER) {
 				ScalrNum num1 = (ScalrNum) expr1.getValue(expressions);
 				ScalrNum num2 = (ScalrNum) expr2.getValue(expressions);
-				return (cachedResult = new ScalrNum(num1.getNum() % num2.getNum()));
+				return new ScalrNum(num1.getNum() % num2.getNum());
 			}
 		}
 		// This should never be reached, but hopefully screws over some invalid syntax and causes an
