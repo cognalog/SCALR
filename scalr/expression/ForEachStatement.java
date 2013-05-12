@@ -59,7 +59,9 @@ public class ForEachStatement implements Expression
 				e1.printStackTrace();
 				System.exit(1);
 			}
-			
+			// Execute the statements
+			for (Expression expr : stmts)
+				expr.getValue(expressions);
 		}
 		return null;
 	}

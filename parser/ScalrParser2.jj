@@ -437,7 +437,6 @@ Expression assignment() throws Exception: {
 	Expression t2;
 	Token op;
 	System.out.println("starting assignment");
-	System.out.println(SymbolTable.reference);
 } 
 {
 	
