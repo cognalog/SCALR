@@ -49,8 +49,10 @@ public class WhileStatement implements Expression
 		// Evaluate it as long as this condition is true
 		while (((ScalrBoolean) cond.getValue(expressions)).getBool())
 			// Just evaluate all the expressions.
-			for (Expression e : statements)
+			for (Expression e : statements) {
+				System.out.println("While: " + e.getClass());
 				e.getValue(expressions);
+			}
 		return null;
 	}
 	

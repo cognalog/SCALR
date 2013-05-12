@@ -70,7 +70,7 @@ Expression statement() throws Exception: {
 			System.out.println("Assignment from function: " + currentFunc);
 			return expr;
 		}
-		| expr = note() {
+		| expr = noteMod() {
 			return expr;
 		} 
 		| expr = whileExpr() {
@@ -273,6 +273,14 @@ Expression note(): {
 	(".pitch(" n = pitch(n) ")" | ".length(" n = length(n) ")" | ".volume(" n = volume(n) ")" | "." n = lenClass(n))* { return n; }
 }
 
+Expression noteMod(): {
+	Token t;
+	Expression n = Note.note();
+} {
+	t = <ID> { n = new VariableReference(t.image, currentFunc); }
+	(".pitch(" n = pitch(n) ")" | ".length(" n = length(n) ")" | ".volume(" n = volume(n) ")" | "." n = lenClass(n))* { return n; }
+}
+
 Expression lenClass(Expression n): {
 	Token len;
 } {
@@ -364,9 +372,9 @@ Expression whileExpr() throws Exception: {
 	Expression arith;
 	WhileStatement whileObj;
 }{
-	"while" "(" ex=boolExpr() { whileObj = new WhileStatement(ex); } ")" ("\n")*
-	(arith = statement())+ ("\n")* { whileObj.addStatement(arith); } 
-	"end" ("\n")* {
+	"while" "(" ex=boolExpr() { whileObj = new WhileStatement(ex); } ")" ("\n")+
+	(arith = statement() { whileObj.addStatement(arith); })+ ("\n")+
+	"end" ("\n")+ {
 		return whileObj;
 	}
 }
