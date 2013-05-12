@@ -15,6 +15,7 @@ public class Function implements Expression
 	private String	             id;
 	private ArrayList<String>	 parameterName;
 	public ArrayList<Expression>	statements;
+	private Expression[]	     expressions;
 	
 	public Function(String name) throws FunctionExistsError
 	{
@@ -29,6 +30,11 @@ public class Function implements Expression
 		if (parameterName.contains(name))
 			throw new TypeError(name);
 		parameterName.add(name);
+	}
+	
+	public void addValues(Expression... expressions)
+	{
+		this.expressions = expressions;
 	}
 	
 	public void addStatement(Expression expr)
@@ -54,7 +60,7 @@ public class Function implements Expression
 	}
 	
 	@Override
-	public Expression getValue(Expression... expressions)
+	public Expression getValue(Expression... exprs)
 	{
 		// Checking to make sure we got the proper number of arguments
 		if (expressions.length != parameterName.size()) {

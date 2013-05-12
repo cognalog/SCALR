@@ -233,18 +233,20 @@ void mainFunc() throws Exception:{
 	ArrayList<Expression> expressions = new ArrayList<Expression>();
 	Expression returnSeq;
 } {
-	"main" {SymbolTable.currentFunctionScope= funcName; f= new Function(funcName); } 
+	"main" {SymbolTable.currentFunctionScope= funcName; f= new Function(funcName); System.out.println("called main"); } 
 	//get all the statements using line
 	 expressions = line1() {
+	 	Collections.reverse(expressions);
+		 for(Expression e : expressions) {
+		 	System.out.println(e.getClass());
+		 }
+		 System.out.println("Above are the classes of the expressions in the main function.");
 		for(Expression e: expressions){
-			//add the statements to the function object with the name main
-			f.addStatement(e);
+			e.getValue();
 		}
 	}
 	
-	"end" {
-		f.getValue();
-	}
+	"end"
 }
 
 /*****************************END OF NEW SHIT*********************************/
@@ -570,7 +572,7 @@ Expression operand() throws Exception: {
 t=<ID> {VariableReference e = new VariableReference(t.image, SymbolTable.currentFunctionScope);
 	return e;}
 | 
-s = funcall() {return s;}
+ex = funcall() {return ex;}
 
 
 | ex = note() 
@@ -581,32 +583,26 @@ s = funcall() {return s;}
 | ex=num() {return ex;}
 }
 
-Sequence funcall() throws Exception: {
+Expression funcall() throws Exception: {
 	Sequence s;
 	String t;
 	ArrayList<Expression> ex = null;
 	System.out.println("called funcall");
 } { 
-t = id() "(" (ex = parameters())? ")" 
-{
-	System.out.println("funcall case 1 ");
+	t = id() "(" (ex = parameters())? ")" {
+		System.out.println("funcall case 1 ");
 	
-	Function f = SymbolTable.getFuncRef(t);
-	System.out.println(SymbolTable.functionReferences);
-	if(ex == null) {
-		s = (Sequence) f.getValue();
-
+		Function f = SymbolTable.getFuncRef(t);
+		System.out.println(SymbolTable.functionReferences);
+		if(ex == null)
+			f.addValues(new Expression[0]);
+		else {
+			Collections.reverse(ex);
+			Expression[] temp = ex.toArray(new Expression[ex.size()]);
+			f.addValues(temp);	
+		}
+		return f;
 	}
-	else{
-		Collections.reverse(ex);
-
-		
-		Expression[] temp = ex.toArray(new Expression[ex.size()]);
-		s = (Sequence) f.getValue(temp);	
-	}
-	
-	return s;
-}
 }
 
 ArrayList<Expression> parameters() throws Exception: {
@@ -920,11 +916,12 @@ Expression unary() throws Exception: {
 					Function f = SymbolTable.getFuncRef(id.image);
 					System.out.println(f);
 					if (params == null)
-						return f.getValue(new Expression[0]);
+						f.addValues(new Expression[0]);
 					else {
 						Collections.reverse(params);
-						return f.getValue(params.toArray(new Expression[params.size()]));
+						f.addValues(params.toArray(new Expression[params.size()]));
 					}
+					return f;
 				}
 			}
 		}
