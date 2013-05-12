@@ -1,6 +1,2 @@
 x = 5
-while (x++ < 10)
-	x = x
-	y = note
-	y.pitch(+5)
-end
+seq = [ note ]

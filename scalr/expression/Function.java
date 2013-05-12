@@ -54,12 +54,6 @@ public class Function implements Expression
 	}
 	
 	@Override
-	public String toString()
-	{
-		return id;
-	}
-	
-	@Override
 	public Expression getValue(Expression... exprs)
 	{
 		// Checking to make sure we got the proper number of arguments
@@ -91,7 +85,7 @@ public class Function implements Expression
 		SymbolTable.currentFunctionScope = id;
 		// Execute the stataments
 		for (int i = 0; i < statements.size() - 1; i++) {
-			System.out.println(statements.get(i).getClass());
+			System.out.println("Function " + id + ": " + statements.get(i).getClass());
 			statements.get(i).getValue(expressions);
 		}
 		Expression lastExpr = statements.get(statements.size() - 1);
@@ -114,5 +108,11 @@ public class Function implements Expression
 	public ExpressionType getType()
 	{
 		return ExpressionType.SEQUENCE;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return id + " " + parameterName;
 	}
 }

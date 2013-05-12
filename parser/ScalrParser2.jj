@@ -242,6 +242,7 @@ void mainFunc() throws Exception:{
 		 }
 		 System.out.println("Above are the classes of the expressions in the main function.");
 		for(Expression e: expressions){
+			System.out.println("Evaluating: " + e.getClass());
 			e.getValue();
 		}
 	}

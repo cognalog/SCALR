@@ -91,6 +91,6 @@ public class BooleanOperator implements Expression
 	@Override
 	public String toString()
 	{
-		return expr1.toString() + " " + operator + " " + expr2.toString();
+		return "(" + expr1.toString() + " " + operator + " " + expr2.toString() + ")";
 	}
 }

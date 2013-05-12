@@ -129,6 +129,25 @@ public class NoteOps implements Expression
 	@Override
 	public String toString()
 	{
-		return getValue().toString();
+		if (type.equals("pit")) {
+			if (mod != null)
+				return note + ".pitch(" + mod + num + ")";
+			else if (scale != null)
+				return note + ".pitch(" + scale + "[" + index + "])";
+			else
+				return note + ".pitch(" + deg + ")";
+		}
+		else if (type.equals("vol")) {
+			if (mod != null)
+				return note + ".volume(" + mod + num + ")";
+			else
+				return note + ".volume(" + num + ")";
+		}
+		else {
+			if (len != null)
+				return note + ".length(" + len + ")";
+			else
+				return note + ".length(" + mod + num + ")";
+		}
 	}
 }

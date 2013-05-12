@@ -125,7 +125,7 @@ public class Sequence implements Variable
 		// Append each note to the string
 		// for(int i = 0; i < theNotes.size(); i++)
 		for (Expression n : notes) {
-			result += n.getValue().toString() + "|";
+			result += n.toString() + "|";
 			
 		}
 		// remove the last bar (if there is a note)

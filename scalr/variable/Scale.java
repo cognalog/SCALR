@@ -25,7 +25,7 @@ public class Scale implements Variable
 	
 	public Degree getDegree(int index)
 	{
-		return (Degree) degrees.get(index);
+		return (Degree) degrees.get(index - 1);
 	}
 	
 	public void extend(int ext)

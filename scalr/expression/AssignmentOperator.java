@@ -206,6 +206,6 @@ public class AssignmentOperator implements Expression
 	@Override
 	public String toString()
 	{
-		return operator;
+		return "(" + var + " " + operator + rval.toString() + ")";
 	}
 }

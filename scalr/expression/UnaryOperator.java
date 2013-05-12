@@ -81,4 +81,12 @@ public class UnaryOperator implements Expression
 		return ExpressionType.NUMBER;
 	}
 	
+	@Override
+	public String toString()
+	{
+		if (operator.equals("-"))
+			return "(-" + expr.toString() + ")";
+		else
+			return "(" + expr.toString() + operator + ")";
+	}
 }
