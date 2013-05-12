@@ -25,6 +25,6 @@ The notes are specified by pitch, duration (in quarter notes), volume.
 To run scalr:
 
 Bash:
-`function scalr1() { make -C parser clean; make -C parser run f="../"$@ | tail -n1; }`
+`function scalr1() { make -C parser clean; midistring=`make -C parser run f="../"$@ | tail -n1`; echo $midistring; python python-midi-generator/midi_generator.py $midistring; cp python-midi-generator/output.mid output.mid;}`
 `alias scalr=scalr1`
 `scalr test/tests-that-should-succeed/hello/hello.tscalr`
