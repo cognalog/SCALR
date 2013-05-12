@@ -771,17 +771,6 @@ Scale scale1() throws Exception: {
 }
 }
 
-Degree scaleGetter() throws Exception:{
-	Token t, i;
-	Scale n;
-	Expression index;
-}
-{
-	(t= <ID> {n = (Scale) new VariableReference(t.image, SymbolTable.currentFunctionScope); }
-	("[" i = <ID> "]")+ { index = new VariableReference(i.image, SymbolTable.currentFunctionScope); return n.getDegree(i.image); })
-
-}
-
 Expression noteModifier() throws Exception:{
 	Token t;
 	Expression n = Note.note();
@@ -845,6 +834,8 @@ Expression lenClass(Expression n) throws Exception: {
 
 Expression pitch(Expression n) throws Exception: {
 	Token mod;
+	Token val = null;
+	Token index = null;
 	Expression e;
 	System.out.println("pitch of the note");
 } {
@@ -859,6 +850,16 @@ Expression pitch(Expression n) throws Exception: {
 		no.addOperand(n);
 		no.addNum(e);
 		no.addMod(mod.image);
+		return no;
+	}
+	| mod = <ID> "[" (val = <ID> | index = <INT>) "]" {
+		NoteOps no = new NoteOps("pit");
+		no.addOperand(n);
+		if (val != null)
+			no.addIndex(new VariableReference(val.image, SymbolTable.currentFunctionScope));
+		else if (index != null)
+			no.addIndex(new ScalrNum(Integer.parseInt(index.image)));
+		no.addScale(new VariableReference(mod.image, SymbolTable.currentFunctionScope));
 		return no;
 	}
 }

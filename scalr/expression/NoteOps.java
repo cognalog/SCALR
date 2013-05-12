@@ -14,6 +14,8 @@ public class NoteOps implements Expression
 	private String	   mod;
 	private Degree	   deg;
 	private Length	   len;
+	private Expression	index;
+	private Expression	scale;
 	
 	public NoteOps(String type)
 	{
@@ -50,6 +52,16 @@ public class NoteOps implements Expression
 		}
 		// If we didn't return, then we could have the actual length
 		this.len = Length.valueOf(len);
+	}
+	
+	public void addIndex(Expression expr)
+	{
+		index = expr;
+	}
+	
+	public void addScale(Expression expr)
+	{
+		scale = expr;
 	}
 	
 	@Override
