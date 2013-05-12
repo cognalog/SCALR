@@ -2,7 +2,7 @@ import orand
 
 main
   seq = c_or_d()
-  seq = a_and_b()
+  seq2 = a_and_b()
 end
 
-track -> [seq]
+track -> [seq, seq2]

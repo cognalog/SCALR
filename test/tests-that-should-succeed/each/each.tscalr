@@ -1,7 +1,7 @@
 import each
 
 main
-  seq = iterate([note.pitch(A4).quarter note.pitch(As4).quarter note.pitch(B4).quarter])
+  seq = iterate([note.pitch(A3).quarter, note.pitch(As3).quarter, note.pitch(B3).quarter])
 end
 
 track -> [seq]

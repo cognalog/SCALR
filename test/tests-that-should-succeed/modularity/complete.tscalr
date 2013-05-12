@@ -3,7 +3,7 @@ import person2
 
 main
   c_scale = {C3 D3 E3 F3 G3 A3 B3 C4}
-  seq = [first_half(c_scale) second_half(c_scale)]
+  seq = [first_half(c_scale), second_half(c_scale)]
 end
 
 track -> [seq]

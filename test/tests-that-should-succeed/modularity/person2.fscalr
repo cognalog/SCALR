@@ -1,3 +1,3 @@
 func second_half (scale)
-  [note.pitch(scale[5]).quarter note.pitch(scale[6]).quarter note.pitch(scale[7]).quarter note.pitch(scale[8]).quarter]
+  [note.pitch(scale[5]).quarter, note.pitch(scale[6]).quarter, note.pitch(scale[7]).quarter, note.pitch(scale[8]).quarter]
 end

@@ -5,4 +5,4 @@ main
   something = seq1(scale1)
 end
 
-track -> [something something]
+track -> [something, something]
