@@ -26,7 +26,7 @@ To run scalr:
 
 Bash:
 
-    `function scalr1() { make -C parser clean; make -C parser run f="../"$@ > tempscalr.scalrlog; midistring=`tail -n1 tempscalr.scalrlog`; rm tempscalr.scalrlog;if echo $midistring | grep -Eq '^\[.*\]$' ; then python python-midi-generator/midi_generator.py $midistring; fi;}`
+    function scalr1() { make -C parser clean; make -C parser run f="../"$@ > tempscalr.scalrlog; midistring=`tail -n1 tempscalr.scalrlog`; rm tempscalr.scalrlog;if echo $midistring | grep -Eq '^\[.*\]$' ; then python python-midi-generator/midi_generator.py $midistring; fi;}
 
 `alias scalr=scalr1`
 
