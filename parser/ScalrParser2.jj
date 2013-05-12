@@ -770,6 +770,16 @@ Scale scale1() throws Exception: {
 }
 }
 
+Degree scaleGetter() throws Exception:{
+	Token t, i;
+	Expression n;
+}
+{
+	(t= <ID> {n = new VariableReference(t.image, SymbolTable.currentFunctionScope); }
+	(".get(" i = <ID> ")")+ { return n.getDegree(i.image); })
+
+}
+
 Expression noteModifier() throws Exception:{
 	Token t;
 	Expression n = Note.note();
