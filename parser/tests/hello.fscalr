@@ -1,0 +1,4 @@
+func hello( y)
+  x= [note.quarter, y]	
+  x
+end

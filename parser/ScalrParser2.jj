@@ -140,21 +140,22 @@ ArrayList<Expression> els3() throws Exception: {
 
 
 
-Expression foreach() throws Exception: {
+void foreach() throws Exception: {
 	Expression seq;
 	ArrayList<Expression> statements = new ArrayList<Expression>();
 	ForEachStatement fes;
+	Token id;
 }
 {
-	"foreach" "Note" <ID> "in" seq = sequence()  
+	"foreach" "Note" id = <ID> "in" seq = sequence()  
 	statements = block()
 	{
 		System.out.println("for each plz");
-		fes = new ForEachStatement(seq);
+		fes = new ForEachStatement(id.image);
+		fes.addSequence(seq);
 		for(Expression s : statements){
 			fes.addStatement(s);
 		}
-		return fes.getValue();
 	}
 }
 

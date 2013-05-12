@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 func hello( )
   y= note.half
   y.pitch(+3)
@@ -12,3 +13,13 @@ func hello( )
 end
 
 hello()
+=======
+import hello
+
+main
+	y= note.half
+	seq= hello(y)
+end
+
+track-> seq
+>>>>>>> slight hello changes
