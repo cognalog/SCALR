@@ -20,3 +20,11 @@ Running string-to-midi converter:
 Square braces denote a track, inside the square braces are notes delimited by |.
 
 The notes are specified by pitch, duration (in quarter notes), volume.
+
+
+To run scalr:
+
+Bash:
+`function scalr1() { make -C parser clean; make -C parser run f="../"$@ | tail -n1; }`
+`alias scalr=scalr1`
+`scalr test/tests-that-should-succeed/hello/hello.tscalr`
