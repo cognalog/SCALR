@@ -1,6 +1,6 @@
 import breaks
 
-func main()
+main
   seq = seq1()
 end
 

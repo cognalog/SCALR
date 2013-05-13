@@ -90,12 +90,14 @@ public class Function implements Expression
 		Expression lastExpr = statements.get(statements.size() - 1);
 		System.out.println(lastExpr.getClass());
 		if (lastExpr.getType() == ExpressionType.SEQUENCE || id.equals("main")) {
+			Expression expr = statements.get(statements.size() - 1).getValue(expressions);
 			SymbolTable.currentFunctionScope = prevScope;
-			return statements.get(statements.size() - 1).getValue(expressions);
+			return expr;
 		}
 		else if (lastExpr.getType() == ExpressionType.NOTE) {
+			Expression expr = new Sequence(lastExpr);
 			SymbolTable.currentFunctionScope = prevScope;
-			return new Sequence(lastExpr);
+			return expr;
 		}
 		else {
 			SymbolTable.currentFunctionScope = prevScope;
