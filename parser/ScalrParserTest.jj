@@ -19,17 +19,13 @@ public class ScalrParserTest {
         try {
 		    in = new FileReader(args[0]);
 		    ScalrParserTest parser = new ScalrParserTest(in);
-		    SymbolTable.addFunc("test");
-		    ArrayList<Expression> function = new ArrayList<Expression>();
-		    function.add(parser.statement());
-		    function.add(parser.statement());
-		    function.add(parser.statement());
-		    function.add(parser.statement());
-		    function.add(parser.statement());
-			for(Expression e : function) {
-				System.out.println("Type: " + e.getType() + " | Value: " + e.getValue());
-			}
-			System.out.println(SymbolTable.reference);
+//		    SymbolTable.addFunc("test");
+//		    ArrayList<Expression> function = new ArrayList<Expression>();
+		    parser.funcDef();
+//			for(Expression e : function) {
+//				System.out.println("Type: " + e.getType() + " | Value: " + e.getValue());
+//			}
+//			System.out.println(SymbolTable.reference);
 			System.out.println("grats, your program compiled alright");
 			in.close();
         } catch (Throwable e) {
@@ -65,6 +61,40 @@ TOKEN: {
    	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "10")> |
 	<INT: (("0")+ | ("0")* ["1"-"9"] (["0"-"9"])*)> |
 	<ID: (["a"-"z"] | "_" | ["A" - "Z"]) (["A"-"Z"] | ["a"-"z"] | <INT> | "_")*>
+}
+
+Expression funcDef(): {
+	Function func = null;
+	Token funcName;
+	Token param;
+	Token retName;
+	Expression stmt;
+} {
+	"func" funcName = <ID> {
+		try {
+			func = new Function(funcName.image);
+		} catch (FunctionExistsError e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+	} "(" (param = <ID> {
+			try {
+				func.addParameter(param.image);
+			} catch (TypeError e) {
+				e.printStackTrace();
+			}
+		})* ")" ("\n")+
+		(stmt = statement() {
+			func.addStatement(stmt);
+		})+
+	retName = <ID> ("\n")+ {
+		stmt = new VariableReference(retName.image, SymbolTable.currentFunctionScope);
+		func.addStatement(stmt);
+	}
+	"end" ("\n")+ {
+		SymbolTable.addFuncRef(func);
+		return func;
+	}
 }
 
 Expression statement(): {

@@ -1,16 +1,4 @@
-g = 1 * 2 + 3 * (5 + 5) / 5
-seq = [note.pitch(A1), note.pitch(A2), note.pitch(A3)]
-while(g++ < 10)
-	seq += note.pitch(+g)
+func hello()
+	x = [ note ]
+	x
 end
-foreach(n) in seq
-	n.volume(+5)
-end
-if (g > 50)
-	g++
-	x = 5
-else if (g == 2)
-else
-	g = 1
-end
-seq = [ note, note.pitch(+5) ]
