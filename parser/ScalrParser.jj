@@ -171,7 +171,13 @@ void funcDef(): {
 			} catch (TypeError e) {
 				e.printStackTrace();
 			}
-		})* ")" ("\n")+
+		} ("," param = <ID> {
+			try {
+				func.addParameter(param.image);
+			} catch (TypeError e) {
+				e.printStackTrace();
+			}
+		})*)? ")" ("\n")+
 		(
 			stmt = sequence() ("\n")+ {
 				func.addStatement(stmt);
@@ -201,7 +207,8 @@ Expression funcCall(String name): {
 	ArrayList<Expression> arguments = new ArrayList<Expression>();
 	Function f = null;
 } {
-	"(" (arg = arithExpr() { arguments.add(arg); })* ")" {
+	"(" (arg = arithExpr() { arguments.add(arg); }
+		("," arg = arithExpr() { arguments.add(arg); })*)? ")" {
 		try {
 			f = SymbolTable.getFuncRef(name);
 		} catch(FunctionDoesNotExistError e) {
