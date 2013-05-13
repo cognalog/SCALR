@@ -39,8 +39,9 @@ public class ForEachStatement implements Expression
 	}
 	
 	/**
-	 * ForEach statements return nothing. It is improper to use them in another expression that
-	 * requires a value.
+	 * To accommodate some of the stuff that Dylan has written, ForEachStatements can now return a
+	 * Sequence. However, that would cause too many conflicts in my grammar, thus it should still
+	 * not be done, though the backend can handle it.
 	 */
 	@Override
 	public Expression getValue(Expression... expressions)
@@ -67,16 +68,17 @@ public class ForEachStatement implements Expression
 			Expression e = SymbolTable.getMember(SymbolTable.currentFunctionScope, noteName);
 			notes.set(i, e.getValue(expressions));
 		}
-		return null;
+		return seq;
 	}
 	
 	/**
-	 * Likewise, this has no ExpressionType
+	 * To accommodate some of the test code that Dylan has written, ForEachStatements will now
+	 * return Sequences.
 	 */
 	@Override
 	public ExpressionType getType()
 	{
-		return null;
+		return ExpressionType.SEQUENCE;
 	}
 	
 }

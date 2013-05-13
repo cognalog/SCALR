@@ -22,8 +22,6 @@ public class ScalrParserTest {
 //		    SymbolTable.addFunc("test");
 		    ArrayList<Expression> function = new ArrayList<Expression>();
 		    parser.funcDef();
-		    function.add(parser.statement());
-		    function.add(parser.statement());
 			for(Expression e : function) {
 				System.out.println("Type: " + e.getType() + " | Value: " + e.getValue());
 			}
@@ -89,18 +87,12 @@ void funcDef(): {
 		(stmt = statement() {
 			func.addStatement(stmt);
 		})+
-	retName = <ID> ("\n")+ {
-		stmt = new VariableReference(retName.image, SymbolTable.currentFunctionScope);
-		func.addStatement(stmt);
-	}
+		(retName = <ID> ("\n")+ {
+			stmt = new VariableReference(retName.image, SymbolTable.currentFunctionScope);
+			func.addStatement(stmt);
+		})?
 	"end" ("\n")+ {
 		SymbolTable.addFuncRef(func);
-		try {
-			SymbolTable.addFunc("test");
-		} catch (FunctionExistsError e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
 	}
 }
 
