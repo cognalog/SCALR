@@ -25,19 +25,18 @@ public class ScalrParserTest {
 		    String text = "";
 		    while (in.hasNextLine())
 		    	text += in.nextLine() + "\n";
-		    
+		    text += "\n";
 		    ScalrParserTest parser = new ScalrParserTest(new StringReader(text));
 		    ArrayList<Expression> function = new ArrayList<Expression>();
 //		    SymbolTable.addFunc("test");
 //		    function.add(parser.arithExpr());
 		    parser.tscalr();
-		    parser.tscalr();
 			for(Expression e : function) {
 				System.out.println("Type: " + e.getType() + " | Value: " + e.getValue());
 			}
 //			System.out.println("\n" + SymbolTable.reference);
-			System.out.println("\n" + SymbolTable.functionReferences);
-			System.out.println("grats, your program compiled alright");
+//			System.out.println("\n" + SymbolTable.functionReferences);
+//			System.out.println("grats, your program compiled alright");
 			in.close();
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
@@ -77,13 +76,20 @@ TOKEN: {
 void tscalr(): {
 	Expression stmt;
 } {
-	("\n")* (importExpr())+ ("\n")+
-//	"main" { SymbolTable.currentFunctionScope = "main"; } ("\n")+
-//		(stmt = statement() {
-//			stmt.getValue();
-//		})+
-//	"end" ("\n")+
-//	(trackExpr() ("\n")+)+
+	("\n")* (importExpr() ("\n")+)+
+	"main" {
+		try {
+			SymbolTable.addFunc("main");			
+		} catch (FunctionExistsError e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+	} ("\n")+
+		(stmt = statement() {
+			stmt.getValue();
+		})+
+	"end" ("\n")+ { System.out.println("Below are the tracks:"); }
+	(trackExpr() ("\n")+)+
 }
 
 void importExpr(): {
@@ -124,7 +130,7 @@ void fscalr(): {}
 void trackExpr(): {
 	Sequence superSequence = new Sequence();
 } {
-	"track" "->" "[" trackSeq(superSequence) ("," trackSeq(superSequence))* "]" ("\n")+ {
+	"track" "->" "[" trackSeq(superSequence) ("," trackSeq(superSequence))* "]" {
 		System.out.print(superSequence);
 	}
 }
@@ -429,6 +435,7 @@ Expression variable(): {
 			  expr = uo;
 		  }
 	      | ("." expr = noteOps(expr))+
+	      | expr = funcCall(id.image)
 	  )? { return expr; }
 	| expr = sequence() { return expr; }
 	| expr = scale() { return expr; }

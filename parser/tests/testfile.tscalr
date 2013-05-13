@@ -1,2 +1,11 @@
 import hello
 import halves
+
+main
+	x = [note]
+	y = note.pitch(Gs9)
+	sc = hello(y)
+end
+
+track -> [sc, x]
+track -> [x]

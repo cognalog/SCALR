@@ -1,3 +1,4 @@
 func hello ()
-	x = 3
+	x = [note]
+	x
 end
