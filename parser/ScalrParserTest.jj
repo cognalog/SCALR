@@ -14,10 +14,12 @@ import scalr.Exceptions.*;
 import java.util.*;
 
 public class ScalrParserTest {
+	public static File tscalrFile;
     public static void main(String[] args) throws Exception {
     Scanner in = null;
         try {
-		    in = new Scanner(new File(args[0]));
+        	tscalrFile = new File(args[0]);
+		    in = new Scanner(tscalrFile);
 		    String text = "";
 		    while (in.hasNextLine())
 		    	text += in.nextLine() + "\n";
@@ -42,7 +44,7 @@ public class ScalrParserTest {
 }
 PARSER_END(ScalrParserTest)
 
-SKIP : { " " | "\t" | <"/*" (~[])* "*/" ("\n")*> }
+SKIP : { " " | "\t" | <"/*" (~[])* "*/"> }
 TOKEN: {
 	"not" | "volume" | "duration" | "end" | "func" | "main" | "while" | "foreach" |
 	"import" | "track" | "in" |	"if" | "else" | "note" | "pitch" | "length" |
@@ -69,18 +71,24 @@ TOKEN: {
 void tscalr(): {
 	Expression stmt;
 } {
-	(importExpr())+ ("\n")+
-	"main" { SymbolTable.currentFunctionScope = "main"; } ("\n")+
-		(stmt = statement() {
-			stmt.getValue();
-		})+
-	"end" ("\n")+
-	(trackExpr() ("\n")+)+
+	("\n")* (importExpr())+ ("\n")+
+//	"main" { SymbolTable.currentFunctionScope = "main"; } ("\n")+
+//		(stmt = statement() {
+//			stmt.getValue();
+//		})+
+//	"end" ("\n")+
+//	(trackExpr() ("\n")+)+
 }
 
-void imortExpr(): {}
-{
-	
+void importExpr(): {
+	File fscalrFile;
+	Token fileName;
+	Token ext;
+} {
+	"import" fileName = <ID> ("." ext = <ID> { fileName.image += "." + ext.image; })? {
+		fscalrFile = new File(tscalrFile.getParent(), fileName.image);
+		System.out.println(fscalrFile.exists());
+	}
 }
 
 void fscalr(): {}

@@ -1,13 +1,1 @@
-func hello()
-	x = [ note ]
-	x
-end
-/* This is a comment. Hopefully, it will be ignored */
-func hi(i)
-	seq = []
-	while (i < 5)
-		i++
-		seq += note.pitch(+i)
-	end
-	seq
-end
+import hello.fscalr
