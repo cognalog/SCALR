@@ -1,7 +1,7 @@
 options
 {
-  LOOKAHEAD = 3;
-//  FORCE_LA_CHECK = true;
+  LOOKAHEAD = 2;
+  FORCE_LA_CHECK = true;
 }
 
 PARSER_BEGIN(ScalrParserTest)
@@ -13,29 +13,28 @@ import scalr.Exceptions.*;
 import java.util.*;
 
 public class ScalrParserTest {
-	public static String currentFunc = "test";
     public static void main(String[] args) throws Exception {
-		Scanner in = null;
-        String text = "";
+    FileReader in = null;
         try {
-		    in = new Scanner(new File(args[0]));
-		    String line = "";
-		    while (in.hasNextLine())
-		    	text += in.nextLine() + "\n";
-                
-		    ScalrParserTest parser = new ScalrParserTest(new java.io.StringReader(text));
-		    SymbolTable.addFunc(currentFunc);
+		    in = new FileReader(args[0]);
+		    ScalrParserTest parser = new ScalrParserTest(in);
+		    SymbolTable.addFunc("test");
 		    ArrayList<Expression> function = new ArrayList<Expression>();
+		    function.add(parser.statement());
 		    function.add(parser.statement());
 		    function.add(parser.statement());
 			for(Expression e : function) {
 				System.out.println("Type: " + e.getType() + " | Value: " + e.getValue());
 			}
+			System.out.println(SymbolTable.reference);
 			System.out.println("grats, your program compiled alright");
+			in.close();
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: ");
             e.printStackTrace();
+            if (in != null)
+            	in.close();
         }
     }
 }
@@ -44,7 +43,7 @@ PARSER_END(ScalrParserTest)
 SKIP : { " " | "\t" | <"/*" (~[])* "*/"> }
 TOKEN: {
 	"not" | "volume" | "duration" | "end" | "func" | "main" | "while" | "foreach" |
-	"import" | "track" | "in" |	"if" | "else" | "note" | "pitch" | 
+	"import" | "track" | "in" |	"if" | "else" | "note" | "pitch" | "length" |
 	"->" | "." | "," | "\"" | "%" | "(" | ")" | "[" | "]" |
     <CREATE: "="> |
     <ASSIGN: "+=" | "-=" | "*=" | "/=" | "%="> |
@@ -53,6 +52,10 @@ TOKEN: {
 	<OR: "or"> |
 	<URELN: "==" | "!="> |
 	<POST: "--" | "++"> |
+	<PLUS: "+"> |
+	<MINUS: "-"> |
+	<DIV: "/"> |
+	<MULMOD: "*" | "%"> |
 	<LENGTH: "whole" | "half" | "quarter" | "eighth" | "sixteenth" | "thirtysec" | "quarterT" |
 		"eighthT" | "sixteenthT" | "thirtysecT"> |
 	<BOOL: "true" | "false"> |
@@ -61,227 +64,184 @@ TOKEN: {
 	<ID: (["a"-"z"] | "_" | ["A" - "Z"]) (["A"-"Z"] | ["a"-"z"] | <INT> | "_")*>
 }
 
-Expression statement() throws Exception: {
+Expression statement(): {
 	Expression expr;
+	Token note;
 } {
-	("\n")* 
-	(
-		expr = creation() {
-			System.out.println("Assignment from function: " + currentFunc);
-			return expr;
-		}
-		| expr = noteMod() {
-			return expr;
-		} 
-		| expr = whileExpr() {
-			return expr;
-		}
-//		| expr = ifExpr() {
-//			return expr;
-//		}
-	)
-	"\n"
+	expr = creation() ("\n")+ {
+		return expr;
+	}
 }
 
 Expression creation(): {
-	Token t1;
-	Expression expr;	
+	Expression expr;
+	Token name;
 } {
-	t1 = <ID> <CREATE> expr = arithExpr() {
-		CreationOperator co = new CreationOperator(t1.image);
-		co.addOperand(expr);
-		co.addFunc(currentFunc);
-		return co;
-	}
-}
-
-Expression boolExpr(): {
-	Expression e1;
-	Expression e2 = null;
-	Token op = null;
-} {
-	e1 = andExpr() (op = <OR> e2 = boolExpr())? {
-		if (op != null) {
-			BooleanOperator bo = new BooleanOperator(op.image);
-			bo.addOperand(e1);
-			bo.addOperand(e2);
-			return bo;
+	name = <ID> 
+	(
+		<CREATE> expr = arithExpr() {
+			CreationOperator co = new CreationOperator(name.image);
+			co.addFunc(SymbolTable.currentFunctionScope);
+			co.addOperand(expr);
+			return co;
 		}
-		else
-			return e1;
-	}
-}
-
-Expression andExpr(): {
-	Expression e1;
-	Expression e2 = null;
-	Token op = null;
-} {
-	e1 = boolEqualExpr() (op = <AND> e2 = boolExpr())? {
-		if (op != null) {
-			BooleanOperator bo = new BooleanOperator(op.image);
-			bo.addOperand(e1);
-			bo.addOperand(e2);
-			return bo;
+		| "." { expr = new VariableReference(name.image, SymbolTable.currentFunctionScope); }
+			expr = noteOps(expr) ("." expr = noteOps(expr))* {
+			return expr;
 		}
-		else
-			return e1;
-	}
-}
-
-Expression boolEqualExpr(): {
-	Expression e1;
-	Expression e2 = null;
-	Token op = null;
-} {
-	e1 = nrelExpr() (op = <URELN> e2 = boolExpr())? {
-		if (op != null) {
-			BooleanOperator bo = new BooleanOperator(op.image);
-			bo.addOperand(e1);
-			bo.addOperand(e2);
-			return bo;
-		}
-		else
-			return e1;
-	}
-}
-
-Expression nrelExpr(): {
-	Expression e1;
-	Expression e2 = null;
-	Token op = null;
-} {
-	e1 = arithExpr() (op = <NRELN> | op = <URELN>) e2 = arithExpr() {
-		if (op != null) {
-			BooleanOperator bo = new BooleanOperator(op.image);
-			bo.addOperand(e1);
-			bo.addOperand(e2);
-			return bo;
-		}
-		else
-			return e1;
-	}
-	| op = <BOOL> {
-		return new ScalrBoolean(Boolean.parseBoolean(op.image));
-	}
-	| "(" e1 = boolExpr() ")" {
-		return e1;
-	}
+	)
 }
 
 Expression arithExpr(): {
 	Expression e1;
-	Expression e2 = null;
-	Token op = null;
+	Expression e2;
+	Token op;
 } {
-	// <PLUS> contains + and -
-	e1 = mulOrDiv() ((op = "+" | op = "-") e2 = arithExpr())? {
-		if (op != null) {
-			BinaryOperator bo = new BinaryOperator(op.image);
-			bo.addOperand(e1);
-			bo.addOperand(e2);
-			return bo;
-		}
-		else
-			return e1;
+	e1 = mulDivModExpr() ((op = <PLUS> | op = <MINUS>) e2 = mulDivModExpr() {
+		BinaryOperator bo = new BinaryOperator(op.image);
+		bo.addOperand(e1);
+		bo.addOperand(e2);
+		e1 = bo;
+	})*	{
+		return e1;
 	}
 }
 
-Expression mulOrDiv(): {
+Expression mulDivModExpr(): {
 	Expression e1;
-	Expression e2 = null;
-	Token op = null;
+	Expression e2;
+	Token op;
 } {
-	// PORD contains *, %, and /
-	e1 = unary() ((op = "*" | op = "%" | op = "/") e2 = arithExpr())? {
-		if (op != null) {
-			BinaryOperator bo = new BinaryOperator(op.image);
-			bo.addOperand(e1);
-			bo.addOperand(e2);
-			return bo;
-		}
-		else
-			return e1;
-	}
+	e1 = unary() ((op = <MULMOD> | op = <DIV>) e2 = unary() {
+		BinaryOperator bo = new BinaryOperator(op.image);
+		bo.addOperand(e1);
+		bo.addOperand(e2);
+		e1 = bo;
+	})*	{ return e1; }
 }
-
-
 
 Expression unary(): {
-	Expression e = null;
-	Expression base = null;
-	Token op = null;
-	Token post = null;
-	Token id = null;
+	Expression e1;
+	Token post;
 } {
-	(op = "-")? ("(" e = arithExpr() ")" | id = <ID> post = <POST> | base = var()) {
-		if (e == null) {
-			if (base != null) {
-				Expression ret = base;
-				if (op != null) {
-					UnaryOperator uo = new UnaryOperator(op.image);
-					uo.addOperand(ret);
-					ret = uo;
-				}
-				return ret;
-			}
-			else if (id != null) {
-				VariableReference ref = new VariableReference(id.image, currentFunc);
-				UnaryOperator uo = new UnaryOperator(post.image);
-				uo.addOperand(ref);
-				uo.addFunc(currentFunc);
-				uo.addVar(id.image);
-				if (op != null) {
-					UnaryOperator uo2 = new UnaryOperator(op.image);
-					uo2.addOperand(uo);
-					uo = uo2;
-				}
-				return uo;
-			}
-		}
-		else {
-			if (op == null)
-				return e;
-			else {
-				UnaryOperator uo = new UnaryOperator(op.image);
-				uo.addOperand(e);
-				return uo;
-			}
-		}
+	e1 = variable() { return e1; }
+	| "(" e1 = arithExpr() ")" { return e1; }
+	| <MINUS> e1 = unary() {
+		UnaryOperator uo = new UnaryOperator("-");
+		uo.addOperand(e1);
+		return uo;
 	}
 }
 
-Expression var(): {
-	Token t;
+Expression variable(): {
 	Expression expr;
+	Token postOp;
+	Token id;
 } {
-	t = <INT> { return new ScalrNum(Integer.parseInt(t.image)); }
-	| (expr = sequence() | expr = note()) { return expr; }
-	| t = <ID> { return new VariableReference(t.image, currentFunc); }
+	id = <INT> { return new ScalrNum(Integer.parseInt(id.image)); }
+	| expr = note() { return expr; }
+	| id = <ID> { expr = new VariableReference(id.image, SymbolTable.currentFunctionScope); }
+	  (
+	      postOp = <POST> {
+			  UnaryOperator uo = new UnaryOperator(postOp.image);
+			  uo.addOperand(expr);
+			  uo.addVar(id.image);
+			  uo.addFunc(SymbolTable.currentFunctionScope);
+			  expr = uo;
+		  }
+	      | ("." expr = noteOps(expr))+
+	  )? { return expr; }
+	| expr = sequence() { return expr; }
+	| expr = scale() { return expr; }
 }
 
-void track(): {}
-{
-	"track" "->" "[" sequence() "]"
+Expression scale(): {
+	
+} {
+	
 }
 
 Expression note(): {
-	Token t;
 	Expression n = Note.note();
 } {
-	("note" | t = <ID> { n = new VariableReference(t.image, currentFunc); }) 
-	(".pitch(" n = pitch(n) ")" | ".length(" n = length(n) ")" | ".volume(" n = volume(n) ")" | "." n = lenClass(n))* { return n; }
+	"note" ("." n = noteOps(n))* { return n; }
 }
 
-Expression noteMod(): {
-	Token t;
-	Expression n = Note.note();
+Expression noteOps(Expression n): {
+	
 } {
-	t = <ID> { n = new VariableReference(t.image, currentFunc); }
-	(".pitch(" n = pitch(n) ")" | ".length(" n = length(n) ")" | ".volume(" n = volume(n) ")" | "." n = lenClass(n))* { return n; }
+	"pitch" "(" n = pitch(n) ")" { return n; }
+	| "volume" "(" n = volume(n) ")" { return n; }
+	| "length" "(" n = length(n) ")" { return n; }
+	| n = lenTok(n) { return n; }
 }
 
-Expression lenClass(Expression n): {
+Expression pitch(Expression n): {
+	Token mod;
+	Token deg;
+	Token scale;
+	Expression modNum;
+} {
+	deg = <DEGREE> {
+		NoteOps no = new NoteOps("pit");
+		no.addOperand(n);
+		no.addPitch(deg.image);
+		return no;
+	}
+	| (mod = <PLUS>) modNum = arithExpr() {
+		NoteOps no = new NoteOps("pit");
+		no.addOperand(n);
+		no.addNum(modNum);
+		no.addMod(mod.image);
+		return no;
+	}
+	| scale = <ID> "[" modNum = arithExpr() "]" {
+		NoteOps no = new NoteOps("pit");
+		no.addOperand(n);
+		no.addIndex(modNum);
+		no.addScale(new VariableReference(scale.image, SymbolTable.currentFunctionScope));
+		return no;
+	}
+}
+
+Expression volume(Expression n): {
+	Expression num;
+	Token mod = null;
+} {
+	(mod = <PLUS>)? num = arithExpr() {
+		NoteOps no = new NoteOps("vol");
+		no.addOperand(n);
+		no.addNum(num);
+		if(mod != null)
+			no.addMod(mod.image);
+		return no;
+	}
+}
+
+Expression length(Expression n): {
+	Expression num;
+	Token mod;
+	Token numer, denom = null;
+} {
+	(mod = <PLUS>) num = arithExpr() {
+		NoteOps no = new NoteOps("len");
+		no.addOperand(n);
+		no.addNum(num);
+		no.addMod(mod.image);
+		return no;
+	}
+	| numer = <INT> (<DIV> denom = <INT>)? {
+		NoteOps no = new NoteOps("len");
+		no.addOperand(n);
+		if (denom != null)
+			no.addLength(numer.image + "/" + denom.image);
+		else
+			no.addLength(numer.image);
+		return no;
+	}
+}
+
+Expression lenTok(Expression n): {
 	Token len;
 } {
 	len = <LENGTH> {
@@ -289,92 +249,5 @@ Expression lenClass(Expression n): {
 		no.addOperand(n);
 		no.addLength(len.image);
 		return no;
-	}
-}
-
-Expression pitch(Expression n): {
-	Token mod;
-	Expression e;
-} {
-	mod = <DEGREE> {
-		NoteOps no = new NoteOps("pit");
-		no.addOperand(n);
-		no.addPitch(mod.image);
-		return no;
-	}
-	| (mod = "+" | mod = "-") e = arithExpr() {
-		NoteOps no = new NoteOps("pit");
-		no.addOperand(n);
-		no.addNum(e);
-		no.addMod(mod.image);
-		return no;
-	}
-}
-
-Expression length(Expression n): {
-	Expression e;
-	Token mod = null;
-	Token numer;
-} {
-	(mod = "+" | mod = "-") e = arithExpr() {
-		NoteOps no = new NoteOps("len");
-		no.addOperand(n);
-		no.addNum(e);
-		no.addMod(mod.image);
-		return no;
-	}
-	| numer = <INT> ("/" mod = <INT>)? {
-		NoteOps no = new NoteOps("len");
-		no.addOperand(n);
-		if (mod != null)
-			no.addLength(numer.image + "/" + mod.image);
-		else
-			no.addLength(numer.image);
-		return no;
-	}
-}
-
-Expression volume(Expression n): {
-	Expression e;
-	Token mod = null;
-} {
-	(mod = "+" | mod = "-")? e = arithExpr() {
-		NoteOps no = new NoteOps("vol");
-		no.addOperand(n);
-		no.addNum(e);
-		if(mod != null)
-			no.addMod(mod.image);
-		return no;
-	}
-}
-
-Sequence sequence() : {
-	Sequence s = new Sequence();
-} {
-	"[" ((seqNote(s) | seqID(s)) ("," <ID>)*)? "]" { return s; }
-}
-
-void seqNote(Sequence s): {
-	Expression e;
-} {
-	e = note() { s.addNoteToEnd(e); }
-}
-
-void seqID(Sequence s): {
-	Token t;
-} {
-	t = <ID> { s.addNoteToEnd(new VariableReference(t.image, currentFunc)); }
-}
-
-Expression whileExpr() throws Exception: {
-	ArrayList<Expression> expressions = new ArrayList<Expression>();
-	Expression ex;
-	Expression arith;
-	WhileStatement whileObj;
-}{
-	"while" "(" ex=boolExpr() { whileObj = new WhileStatement(ex); } ")" ("\n")+
-	(arith = statement() { whileObj.addStatement(arith); })+ ("\n")+
-	"end" ("\n")+ {
-		return whileObj;
 	}
 }

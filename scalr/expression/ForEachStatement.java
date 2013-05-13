@@ -49,8 +49,9 @@ public class ForEachStatement implements Expression
 		Sequence seq = (Sequence) sequence.getValue(expressions);
 		// Iterate through the sequence (note, the getValue of a sequence automatically evaluates
 		// all the notes)
-		for (Expression e : seq.getSequence()) {
-			Note n = (Note) e;
+		ArrayList<Expression> notes = seq.getSequence();
+		for (int i = 0; i < notes.size(); i++) {
+			Note n = (Note) notes.get(i);
 			// Add the current note to the symbol table as this note value
 			try {
 				SymbolTable.addReference(SymbolTable.currentFunctionScope, noteName, n);
@@ -62,6 +63,9 @@ public class ForEachStatement implements Expression
 			// Execute the statements
 			for (Expression expr : stmts)
 				expr.getValue(expressions);
+			// Add the (modified?) note back
+			Expression e = SymbolTable.getMember(SymbolTable.currentFunctionScope, noteName);
+			notes.set(i, e.getValue(expressions));
 		}
 		return null;
 	}

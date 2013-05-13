@@ -1,5 +1,5 @@
 func iterate(sequence)
   foreach(n) in sequence
-    n.length.half
+    n.half
   end
 end

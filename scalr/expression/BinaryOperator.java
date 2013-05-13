@@ -119,7 +119,7 @@ public class BinaryOperator implements Expression
 			        && expr2.getType() == ExpressionType.NUMBER) {
 				ScalrNum num1 = (ScalrNum) expr1.getValue(expressions);
 				ScalrNum num2 = (ScalrNum) expr2.getValue(expressions);
-				return new ScalrNum(Math.round(num1.getNum() / num2.getNum()));
+				return new ScalrNum((int) Math.floor(num1.getNum() / num2.getNum()));
 			}
 		}
 		else if (operator.equals("%")) {

@@ -1,2 +1,8 @@
-x = 5
-seq = [ note ]
+g = 1 * 2 + 3 * 5 + 5 / 5
+y = note.length(1/8)
+y.pitch(+5)
+while(i < 4)
+	x = i * 2 - 1 /* testing with a comment in the mix */
+	i++
+end
+seq = [ note, note.pitch(+5) ]

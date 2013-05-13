@@ -262,11 +262,13 @@ public class Note implements Variable
 	
 	private String fractionToDouble(String duration)
 	{
-		if (duration.equals("1"))
-			return duration;
+		if (duration.equals("1")) {
+			double temp = 4;
+			return String.format("%.5f", temp);
+		}
 		String[] frac = duration.split("/");
 		double temp = (4.0 * (Integer.parseInt(frac[0]) / Double.parseDouble(frac[1])));
-		return "" + String.format("%.5f",temp);
+		return String.format("%.5f", temp);
 	}
 	
 	@Override

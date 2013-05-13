@@ -140,22 +140,22 @@ ArrayList<Expression> els3() throws Exception: {
 
 
 
-void foreach() throws Exception: {
-	Expression seq;
+Expression foreach() throws Exception: {
 	ArrayList<Expression> statements = new ArrayList<Expression>();
 	ForEachStatement fes;
+	Token seq;
 	Token id;
+	System.out.println("here");
 }
 {
-	"foreach" "Note" id = <ID> "in" seq = sequence()  
+	"foreach" "(" id = <ID> { fes = new ForEachStatement(id.image); }  ")" "in" seq = <ID>  
 	statements = block()
 	{
-		System.out.println("for each plz");
-		fes = new ForEachStatement(id.image);
-		fes.addSequence(seq);
+		fes.addSequence(new VariableReference(seq.image, SymbolTable.currentFunctionScope));
 		for(Expression s : statements){
 			fes.addStatement(s);
 		}
+		return fes;
 	}
 }
 
@@ -321,6 +321,11 @@ Expression line() throws Exception: {
 	|
 	e=noteModifier() {
 		System.out.println("line consisting of note");
+		return e;
+	}
+	|
+	e = foreach() {
+		System.out.println("line consisting of foreach");
 		return e;
 	}
 	//|
