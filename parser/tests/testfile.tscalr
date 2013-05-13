@@ -6,8 +6,11 @@ end
 foreach(n) in seq
 	n.volume(+5)
 end
-while(i < 4)
-	x = i * 2 - 1 /* testing with a comment in the mix */
-	i++
+if (g > 50)
+	g++
+	x = 5
+else if (g == 2)
+else
+	g = 1
 end
 seq = [ note, note.pitch(+5) ]

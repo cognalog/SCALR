@@ -25,6 +25,7 @@ public class ScalrParserTest {
 		    function.add(parser.statement());
 		    function.add(parser.statement());
 		    function.add(parser.statement());
+		    function.add(parser.statement());
 			for(Expression e : function) {
 				System.out.println("Type: " + e.getType() + " | Value: " + e.getValue());
 			}
@@ -76,8 +77,31 @@ Expression statement(): {
 	| expr = foreachExpr() ("\n")+ {
 		return expr;
 	}
+	| expr = ifElseExpr() ("\n")+ {
+		return expr;
+	}
 	| expr = startsWithIDExpr() ("\n")+ {
 		return expr;
+	}
+}
+
+Expression ifElseExpr(): {
+	IfElseStatement ifElse;
+	Expression cond;
+	Expression stmt;
+} {
+	"if" "(" cond = boolExpr() { ifElse = new IfElseStatement(cond); } ")" ("\n")+
+		(stmt = statement() { ifElse.addStatement(stmt); })*
+	(
+		"else" "if" "(" cond = boolExpr() { ifElse.addElIf(cond); } ")" ("\n")+
+			(stmt = statement() { ifElse.addStatement(stmt); })*
+	)*
+	(
+		"else" { ifElse.addEl(); } ("\n")+
+			(stmt = statement() { ifElse.addStatement(stmt); })*
+	)?
+	"end" {
+		return ifElse;
 	}
 }
 
