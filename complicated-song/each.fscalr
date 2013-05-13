@@ -9,3 +9,9 @@ func iterate2(sequence)
     n.half
   end
 end
+
+func iterate3(sequence)
+  foreach(n) in sequence
+    n.quarterT
+  end
+end
