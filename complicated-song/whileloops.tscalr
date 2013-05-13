@@ -1,0 +1,16 @@
+import whileloops
+import each
+
+main
+  scale1 = {C4 D4 E4 F4 G4 A4 B4}
+  something = seq1(scale1)
+  scale2 = {E4 F4 G4 A4 B4}
+  something2 = seq1(scale2)
+  temp = seq1(scale1)
+  temp2 = seq1(scale2)
+  halved = iterate(temp)
+  twicelength = iterate2(temp2)
+end
+
+track -> [something, something, halved, halved, halved, halved]
+track -> [something2, something2, twicelength]
