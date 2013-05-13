@@ -23,6 +23,8 @@ public class ScalrParserTest {
 		    ArrayList<Expression> function = new ArrayList<Expression>();
 		    function.add(parser.statement());
 		    function.add(parser.statement());
+		    function.add(parser.statement());
+		    function.add(parser.statement());
 			for(Expression e : function) {
 				System.out.println("Type: " + e.getType() + " | Value: " + e.getValue());
 			}
@@ -68,11 +70,44 @@ Expression statement(): {
 	Expression expr;
 	Token note;
 } {
-	expr = startsWithIDExpr() ("\n")+ {
+	expr = whileExpr() ("\n")+ {
 		return expr;
 	}
-	| expr = boolExpr() ("\n")+ {
+	| expr = foreachExpr() ("\n")+ {
 		return expr;
+	}
+	| expr = startsWithIDExpr() ("\n")+ {
+		return expr;
+	}
+}
+
+Expression foreachExpr(): {
+	ForEachStatement forLoop;
+	Token noteName;
+	Token seqName;
+	Expression stmt;
+} {
+	"foreach" "(" noteName = <ID> {
+		forLoop = new ForEachStatement(noteName.image);
+	} ")" "in" seqName = <ID> {
+		VariableReference seq = new VariableReference(seqName.image, SymbolTable.currentFunctionScope);
+		forLoop.addSequence(seq);
+	} ("\n")+
+		(stmt = statement() { forLoop.addStatement(stmt); })+
+	"end" {
+		return forLoop;
+	}
+}
+
+Expression whileExpr(): {
+	WhileStatement whileLoop;
+	Expression cond;
+	Expression stmt;
+} {
+	"while" "(" cond = boolExpr() { whileLoop = new WhileStatement(cond); } ")" ("\n")+
+		(stmt = statement() { whileLoop.addStatement(stmt);	})+
+	"end" {
+		return whileLoop;
 	}
 }
 

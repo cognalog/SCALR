@@ -19,12 +19,17 @@ public class WhileStatement implements Expression
 	 * @throws TypeError
 	 *             Thrown in case the given expression isn't of type boolean.
 	 */
-	public WhileStatement(Expression expr) throws TypeError
+	public WhileStatement(Expression expr)
 	{
 		if (expr.getType() == ExpressionType.BOOLEAN)
 			cond = expr;
-		else
-			throw new TypeError("Assigned expression is not of type boolean");
+		else {
+			System.err.println("The given check expression is not of type boolean.");
+			StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+			for (StackTraceElement elem : stack)
+				System.err.println(elem);
+			System.exit(1);
+		}
 	}
 	
 	/**
