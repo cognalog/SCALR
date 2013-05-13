@@ -31,3 +31,11 @@ Bash:
 `alias scalr=scalr1`
 
 `scalr test/tests-that-should-succeed/hello/hello.tscalr`
+
+Alternatively, you can run `scalr` (in the parser directory) as follows:
+
+```41
+./scalr <file.tscalr>
+```
+
+`scalr` can be run from any directory, but it can't be moved from parser. Don't forget to `chmod +x` if it isn't already executable.

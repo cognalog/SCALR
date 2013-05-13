@@ -23,7 +23,7 @@
 *Scratch.java
 *classCleaner
 *.DS_Store
-
+*output.mid
 
 # A file I often create that contains scratch work not interesting to anyone
 scalr/misc/scratch.java
