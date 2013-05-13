@@ -1,3 +1,13 @@
-seq = [note.pitch(A3), note.pitch(A6)]
-track -> [seq, seq]
-track -> [seq]
+func hello()
+	x = [ note ]
+	x
+end
+/* This is a comment. Hopefully, it will be ignored */
+func hi(i)
+	seq = []
+	while (i < 5)
+		i++
+		seq += note.pitch(+i)
+	end
+	seq
+end

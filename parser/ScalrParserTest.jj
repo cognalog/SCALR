@@ -19,15 +19,12 @@ public class ScalrParserTest {
         try {
 		    in = new FileReader(args[0]);
 		    ScalrParserTest parser = new ScalrParserTest(in);
-		    SymbolTable.addFunc("test");
 		    ArrayList<Expression> function = new ArrayList<Expression>();
-		    function.add(parser.statement());
+		    parser.fscalr();
 			for(Expression e : function) {
 				System.out.println("Type: " + e.getType() + " | Value: " + e.getValue());
 			}
-			parser.trackExpr();
-			parser.trackExpr();
-			System.out.println("\n" + SymbolTable.reference);
+//			System.out.println("\n" + SymbolTable.reference);
 			System.out.println("grats, your program compiled alright");
 			in.close();
         } catch (Throwable e) {
@@ -41,7 +38,7 @@ public class ScalrParserTest {
 }
 PARSER_END(ScalrParserTest)
 
-SKIP : { " " | "\t" | <"/*" (~[])* "*/"> }
+SKIP : { " " | "\t" | <"/*" (~[])* "*/" ("\n")*> }
 TOKEN: {
 	"not" | "volume" | "duration" | "end" | "func" | "main" | "while" | "foreach" |
 	"import" | "track" | "in" |	"if" | "else" | "note" | "pitch" | "length" |
@@ -63,6 +60,11 @@ TOKEN: {
    	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "10")> |
 	<INT: (("0")+ | ("0")* ["1"-"9"] (["0"-"9"])*)> |
 	<ID: (["a"-"z"] | "_" | ["A" - "Z"]) (["A"-"Z"] | ["a"-"z"] | <INT> | "_")*>
+}
+
+void fscalr(): {}
+{
+	("\n")* (funcDef())+
 }
 
 void trackExpr(): {

@@ -21,15 +21,7 @@ public class WhileStatement implements Expression
 	 */
 	public WhileStatement(Expression expr)
 	{
-		if (expr.getType() == ExpressionType.BOOLEAN)
-			cond = expr;
-		else {
-			System.err.println("The given check expression is not of type boolean.");
-			StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-			for (StackTraceElement elem : stack)
-				System.err.println(elem);
-			System.exit(1);
-		}
+		cond = expr;
 	}
 	
 	/**
