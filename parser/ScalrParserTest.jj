@@ -1,12 +1,14 @@
 options
 {
   LOOKAHEAD = 3;
+  STATIC = false;
   FORCE_LA_CHECK = true;
 }
 
 PARSER_BEGIN(ScalrParserTest)
 package parser;
 import java.io.*;
+
 import scalr.Degree;
 import scalr.variable.*;
 import scalr.expression.*;
@@ -28,11 +30,13 @@ public class ScalrParserTest {
 		    ArrayList<Expression> function = new ArrayList<Expression>();
 //		    SymbolTable.addFunc("test");
 //		    function.add(parser.arithExpr());
-		    parser.fscalr();
+		    parser.tscalr();
+		    parser.tscalr();
 			for(Expression e : function) {
 				System.out.println("Type: " + e.getType() + " | Value: " + e.getValue());
 			}
 //			System.out.println("\n" + SymbolTable.reference);
+			System.out.println("\n" + SymbolTable.functionReferences);
 			System.out.println("grats, your program compiled alright");
 			in.close();
         } catch (Throwable e) {
@@ -85,11 +89,30 @@ void tscalr(): {
 void importExpr(): {
 	File fscalrFile;
 	Token fileName;
-	Token ext;
+	Token ext = null;
 } {
 	"import" fileName = <ID> ("." ext = <ID> { fileName.image += "." + ext.image; })? {
-		fscalrFile = new File(tscalrFile.getParent(), fileName.image);
-		System.out.println(fscalrFile.exists());
+		if (ext != null)
+			fscalrFile = new File(tscalrFile.getParent(), fileName.image);
+		else
+			fscalrFile = new File(tscalrFile.getParent(), fileName.image + ".fscalr");
+		// Read in the file
+		try {
+			Scanner in = new Scanner(fscalrFile);
+			String text = "";
+			while (in.hasNextLine())
+				text += in.nextLine() + "\n";
+			// Print out the file
+			System.out.println("**************");
+			System.out.println(text.trim());
+			System.out.println("**************");
+			ScalrParserTest fscalrParser = new ScalrParserTest(new StringReader(text));
+			fscalrParser.fscalr();
+		} catch (Exception e) {
+			System.err.println("Syntax check failed: ");
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 }
 
@@ -416,8 +439,8 @@ Expression sequence(): {
 	Expression note;
 } {
 	"[" (
-			(note = note() | note = noteID()) { s.addNoteToEnd(note); }
-			("," (note = note() | note = noteID()) { s.addNoteToEnd(note); })*
+			(note = note() | note = noteID()) ("\n")* { s.addNoteToEnd(note); }
+			("," ("\n")* (note = note() | note = noteID()) ("\n")* { s.addNoteToEnd(note); })*
 		)?
 	"]" {
 		return s;
