@@ -15,8 +15,7 @@ main
   triplets = iterate3(seq1(scale3))
   triplets *= 4
 
-  wholeseq = []
-  wholeseq += wholenoteatpitch(scale1, 3)
+  wholeseq = wholenoteatpitch(scale1, 3)
   wholeseq += wholenoteatpitch(scale1, 2)
 end
 
