@@ -1,0 +1,574 @@
+options
+{
+  LOOKAHEAD = 3;
+  STATIC = false;
+  FORCE_LA_CHECK = true;
+}
+
+PARSER_BEGIN(ScalrParser)
+package parser;
+import java.io.*;
+
+import scalr.Degree;
+import scalr.variable.*;
+import scalr.expression.*;
+import scalr.Exceptions.*;
+import java.util.*;
+import java.util.regex.Pattern;
+
+public class ScalrParser {
+	public static File tscalrFile;
+    public static void main(String[] args) throws Exception {
+    Scanner in = null;
+        try {
+        	if (args.length == 0) {
+        		System.out.println("Usage: java -jar ScalrParser.jar <tscalr>");
+        		System.exit(0);
+        	}
+        	tscalrFile = new File(args[0]);
+		    in = new Scanner(tscalrFile);
+		    String text = "";
+		    while (in.hasNextLine())
+		    	text += in.nextLine() + "\n";
+		    text += "\n";
+		    ScalrParser parser = new ScalrParser(new StringReader(text));
+		    parser.tscalr();
+		    System.out.println();
+			in.close();
+        } catch (Throwable e) {
+            // Catching Throwable is ugly but JavaCC throws Error objects!
+            System.out.println("Syntax check failed: ");
+            e.printStackTrace();
+            if (in != null)
+            	in.close();
+        }
+    }
+}
+PARSER_END(ScalrParser)
+
+SKIP : { " " | "\t" | <"/*" (~["*","/"])* "*/"> }
+TOKEN: {
+	"not" | "volume" | "duration" | "end" | "func" | "main" | "while" | "foreach" |
+	"import" | "track" | "in" |	"if" | "else" | "note" | "pitch" | "length" | "break" |
+	"->" | "." | "," | "\"" | "(" | ")" | "[" | "]" |
+    <CREATE: "="> |
+    <ASSIGN: "+=" | "-=" | "*=" | "/=" | "%="> |
+	<NRELN: "<" | ">" | ">=" | "<="> |
+	<AND: "and"> |
+	<OR: "or"> |
+	<URELN: "==" | "!="> |
+	<POST: "--" | "++"> |
+	<PLUS: "+"> |
+	<MINUS: "-"> |
+	<DIV: "/"> |
+	<MULMOD: "*" | "%"> |
+	<LENGTH: "whole" | "half" | "quarter" | "eighth" | "sixteenth" | "thirtysec" | "quarterT" |
+		"eighthT" | "sixteenthT" | "thirtysecT"> |
+	<BOOL: "true" | "false"> |
+   	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "10")> |
+	<INT: (("0")+ | ("0")* ["1"-"9"] (["0"-"9"])*)> |
+	<ID: (["a"-"z"] | "_" | ["A" - "Z"]) (["A"-"Z"] | ["a"-"z"] | <INT> | "_")*>
+}
+
+void tscalr(): {
+	Expression stmt;
+} {
+	("\n")* (importExpr() ("\n")+)+
+	"main" {
+		try {
+			SymbolTable.addFunc("main");			
+		} catch (FunctionExistsError e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+	} ("\n")+
+		(stmt = statement() {
+			stmt.getValue();
+		})+
+	"end" ("\n")+ { System.out.println("Below are the tracks:"); }
+	(trackExpr() ("\n")+)+
+}
+
+void importExpr(): {
+	File fscalrFile;
+	String name = "";
+	Token tok;
+} {
+	"import" ((tok = <ID> | tok = "." | tok = <DIV> | tok = "\\") { name += tok.image; })+ {
+		// The name starts with a "/" or "\", so it is an absolute path
+		if (name.startsWith(System.getProperty("file.separator"))) {
+			// This file has an extension, so don't include .fscalr
+			if (Pattern.matches("^.*\\.\\w+$", name))
+				fscalrFile = new File(name);
+			else
+				fscalrFile = new File(name + ".fscalr");
+		}
+		else {
+			if (Pattern.matches("^.*\\.\\w+$", name))
+				fscalrFile = new File(tscalrFile.getParent(), name);
+			else
+				fscalrFile = new File(tscalrFile.getParent(), name + ".fscalr");
+		}
+		// Read in the file
+		try {
+			Scanner in = new Scanner(fscalrFile);
+			String text = "";
+			while (in.hasNextLine())
+				text += in.nextLine() + "\n";
+			// Print out the file
+			System.out.println("**************");
+			System.out.println(text.trim());
+			System.out.println("**************");
+			ScalrParser fscalrParser = new ScalrParser(new StringReader(text));
+			fscalrParser.fscalr();
+		} catch (Exception e) {
+			System.err.println("Syntax check failed: ");
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+}
+
+void fscalr(): {}
+{
+	("\n")* (funcDef())+
+}
+
+void trackExpr(): {
+	Sequence superSequence = new Sequence();
+} {
+	"track" "->" "[" trackSeq(superSequence) ("," trackSeq(superSequence))* "]" {
+		System.out.print(superSequence);
+	}
+}
+
+void trackSeq(Sequence superSequence): {
+	Token seqName;
+} {
+	seqName = <ID> {
+		VariableReference vr = new VariableReference(seqName.image, SymbolTable.currentFunctionScope);
+		superSequence.addSequence((Sequence) vr.getValue());
+	}
+}
+
+void funcDef(): {
+	Function func = null;
+	Token funcName;
+	Token param;
+	Token retName;
+	Expression stmt;
+} {
+	"func" funcName = <ID> {
+		try {
+			func = new Function(funcName.image);
+		} catch (FunctionExistsError e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+	} "(" (param = <ID> {
+			try {
+				func.addParameter(param.image);
+			} catch (TypeError e) {
+				e.printStackTrace();
+			}
+		})* ")" ("\n")+
+		(
+			stmt = sequence() ("\n")+ {
+				func.addStatement(stmt);
+			}
+			| (stmt = statement() {
+				func.addStatement(stmt);
+			})+
+		)
+		(
+			retName = <ID> ("\n")+ {
+				stmt = new VariableReference(retName.image, SymbolTable.currentFunctionScope);
+				func.addStatement(stmt);
+			}
+			| stmt = sequence() ("\n")+ {
+				func.addStatement(stmt);
+			}
+		)?
+	"end" ("\n")+ {
+		SymbolTable.addFuncRef(func);
+		System.out.println(func.statements);
+	}
+}
+
+Expression funcCall(String name): {
+	Token funcArg;
+	Expression arg;
+	ArrayList<Expression> arguments = new ArrayList<Expression>();
+	Function f = null;
+} {
+	"(" (arg = arithExpr() { arguments.add(arg); })* ")" {
+		try {
+			f = SymbolTable.getFuncRef(name);
+		} catch(FunctionDoesNotExistError e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		f.addValues(arguments.toArray(new Expression[arguments.size()]));
+		return f; 
+	}
+}
+
+Expression statement(): {
+	Expression expr;
+	Token note;
+} {
+	expr = whileExpr() ("\n")+ {
+		return expr;
+	}
+	| expr = foreachExpr() ("\n")+ {
+		return expr;
+	}
+	| expr = ifElseExpr() ("\n")+ {
+		return expr;
+	}
+	| expr = startsWithIDExpr() ("\n")+ {
+		return expr;
+	}
+}
+
+Expression ifElseExpr(): {
+	IfElseStatement ifElse;
+	Expression cond;
+	Expression stmt;
+} {
+	"if" "(" cond = boolExpr() { ifElse = new IfElseStatement(cond); } ")" ("\n")+
+		(stmt = statement() { ifElse.addStatement(stmt); })*
+	(
+		"else" "if" "(" cond = boolExpr() { ifElse.addElIf(cond); } ")" ("\n")+
+			(stmt = statement() { ifElse.addStatement(stmt); })*
+	)*
+	(
+		"else" { ifElse.addEl(); } ("\n")+
+			(stmt = statement() { ifElse.addStatement(stmt); })*
+	)?
+	"end" {
+		return ifElse;
+	}
+}
+
+Expression foreachExpr(): {
+	ForEachStatement forLoop;
+	Token noteName;
+	Token seqName;
+	Expression stmt;
+} {
+	"foreach" "(" noteName = <ID> {
+		forLoop = new ForEachStatement(noteName.image);
+	} ")" "in" seqName = <ID> {
+		VariableReference seq = new VariableReference(seqName.image, SymbolTable.currentFunctionScope);
+		forLoop.addSequence(seq);
+	} ("\n")+
+		(stmt = statement() { forLoop.addStatement(stmt); })+
+	"end" {
+		return forLoop;
+	}
+}
+
+Expression whileExpr(): {
+	WhileStatement whileLoop;
+	Expression cond;
+	Expression stmt;
+} {
+	"while" "(" cond = boolExpr() { whileLoop = new WhileStatement(cond); } ")" ("\n")+
+		(stmt = statement() { whileLoop.addStatement(stmt);	})+
+	"end" {
+		return whileLoop;
+	}
+}
+
+Expression startsWithIDExpr(): {
+	Expression expr;
+	Token name;
+	Token postOp;
+	Token assignOp;
+} {
+	name = <ID> 
+	(
+		// A function call. The most important production
+		expr = funcCall(name.image) {
+			return expr;
+		}
+		| <CREATE> expr = arithExpr() {
+			CreationOperator co = new CreationOperator(name.image);
+			co.addFunc(SymbolTable.currentFunctionScope);
+			co.addOperand(expr);
+			return co;
+		}
+		| "." { expr = new VariableReference(name.image, SymbolTable.currentFunctionScope); }
+			expr = noteOps(expr) ("." expr = noteOps(expr))* {
+			return expr;
+		}
+		| postOp = <POST> {
+			expr = new VariableReference(name.image, SymbolTable.currentFunctionScope);
+			UnaryOperator uo = new UnaryOperator(postOp.image);
+			uo.addOperand(expr);
+			uo.addVar(name.image);
+			uo.addFunc(SymbolTable.currentFunctionScope);
+			return uo;
+		}
+		| assignOp = <ASSIGN> expr = arithExpr() {
+			AssignmentOperator ao = new AssignmentOperator(assignOp.image);
+			ao.addOperand(expr);
+			ao.setVar(name.image);
+			ao.setFunc(SymbolTable.currentFunctionScope);
+			return ao;
+		}
+	)
+}
+
+Expression boolExpr(): {
+	Expression e1;
+	Expression e2;
+	Token op;
+} {
+	e1 = andExpr() (op = <OR> e2 = andExpr() {
+		BooleanOperator bo = new BooleanOperator(op.image);
+		bo.addOperand(e1);
+		bo.addOperand(e2);
+		e1 = bo;
+	})* {
+		return e1;
+	}
+}
+
+Expression andExpr(): {
+	Expression e1;
+	Expression e2;
+	Token op;
+} {
+	e1 = equalityExpr() (op = <AND> e2 = equalityExpr() {
+		BooleanOperator bo = new BooleanOperator(op.image);
+		bo.addOperand(e1);
+		bo.addOperand(e2);
+		e1 = bo;
+	})* {
+		return e1;
+	}
+}
+
+Expression equalityExpr(): {
+	Expression e1;
+	Expression e2;
+	Token op;
+} {
+	e1 = relnExpr() (op = <URELN> e2 = relnExpr() {
+		BooleanOperator bo = new BooleanOperator(op.image);
+		bo.addOperand(e1);
+		bo.addOperand(e2);
+		e1 = bo;
+	})* {
+		return e1;
+	}
+}
+
+Expression relnExpr(): {
+	Expression e1;
+	Expression e2;
+	Token op;
+} {
+	op = <BOOL> {
+		return new ScalrBoolean(Boolean.parseBoolean(op.image));
+	}
+	| e1 = arithExpr() (op = <URELN> | op = <NRELN>) e2 = arithExpr() {
+		BooleanOperator bo = new BooleanOperator(op.image);
+		bo.addOperand(e1);
+		bo.addOperand(e2);
+		return bo;
+	}
+	| "(" e1 = boolExpr() ")" {
+		return e1;
+	}
+}
+
+Expression arithExpr(): {
+	Expression e1;
+	Expression e2;
+	Token op;
+} {
+	e1 = mulDivModExpr() ((op = <PLUS> | op = <MINUS>) e2 = mulDivModExpr() {
+		BinaryOperator bo = new BinaryOperator(op.image);
+		bo.addOperand(e1);
+		bo.addOperand(e2);
+		e1 = bo;
+	})*	{
+		return e1;
+	}
+}
+
+Expression mulDivModExpr(): {
+	Expression e1;
+	Expression e2;
+	Token op;
+} {
+	e1 = unary() ((op = <MULMOD> | op = <DIV>) e2 = unary() {
+		BinaryOperator bo = new BinaryOperator(op.image);
+		bo.addOperand(e1);
+		bo.addOperand(e2);
+		e1 = bo;
+	})*	{ return e1; }
+}
+
+Expression unary(): {
+	Expression e1;
+	Token post;
+} {
+	e1 = variable() { return e1; }
+	| "(" e1 = arithExpr() ")" { return e1; }
+	| <MINUS> e1 = unary() {
+		UnaryOperator uo = new UnaryOperator("-");
+		uo.addOperand(e1);
+		return uo;
+	}
+}
+
+Expression variable(): {
+	Expression expr;
+	Token postOp;
+	Token id;
+} {
+	id = <INT> { return new ScalrNum(Integer.parseInt(id.image)); }
+	| expr = note() { return expr; }
+	| id = <ID> { expr = new VariableReference(id.image, SymbolTable.currentFunctionScope); }
+	  (
+	      postOp = <POST> {
+			  UnaryOperator uo = new UnaryOperator(postOp.image);
+			  uo.addOperand(expr);
+			  uo.addVar(id.image);
+			  uo.addFunc(SymbolTable.currentFunctionScope);
+			  expr = uo;
+		  }
+	      | ("." expr = noteOps(expr))+
+	      | expr = funcCall(id.image)
+	  )? { return expr; }
+	| expr = sequence() { return expr; }
+	| expr = scale() { return expr; }
+}
+
+Expression sequence(): {
+	Sequence s = new Sequence();
+	Expression note;
+} {
+	"[" (
+			(note = note() | note = noteID()) ("\n")* { s.addNoteToEnd(note); }
+			("," ("\n")* (note = note() | note = noteID()) ("\n")* { s.addNoteToEnd(note); })*
+		)?
+	"]" {
+		return s;
+	}
+}
+
+Expression scale(): {
+	Scale scale = new Scale();
+	Token deg;
+} {
+	"{" (deg = <DEGREE> { scale.addDegreeToEnd(Degree.valueOf(deg.image)); })+ "}" {
+		return scale;
+	}
+}
+
+Expression note(): {
+	Expression n = Note.note();
+} {
+	"note" ("." n = noteOps(n))* { return n; }
+	| "break" { n = Note.getBreak(); } ("." n = noteOps(n))* { return n; }
+}
+
+Expression noteID(): {
+	Expression n;
+	Token name;
+} {
+	name = <ID> { n = new VariableReference(name.image, SymbolTable.currentFunctionScope); } 
+	("." n = noteOps(n))* {
+		return n;
+	}
+}
+
+Expression noteOps(Expression n): {
+	
+} {
+	"pitch" "(" n = pitch(n) ")" { return n; }
+	| "volume" "(" n = volume(n) ")" { return n; }
+	| "length" "(" n = length(n) ")" { return n; }
+	| n = lenTok(n) { return n; }
+}
+
+Expression pitch(Expression n): {
+	Token mod;
+	Token deg;
+	Token scale;
+	Expression modNum;
+} {
+	deg = <DEGREE> {
+		NoteOps no = new NoteOps("pit");
+		no.addOperand(n);
+		no.addPitch(deg.image);
+		return no;
+	}
+	| (mod = <PLUS>) modNum = arithExpr() {
+		NoteOps no = new NoteOps("pit");
+		no.addOperand(n);
+		no.addNum(modNum);
+		no.addMod(mod.image);
+		return no;
+	}
+	| scale = <ID> "[" modNum = arithExpr() "]" {
+		NoteOps no = new NoteOps("pit");
+		no.addOperand(n);
+		no.addIndex(modNum);
+		no.addScale(new VariableReference(scale.image, SymbolTable.currentFunctionScope));
+		return no;
+	}
+}
+
+Expression volume(Expression n): {
+	Expression num;
+	Token mod = null;
+} {
+	(mod = <PLUS>)? num = arithExpr() {
+		NoteOps no = new NoteOps("vol");
+		no.addOperand(n);
+		no.addNum(num);
+		if(mod != null)
+			no.addMod(mod.image);
+		return no;
+	}
+}
+
+Expression length(Expression n): {
+	Expression num;
+	Token mod;
+	Token numer, denom = null;
+} {
+	(mod = <PLUS>) num = arithExpr() {
+		NoteOps no = new NoteOps("len");
+		no.addOperand(n);
+		no.addNum(num);
+		no.addMod(mod.image);
+		return no;
+	}
+	| numer = <INT> (<DIV> denom = <INT>)? {
+		NoteOps no = new NoteOps("len");
+		no.addOperand(n);
+		if (denom != null)
+			no.addLength(numer.image + "/" + denom.image);
+		else
+			no.addLength(numer.image);
+		return no;
+	}
+}
+
+Expression lenTok(Expression n): {
+	Token len;
+} {
+	len = <LENGTH> {
+		NoteOps no = new NoteOps("len");
+		no.addOperand(n);
+		no.addLength(len.image);
+		return no;
+	}
+}

@@ -16,7 +16,6 @@
 *SyntaxChecker.java
 *SyntaxCheckerConstants.java
 *Node.java
-*ScalrParser.jj
 *ScalrParser*.java
 *ScalrParserTest*.java
 *ScalrParser2*.java
