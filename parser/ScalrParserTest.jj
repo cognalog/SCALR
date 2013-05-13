@@ -49,8 +49,8 @@ PARSER_END(ScalrParserTest)
 SKIP : { " " | "\t" | <"/*" (~[])* "*/"> }
 TOKEN: {
 	"not" | "volume" | "duration" | "end" | "func" | "main" | "while" | "foreach" |
-	"import" | "track" | "in" |	"if" | "else" | "note" | "pitch" | "length" |
-	"->" | "." | "," | "\"" | "%" | "(" | ")" | "[" | "]" |
+	"import" | "track" | "in" |	"if" | "else" | "note" | "pitch" | "length" | "break" |
+	"->" | "." | "," | "\"" | "(" | ")" | "[" | "]" |
     <CREATE: "="> |
     <ASSIGN: "+=" | "-=" | "*=" | "/=" | "%="> |
 	<NRELN: "<" | ">" | ">=" | "<="> |
@@ -437,6 +437,7 @@ Expression note(): {
 	Expression n = Note.note();
 } {
 	"note" ("." n = noteOps(n))* { return n; }
+	| "break" { n = Note.getBreak(); } ("." n = noteOps(n))* { return n; }
 }
 
 Expression noteID(): {

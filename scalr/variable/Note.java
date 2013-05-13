@@ -250,7 +250,8 @@ public class Note implements Variable
 	public static Note getBreak(String... length)
 	{
 		Note n = new Note(Degree.br, 100, Length.quarter);
-		n.length(length[0]);
+		if (length.length == 1)
+			n.length(length[0]);
 		return n;
 	}
 	
