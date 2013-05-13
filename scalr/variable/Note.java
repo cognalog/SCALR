@@ -209,12 +209,22 @@ public class Note implements Variable
 	public Note modPitch(int modVal)
 	{
 		Degree[] degrees = Degree.values();
-		if (modVal + pitch.ordinal() >= degrees.length)
-			pitch = degrees[degrees.length - 1];
-		else if (modVal + pitch.ordinal() < 0)
+		int desiredPitch = pitch.getMidi() + modVal;
+		// Boundary cases
+		if (desiredPitch < 0) {
 			pitch = degrees[0];
-		else
-			pitch = degrees[pitch.ordinal() + modVal];
+			return this;
+		}
+		else if (desiredPitch > 127) {
+			pitch = Degree.br;
+			return this;
+		}
+		for (Degree d : degrees) {
+			if (d.getMidi() == desiredPitch) {
+				pitch = d;
+				break;
+			}
+		}
 		return this;
 	}
 	
