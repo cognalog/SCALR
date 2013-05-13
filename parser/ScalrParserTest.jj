@@ -95,6 +95,12 @@ void funcDef(): {
 	}
 	"end" ("\n")+ {
 		SymbolTable.addFuncRef(func);
+		try {
+			SymbolTable.addFunc("test");
+		} catch (FunctionExistsError e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 }
 
