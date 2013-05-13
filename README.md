@@ -11,7 +11,7 @@ Testing SyntaxChecker.jj:
 
 Installing midiutil:
 
-`python python-midiutil/setup.py`
+`python python-midiutil/setup.py install`
 
 Running string-to-midi converter:
 
