@@ -15,9 +15,8 @@ main
   triplets = iterate3(seq1(scale3))
   triplets *= 4
 
-  wholeseq = []
-  wholeseq += [note.pitch(E4).whole]
-  wholeseq += [note.pitch(D4).whole]
+  wholeseq = wholenoteatpitch(scale1, 3)
+  wholeseq += wholenoteatpitch(scale1, 2)
 end
 
 track -> [something, something, halved, triplets, something, something]
