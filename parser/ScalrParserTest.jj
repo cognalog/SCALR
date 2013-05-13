@@ -49,7 +49,7 @@ public class ScalrParserTest {
 }
 PARSER_END(ScalrParserTest)
 
-SKIP : { " " | "\t" | <"/*" (~[])* "*/"> }
+SKIP : { " " | "\t" | <"/*" (~["*","/"])* "*/"> }
 TOKEN: {
 	"not" | "volume" | "duration" | "end" | "func" | "main" | "while" | "foreach" |
 	"import" | "track" | "in" |	"if" | "else" | "note" | "pitch" | "length" | "break" |
@@ -184,6 +184,7 @@ void funcDef(): {
 		)?
 	"end" ("\n")+ {
 		SymbolTable.addFuncRef(func);
+		System.out.println(func.statements);
 	}
 }
 
