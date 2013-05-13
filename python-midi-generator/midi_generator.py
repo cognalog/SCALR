@@ -50,7 +50,7 @@ for track in tracks:
 
   current_duration = 0
   for note in track.notes:
-    print "Track number " +str(track_no) + ", Pitch " + str(note.pitch) + ", current_duration " + str(current_duration) + ", duration " +str(note.duration) +", volume" +str(note.volume)
+    print "Track number " +str(track_no) + ", Pitch " + str(note.pitch) + ", current_duration " + str(current_duration) + ", duration " +str(note.duration) +", volume " +str(note.volume)
     MyMIDI.addNote(track_no,0,note.pitch,current_duration,note.duration,note.volume)
     current_duration += note.duration
 
