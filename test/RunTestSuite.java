@@ -58,7 +58,7 @@ public class RunTestSuite {
           else {
             System.out.println(red + "Test failed.");
             System.out.println(red + "Expected output: " + lastLine);
-            System.out.println(red + "Got: " + output);
+            System.out.println(red + "Got: " + output + end);
           }
           System.out.println("\n");
         }
