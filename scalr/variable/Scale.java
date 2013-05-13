@@ -11,11 +11,6 @@ public class Scale implements Variable
 {
 	ArrayList<Degree>	degrees;
 	
-	public Scale()
-	{
-		degrees = new ArrayList<Degree>();
-	}
-	
 	public Scale(Degree... degrees)
 	{
 		this.degrees = new ArrayList<Degree>(degrees.length + 10);
@@ -102,7 +97,7 @@ public class Scale implements Variable
 		// Append each note to the string
 		// for(int i = 0; i < theNotes.size(); i++)
 		for (Degree n : degrees) {
-			result += n.getMidi() + ",";
+			result += n + ",";
 			
 		}
 		// remove the last bar (if there is a note)

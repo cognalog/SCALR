@@ -1,12 +1,13 @@
 options
 {
-  LOOKAHEAD = 2;
+  LOOKAHEAD = 3;
   FORCE_LA_CHECK = true;
 }
 
 PARSER_BEGIN(ScalrParserTest)
 package parser;
 import java.io.*;
+import scalr.Degree;
 import scalr.variable.*;
 import scalr.expression.*;
 import scalr.Exceptions.*;
@@ -20,7 +21,6 @@ public class ScalrParserTest {
 		    ScalrParserTest parser = new ScalrParserTest(in);
 		    SymbolTable.addFunc("test");
 		    ArrayList<Expression> function = new ArrayList<Expression>();
-		    function.add(parser.statement());
 		    function.add(parser.statement());
 		    function.add(parser.statement());
 			for(Expression e : function) {
@@ -68,14 +68,19 @@ Expression statement(): {
 	Expression expr;
 	Token note;
 } {
-	expr = creation() ("\n")+ {
+	expr = startsWithIDExpr() ("\n")+ {
+		return expr;
+	}
+	| expr = boolExpr() ("\n")+ {
 		return expr;
 	}
 }
 
-Expression creation(): {
+Expression startsWithIDExpr(): {
 	Expression expr;
 	Token name;
+	Token postOp;
+	Token assignOp;
 } {
 	name = <ID> 
 	(
@@ -89,7 +94,86 @@ Expression creation(): {
 			expr = noteOps(expr) ("." expr = noteOps(expr))* {
 			return expr;
 		}
+		| postOp = <POST> {
+			expr = new VariableReference(name.image, SymbolTable.currentFunctionScope);
+			UnaryOperator uo = new UnaryOperator(postOp.image);
+			uo.addOperand(expr);
+			uo.addVar(name.image);
+			uo.addFunc(SymbolTable.currentFunctionScope);
+			return uo;
+		}
+		| assignOp = <ASSIGN> expr = arithExpr() {
+			AssignmentOperator ao = new AssignmentOperator(assignOp.image);
+			ao.addOperand(expr);
+			ao.setVar(name.image);
+			ao.setFunc(SymbolTable.currentFunctionScope);
+			return ao;
+		}
 	)
+}
+
+Expression boolExpr(): {
+	Expression e1;
+	Expression e2;
+	Token op;
+} {
+	e1 = andExpr() (op = <OR> e2 = andExpr() {
+		BooleanOperator bo = new BooleanOperator(op.image);
+		bo.addOperand(e1);
+		bo.addOperand(e2);
+		e1 = bo;
+	})* {
+		return e1;
+	}
+}
+
+Expression andExpr(): {
+	Expression e1;
+	Expression e2;
+	Token op;
+} {
+	e1 = equalityExpr() (op = <AND> e2 = equalityExpr() {
+		BooleanOperator bo = new BooleanOperator(op.image);
+		bo.addOperand(e1);
+		bo.addOperand(e2);
+		e1 = bo;
+	})* {
+		return e1;
+	}
+}
+
+Expression equalityExpr(): {
+	Expression e1;
+	Expression e2;
+	Token op;
+} {
+	e1 = relnExpr() (op = <URELN> e2 = relnExpr() {
+		BooleanOperator bo = new BooleanOperator(op.image);
+		bo.addOperand(e1);
+		bo.addOperand(e2);
+		e1 = bo;
+	})* {
+		return e1;
+	}
+}
+
+Expression relnExpr(): {
+	Expression e1;
+	Expression e2;
+	Token op;
+} {
+	op = <BOOL> {
+		return new ScalrBoolean(Boolean.parseBoolean(op.image));
+	}
+	| e1 = arithExpr() (op = <URELN> | op = <NRELN>) e2 = arithExpr() {
+		BooleanOperator bo = new BooleanOperator(op.image);
+		bo.addOperand(e1);
+		bo.addOperand(e2);
+		return bo;
+	}
+	| "(" e1 = boolExpr() ")" {
+		return e1;
+	}
 }
 
 Expression arithExpr(): {
@@ -155,16 +239,42 @@ Expression variable(): {
 	| expr = scale() { return expr; }
 }
 
-Expression scale(): {
-	
+Expression sequence(): {
+	Sequence s = new Sequence();
+	Expression note;
 } {
-	
+	"[" (
+			(note = note() | note = noteID()) { s.addNoteToEnd(note); }
+			("," (note = note() | note = noteID()) { s.addNoteToEnd(note); })*
+		)?
+	"]" {
+		return s;
+	}
+}
+
+Expression scale(): {
+	Scale scale = new Scale();
+	Token deg;
+} {
+	"{" (deg = <DEGREE> { scale.addDegreeToEnd(Degree.valueOf(deg.image)); })+ "}" {
+		return scale;
+	}
 }
 
 Expression note(): {
 	Expression n = Note.note();
 } {
 	"note" ("." n = noteOps(n))* { return n; }
+}
+
+Expression noteID(): {
+	Expression n;
+	Token name;
+} {
+	name = <ID> { n = new VariableReference(name.image, SymbolTable.currentFunctionScope); } 
+	("." n = noteOps(n))* {
+		return n;
+	}
 }
 
 Expression noteOps(Expression n): {
