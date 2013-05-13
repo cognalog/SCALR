@@ -1,9 +1,3 @@
-func hello(i)
-	x = [ note ]
-	foreach(n) in x
-		n.volume(+i)
-	end
-	x
-end
-i = 1
-hello(i)
+seq = [note.pitch(A3), note.pitch(A6)]
+track -> [seq, seq]
+track -> [seq]
