@@ -2,7 +2,6 @@
 package scalr.expression;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import scalr.Exceptions.FunctionExistsError;
 import scalr.Exceptions.TypeError;
@@ -76,10 +75,10 @@ public class Function implements Expression
 			}
 		}
 		// Reverse all the expressions but the last
-		Collections.reverse(statements);
-		Expression returnExpr = statements.get(0);
-		statements.remove(0);
-		statements.add(returnExpr);
+		// Collections.reverse(statements);
+		// Expression returnExpr = statements.get(0);
+		// statements.remove(0);
+		// statements.add(returnExpr);
 		// Change the current function scope to us
 		String prevScope = SymbolTable.currentFunctionScope;
 		SymbolTable.currentFunctionScope = id;

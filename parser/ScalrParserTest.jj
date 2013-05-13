@@ -20,12 +20,14 @@ public class ScalrParserTest {
 		    in = new FileReader(args[0]);
 		    ScalrParserTest parser = new ScalrParserTest(in);
 //		    SymbolTable.addFunc("test");
-//		    ArrayList<Expression> function = new ArrayList<Expression>();
+		    ArrayList<Expression> function = new ArrayList<Expression>();
 		    parser.funcDef();
-//			for(Expression e : function) {
-//				System.out.println("Type: " + e.getType() + " | Value: " + e.getValue());
-//			}
-//			System.out.println(SymbolTable.reference);
+		    function.add(parser.statement());
+		    function.add(parser.statement());
+			for(Expression e : function) {
+				System.out.println("Type: " + e.getType() + " | Value: " + e.getValue());
+			}
+			System.out.println(SymbolTable.reference);
 			System.out.println("grats, your program compiled alright");
 			in.close();
         } catch (Throwable e) {
@@ -63,7 +65,7 @@ TOKEN: {
 	<ID: (["a"-"z"] | "_" | ["A" - "Z"]) (["A"-"Z"] | ["a"-"z"] | <INT> | "_")*>
 }
 
-Expression funcDef(): {
+void funcDef(): {
 	Function func = null;
 	Token funcName;
 	Token param;
@@ -93,7 +95,24 @@ Expression funcDef(): {
 	}
 	"end" ("\n")+ {
 		SymbolTable.addFuncRef(func);
-		return func;
+	}
+}
+
+Expression funcCall(String name): {
+	Token funcArg;
+	Expression arg;
+	ArrayList<Expression> arguments = new ArrayList<Expression>();
+	Function f = null;
+} {
+	"(" (arg = arithExpr() { arguments.add(arg); })* ")" {
+		try {
+			f = SymbolTable.getFuncRef(name);
+		} catch(FunctionDoesNotExistError e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		f.addValues(arguments.toArray(new Expression[arguments.size()]));
+		return f; 
 	}
 }
 
@@ -173,7 +192,11 @@ Expression startsWithIDExpr(): {
 } {
 	name = <ID> 
 	(
-		<CREATE> expr = arithExpr() {
+		// A function call. The most important production
+		expr = funcCall(name.image) {
+			return expr;
+		}
+		| <CREATE> expr = arithExpr() {
 			CreationOperator co = new CreationOperator(name.image);
 			co.addFunc(SymbolTable.currentFunctionScope);
 			co.addOperand(expr);

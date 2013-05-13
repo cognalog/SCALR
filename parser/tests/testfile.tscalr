@@ -1,4 +1,9 @@
-func hello()
+func hello(i)
 	x = [ note ]
+	foreach(n) in x
+		n.volume(+i)
+	end
 	x
 end
+i = 1
+hello(i)
