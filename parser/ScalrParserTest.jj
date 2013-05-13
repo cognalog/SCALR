@@ -26,6 +26,8 @@ public class ScalrParserTest {
 		    
 		    ScalrParserTest parser = new ScalrParserTest(new StringReader(text));
 		    ArrayList<Expression> function = new ArrayList<Expression>();
+//		    SymbolTable.addFunc("test");
+//		    function.add(parser.arithExpr());
 		    parser.fscalr();
 			for(Expression e : function) {
 				System.out.println("Type: " + e.getType() + " | Value: " + e.getValue());
