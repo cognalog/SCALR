@@ -3,6 +3,7 @@ func two_times(seq)
   foreach(n) in seq
     newseq += n.length(+-2)
   end
+  n = note.halfT
   newseq
 end
 
