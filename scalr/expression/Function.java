@@ -7,6 +7,7 @@ import scalr.Exceptions.FunctionExistsError;
 import scalr.Exceptions.TypeError;
 import scalr.variable.Sequence;
 import scalr.variable.SymbolTable;
+import scalr.variable.Variable;
 
 public class Function implements Expression
 {
@@ -67,7 +68,8 @@ public class Function implements Expression
 		// Add the expressions to the symbol table
 		for (int i = 0; i < expressions.length; i++) {
 			try {
-				SymbolTable.addReference(id, parameterName.get(i), expressions[i]);
+				SymbolTable.addReference(id, parameterName.get(i),
+				        ((Variable) expressions[i].getValue(exprs)).getCopy());
 			}
 			catch (TypeError e) {
 				e.printStackTrace();
