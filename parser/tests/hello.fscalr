@@ -4,7 +4,7 @@ func hello( y)
   while(z < 5)
   	z++
   	h = y
-  	if(pitch(y) == pitch(h))
+  	if(volume(y) == volume(h))
   		x += h
   	end
   end

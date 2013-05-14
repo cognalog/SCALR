@@ -58,6 +58,12 @@ public class GetOperator implements Expression
 				return new ScalrNum(note.pitch.ordinal());
 			}
 		}
+		else if (operator.equals("vol")) {
+			if (operand.getType() == ExpressionType.NOTE) {
+				Note note = (Note) operand.getValue(expressions);
+				return new ScalrNum(note.volume);
+			}
+		}
 		// Someone used this function inappropriately.
 		return null;
 	}
@@ -71,6 +77,10 @@ public class GetOperator implements Expression
 				return ExpressionType.NUMBER;
 		}
 		else if (operator.equals("pit")) {
+			if (operand.getType() == ExpressionType.NOTE)
+				return ExpressionType.NUMBER;
+		}
+		else if (operator.equals("vol")) {
 			if (operand.getType() == ExpressionType.NOTE)
 				return ExpressionType.NUMBER;
 		}

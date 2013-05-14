@@ -433,6 +433,11 @@ Expression unary(): {
 		geOp.addOperand(e1);
 		return geOp;
 	}
+	| "volume" "(" e1 = arithExpr() ")" {
+		GetOperator geOp = new GetOperator("vol");
+		geOp.addOperand(e1);
+		return geOp;
+	}
 }
 
 Expression variable(): {
