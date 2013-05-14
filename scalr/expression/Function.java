@@ -68,8 +68,9 @@ public class Function implements Expression
 		// Add the expressions to the symbol table
 		for (int i = 0; i < expressions.length; i++) {
 			try {
-				SymbolTable.addReference(id, parameterName.get(i),
-				        ((Variable) expressions[i].getValue(exprs)).getCopy());
+				Expression copy = ((Variable) expressions[i].getValue(expressions)).getCopy();
+				SymbolTable.addReference(id, parameterName.get(i), copy);
+				expressions[i] = copy;
 			}
 			catch (TypeError e) {
 				e.printStackTrace();
