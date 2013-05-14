@@ -75,8 +75,9 @@ public class Sequence implements Variable
 	public Variable getCopy()
 	{
 		ArrayList<Expression> copy = new ArrayList<Expression>(notes.size());
+		// At this point in time, the notes should be actual notes, and thus we can copy them
 		for (Expression n : notes)
-			copy.add(n);
+			copy.add(((Note) n.getValue()).getCopy());
 		Sequence seq = new Sequence();
 		seq.notes = copy;
 		return seq;

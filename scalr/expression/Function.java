@@ -74,11 +74,6 @@ public class Function implements Expression
 				System.exit(1);
 			}
 		}
-		// Reverse all the expressions but the last
-		// Collections.reverse(statements);
-		// Expression returnExpr = statements.get(0);
-		// statements.remove(0);
-		// statements.add(returnExpr);
 		// Change the current function scope to us
 		String prevScope = SymbolTable.currentFunctionScope;
 		SymbolTable.currentFunctionScope = id;
@@ -101,6 +96,10 @@ public class Function implements Expression
 		}
 		else {
 			SymbolTable.currentFunctionScope = prevScope;
+			System.err.println("Last line: " + lastExpr.getValue(expressions)
+			        + " is not of type sequence.");
+			System.exit(1);
+			// This line will never be reached.
 			return null;
 		}
 	}
