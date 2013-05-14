@@ -5,7 +5,8 @@ main
 	x = [note]
 	y = note.pitch(Gs9)
 	sc = hello(y)
+	hc = hello(y)
 end
 
 track -> [sc, x]
-track -> [x]
+track -> [x, sc]

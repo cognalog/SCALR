@@ -2,6 +2,9 @@
 package scalr.expression;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 import scalr.Exceptions.TypeError;
 import scalr.variable.Note;
@@ -46,6 +49,26 @@ public class ForEachStatement implements Expression
 	@Override
 	public Expression getValue(Expression... expressions)
 	{
+		// Get the function symbol table
+		HashMap<String, Expression> symTab =
+		        SymbolTable.reference.get(SymbolTable.currentFunctionScope);
+		// Get the reference type table
+		HashMap<String, ExpressionType> refTab =
+		        SymbolTable.referenceType.get(SymbolTable.currentFunctionScope);
+		ArrayList<Map.Entry<String, ExpressionType>> refTabEntries =
+		        new ArrayList<Map.Entry<String, ExpressionType>>(refTab.entrySet());
+		
+		// Get the current variables in this function scope
+		HashSet<String> prevVar = new HashSet<String>(symTab.keySet());
+		// Get the keys and values in the reference table
+		ArrayList<String> keys = new ArrayList<String>(refTabEntries.size());
+		ArrayList<ExpressionType> values = new ArrayList<ExpressionType>(refTabEntries.size());
+		// Populate them
+		for (Map.Entry<String, ExpressionType> entry : refTabEntries) {
+			keys.add(entry.getKey());
+			values.add(entry.getValue());
+		}
+		
 		// At this point, we should be able to evaluate the sequence
 		Sequence seq = (Sequence) sequence.getValue(expressions);
 		// Iterate through the sequence (note, the getValue of a sequence automatically evaluates
@@ -67,6 +90,21 @@ public class ForEachStatement implements Expression
 			// Add the (modified?) note back
 			Expression e = SymbolTable.getMember(SymbolTable.currentFunctionScope, noteName);
 			notes.set(i, e.getValue(expressions));
+		}
+		
+		// Remove any keys that were added to the current function by this while loop.
+		ArrayList<String> currVar = new ArrayList<String>(symTab.keySet());
+		for (String var : currVar)
+			if (!prevVar.contains(var))
+				symTab.remove(var);
+		// Change the references back to normal
+		refTabEntries = new ArrayList<Map.Entry<String, ExpressionType>>(refTab.entrySet());
+		for (Map.Entry<String, ExpressionType> entry : refTabEntries) {
+			int index = keys.indexOf(entry.getKey());
+			if (index != -1)
+				entry.setValue(values.get(index));
+			else
+				refTab.remove(entry.getKey());
 		}
 		return seq;
 	}

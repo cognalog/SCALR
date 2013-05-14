@@ -178,23 +178,12 @@ void funcDef(): {
 				e.printStackTrace();
 			}
 		})*)? ")" ("\n")+
-		(
-			stmt = sequence() ("\n")+ {
-				func.addStatement(stmt);
-			}
-			| (stmt = statement() {
-				func.addStatement(stmt);
-			})+
-		)
-		(
-			retName = <ID> ("\n")+ {
-				stmt = new VariableReference(retName.image, SymbolTable.currentFunctionScope);
-				func.addStatement(stmt);
-			}
-			| stmt = sequence() ("\n")+ {
-				func.addStatement(stmt);
-			}
-		)?
+		(stmt = statement() {
+			func.addStatement(stmt);
+		})+
+		(stmt = arithExpr() ("\n")+ {
+			func.addStatement(stmt);
+		})?
 	"end" ("\n")+ {
 		SymbolTable.addFuncRef(func);
 		System.out.println(func.statements);
@@ -231,6 +220,9 @@ Expression statement(): {
 		return expr;
 	}
 	| expr = ifElseExpr() ("\n")+ {
+		return expr;
+	}
+	| expr = sequence() ("\n")+ {
 		return expr;
 	}
 	| expr = startsWithIDExpr() ("\n")+ {

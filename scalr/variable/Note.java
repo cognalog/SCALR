@@ -209,7 +209,7 @@ public class Note implements Variable
 	public Note modPitch(int modVal)
 	{
 		Degree[] degrees = Degree.values();
-		if (modVal + pitch.ordinal() >= degrees.length)
+		if (modVal + pitch.ordinal() > degrees.length)
 			pitch = degrees[degrees.length - 1];
 		else if (modVal + pitch.ordinal() < 0)
 			pitch = degrees[0];

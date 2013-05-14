@@ -1,17 +1,10 @@
-func nth_different( nth)
-/* comment, son! */
-     myseq= []
-     irk+= 1
-     nth=9+4+(3*5)*6
-     n = note
-     while(irk<nth*2)
-	if(i%nth==0)
-		myseq += note.pitch(A3).quarter
-	else
-		myseq += note.pitch(C3).quarter
+func fun(x, y)
+	y = []
+	while(x++ < 5)
+		y += note.pitch(+x)
+		if(x % 2 == 0)
+			y += note.pitch(+(-x))
+		end
 	end
-     	i+=1
-     end
-     myseq
+	y
 end
-

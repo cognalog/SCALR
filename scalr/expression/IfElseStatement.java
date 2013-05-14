@@ -2,8 +2,12 @@
 package scalr.expression;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 import scalr.variable.ScalrBoolean;
+import scalr.variable.SymbolTable;
 
 public class IfElseStatement implements Expression
 {
@@ -120,6 +124,26 @@ public class IfElseStatement implements Expression
 	@Override
 	public Expression getValue(Expression... expressions)
 	{
+		// Get the function symbol table
+		HashMap<String, Expression> symTab =
+		        SymbolTable.reference.get(SymbolTable.currentFunctionScope);
+		// Get the reference type table
+		HashMap<String, ExpressionType> refTab =
+		        SymbolTable.referenceType.get(SymbolTable.currentFunctionScope);
+		ArrayList<Map.Entry<String, ExpressionType>> refTabEntries =
+		        new ArrayList<Map.Entry<String, ExpressionType>>(refTab.entrySet());
+		
+		// Get the current variables in this function scope
+		HashSet<String> prevVar = new HashSet<String>(symTab.keySet());
+		// Get the keys and values in the reference table
+		ArrayList<String> keys = new ArrayList<String>(refTabEntries.size());
+		ArrayList<ExpressionType> values = new ArrayList<ExpressionType>(refTabEntries.size());
+		// Populate them
+		for (Map.Entry<String, ExpressionType> entry : refTabEntries) {
+			keys.add(entry.getKey());
+			values.add(entry.getValue());
+		}
+		
 		int blockIndex = 0;
 		for (Expression check : checks) {
 			if (check != null) {
@@ -138,6 +162,21 @@ public class IfElseStatement implements Expression
 					stmt.getValue(expressions);
 			}
 			blockIndex++;
+		}
+		
+		// Remove any keys that were added to the current function by this while loop.
+		ArrayList<String> currVar = new ArrayList<String>(symTab.keySet());
+		for (String var : currVar)
+			if (!prevVar.contains(var))
+				symTab.remove(var);
+		// Change the references back to normal
+		refTabEntries = new ArrayList<Map.Entry<String, ExpressionType>>(refTab.entrySet());
+		for (Map.Entry<String, ExpressionType> entry : refTabEntries) {
+			int index = keys.indexOf(entry.getKey());
+			if (index != -1)
+				entry.setValue(values.get(index));
+			else
+				refTab.remove(entry.getKey());
 		}
 		return null;
 	}

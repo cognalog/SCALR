@@ -1,4 +1,11 @@
 func hello( y)
-  x= [note.quarter, y]	
+  x= [note.quarter, y]
+  z = 1
+  while(z < 5)
+  	z++
+  	h = y
+  	x += h
+  end
+  g = y	
   x
 end

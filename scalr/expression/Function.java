@@ -2,6 +2,9 @@
 package scalr.expression;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 import scalr.Exceptions.FunctionExistsError;
 import scalr.Exceptions.TypeError;
@@ -56,6 +59,9 @@ public class Function implements Expression
 	@Override
 	public Expression getValue(Expression... exprs)
 	{
+		// Change the current function scope to us
+		String prevScope = SymbolTable.currentFunctionScope;
+		SymbolTable.currentFunctionScope = id;
 		// Checking to make sure we got the proper number of arguments
 		if (expressions.length != parameterName.size()) {
 			System.err.println("Incorrect number of arguments for function: " + id + parameterName
@@ -64,6 +70,25 @@ public class Function implements Expression
 			for (StackTraceElement elem : stack)
 				System.err.println(elem);
 			System.exit(1);
+		}
+		// Get the function symbol table
+		HashMap<String, Expression> symTab =
+		        SymbolTable.reference.get(SymbolTable.currentFunctionScope);
+		// Get the reference type table
+		HashMap<String, ExpressionType> refTab =
+		        SymbolTable.referenceType.get(SymbolTable.currentFunctionScope);
+		ArrayList<Map.Entry<String, ExpressionType>> refTabEntries =
+		        new ArrayList<Map.Entry<String, ExpressionType>>(refTab.entrySet());
+		
+		// Get the current variables in this function scope
+		HashSet<String> prevVar = new HashSet<String>(symTab.keySet());
+		// Get the keys and values in the reference table
+		ArrayList<String> keys = new ArrayList<String>(refTabEntries.size());
+		ArrayList<ExpressionType> values = new ArrayList<ExpressionType>(refTabEntries.size());
+		// Populate them
+		for (Map.Entry<String, ExpressionType> entry : refTabEntries) {
+			keys.add(entry.getKey());
+			values.add(entry.getValue());
 		}
 		// Add the expressions to the symbol table
 		for (int i = 0; i < expressions.length; i++) {
@@ -77,34 +102,42 @@ public class Function implements Expression
 				System.exit(1);
 			}
 		}
-		// Change the current function scope to us
-		String prevScope = SymbolTable.currentFunctionScope;
-		SymbolTable.currentFunctionScope = id;
+		
 		// Execute the stataments
 		for (int i = 0; i < statements.size() - 1; i++) {
 			System.out.println("Function " + id + ": " + statements.get(i).getClass());
 			statements.get(i).getValue(expressions);
 		}
 		Expression lastExpr = statements.get(statements.size() - 1);
-		System.out.println(lastExpr.getClass());
-		if (lastExpr.getType() == ExpressionType.SEQUENCE || id.equals("main")) {
-			Expression expr = statements.get(statements.size() - 1).getValue(expressions);
-			SymbolTable.currentFunctionScope = prevScope;
-			return expr;
-		}
-		else if (lastExpr.getType() == ExpressionType.NOTE) {
-			Expression expr = new Sequence(lastExpr);
-			SymbolTable.currentFunctionScope = prevScope;
-			return expr;
-		}
+		System.out.println("Return: " + lastExpr.getClass());
+		Expression expr = null;
+		if (lastExpr.getType() == ExpressionType.SEQUENCE || id.equals("main"))
+			expr = lastExpr.getValue(expressions);
+		else if (lastExpr.getType() == ExpressionType.NOTE)
+			expr = new Sequence(lastExpr.getValue(expressions));
 		else {
 			SymbolTable.currentFunctionScope = prevScope;
 			System.err.println("Last line: " + lastExpr.getValue(expressions)
 			        + " is not of type sequence.");
 			System.exit(1);
-			// This line will never be reached.
-			return null;
 		}
+		
+		// Remove any keys that were added to the current function by this while loop.
+		ArrayList<String> currVar = new ArrayList<String>(symTab.keySet());
+		for (String var : currVar)
+			if (!prevVar.contains(var))
+				symTab.remove(var);
+		// Change the references back to normal
+		refTabEntries = new ArrayList<Map.Entry<String, ExpressionType>>(refTab.entrySet());
+		for (Map.Entry<String, ExpressionType> entry : refTabEntries) {
+			int index = keys.indexOf(entry.getKey());
+			if (index != -1)
+				entry.setValue(values.get(index));
+			else
+				refTab.remove(entry.getKey());
+		}
+		SymbolTable.currentFunctionScope = prevScope;
+		return expr;
 	}
 	
 	@Override
