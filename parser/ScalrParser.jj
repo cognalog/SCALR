@@ -178,12 +178,23 @@ void funcDef(): {
 				e.printStackTrace();
 			}
 		})*)? ")" ("\n")+
-		(stmt = statement() {
-			func.addStatement(stmt);
-		})+
-		(stmt = arithExpr() ("\n")+ {
-			func.addStatement(stmt);
-		})?
+		(
+			stmt = sequence() ("\n")+ {
+				func.addStatement(stmt);
+			}
+			| (stmt = statement() {
+				func.addStatement(stmt);
+			})+
+		)
+		(
+			retName = <ID> ("\n")+ {
+				stmt = new VariableReference(retName.image, SymbolTable.currentFunctionScope);
+				func.addStatement(stmt);
+			}
+			| stmt = sequence() ("\n")+ {
+				func.addStatement(stmt);
+			}
+		)?
 	"end" ("\n")+ {
 		SymbolTable.addFuncRef(func);
 		System.out.println(func.statements);
