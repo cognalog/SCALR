@@ -182,9 +182,14 @@ void funcDef(): {
 		(stmt = statement() {
 			func.addStatement(stmt);
 		})*
-		stmt = arithExpr() ("\n")+ {
-			func.addStatement(stmt);
-		}
+		(
+			stmt = arithExpr() ("\n")+ {
+				func.addStatement(stmt);
+			}
+			| stmt = foreachExpr() ("\n")+ {
+				func.addStatement(stmt);
+			}
+		)
 	"end" ("\n")+ {
 		SymbolTable.addFuncRef(func);
 		System.out.println(func.statements);
