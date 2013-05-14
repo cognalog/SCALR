@@ -3,8 +3,21 @@ import each
 
 main
   scale1 = {C4 D4 E4 F4 G4 A4 B4}
+  scale2 = {E4 F4 G4 A4 B4}
+  scale3 = {G4 A4 B5 C5 D5}
+
   something = seq1(scale1)
-  something2 = faster(3,something*2)
+  something2 = seq1(scale2)
+
+  halved = iterate(seq1(scale1))
+  halved *= 4
+  twicelength = iterate2(seq1(scale2))
+  triplets = iterate3(seq1(scale3))
+  triplets *= 4
+
+  wholeseq = wholenoteatpitch(scale1, 3)
+  wholeseq += wholenoteatpitch(scale1, 2)
 end
 
-track -> [something2]
+track -> [something, something, halved, triplets, something, something]
+track -> [something2, something2, twicelength, wholeseq, something2, something2]
