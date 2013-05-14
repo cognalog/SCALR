@@ -530,6 +530,12 @@ Expression pitch(Expression n): {
 		no.addScale(new VariableReference(scale.image, SymbolTable.currentFunctionScope));
 		return no;
 	}
+	| deg = "break" {
+			NoteOps no = new NoteOps("pit");
+			no.addOperand(n);
+			no.addPitch("br");
+			return no;
+	}
 }
 
 Expression volume(Expression n): {
