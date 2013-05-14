@@ -1,7 +1,33 @@
-func iterate(sequence)
-  foreach(n) in sequence
-    n.eighth
+func iterate(seq)
+  i=0
+  sequence = seq
+  newseq = []
+  while(i < 2)
+    if(i==0)
+      foreach(n) in sequence
+        newseq += n.length(+(-2))
+      end
+      i++
+    else
+      foreach(n) in sequence
+        newseq += n.length(+(-2))
+      end
+      i++
+    end
   end
+  newseq
+end
+
+
+func faster(n, seq)
+  newseq= seq
+  myseq = []
+  while(n>0)
+    myseq += newseq
+    newseq = iterate(newseq)
+    n -= 1
+  end
+  myseq
 end
 
 func iterate2(sequence)

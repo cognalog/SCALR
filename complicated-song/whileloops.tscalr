@@ -17,7 +17,12 @@ main
 
   wholeseq = wholenoteatpitch(scale1, 3)
   wholeseq += wholenoteatpitch(scale1, 2)
+
+  something = something + something + halved + triplets + something + something
+  cs = something
+  fast1 = iterate(something)
+  fast2 = iterate(fast1)
+  something2 = cs + something + [break] * 5 + fast1 + [break]*5+ fast2
 end
 
-track -> [something, something, halved, triplets, something, something]
-track -> [something2, something2, twicelength, wholeseq, something2, something2]
+track -> [something2]
