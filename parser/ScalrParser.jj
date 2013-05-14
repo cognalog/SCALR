@@ -50,7 +50,7 @@ SKIP : { " " | "\t" | <"/*" (~["*","/"])* "*/"> }
 TOKEN: {
 	"not" | "volume" | "duration" | "end" | "func" | "main" | "while" | "foreach" |
 	"import" | "track" | "in" |	"if" | "else" | "note" | "pitch" | "length" | "break" |
-	"half" | "double" |
+	"double" |
 	"->" | "." | "," | "\"" | "(" | ")" | "[" | "]" |
     <CREATE: "="> |
     <ASSIGN: "+=" | "-=" | "*=" | "/=" | "%="> |
@@ -181,7 +181,7 @@ void funcDef(): {
 		})*)? ")" ("\n")+
 		(stmt = statement() {
 			func.addStatement(stmt);
-		})*
+		})+
 		(
 			stmt = arithExpr() ("\n")+ {
 				func.addStatement(stmt);
@@ -189,7 +189,7 @@ void funcDef(): {
 			| stmt = foreachExpr() ("\n")+ {
 				func.addStatement(stmt);
 			}
-		)
+		)?
 	"end" ("\n")+ {
 		SymbolTable.addFuncRef(func);
 		System.out.println(func.statements);
