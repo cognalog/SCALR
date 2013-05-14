@@ -19,3 +19,4 @@ end
 func wholenoteatpitch(sca, pit)
   [note.whole.pitch(sca[pit])]
 end
+

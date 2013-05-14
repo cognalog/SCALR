@@ -1,0 +1,10 @@
+import whileloops
+import each
+
+main
+  scale1 = {C4 D4 E4 F4 G4 A4 B4}
+  something = seq1(scale1)
+  something2 = faster(3,something*2)
+end
+
+track -> [something2]

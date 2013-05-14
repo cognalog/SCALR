@@ -1,0 +1,20 @@
+func two_times(seq)
+  newseq = []
+  foreach(n) in seq
+    newseq += n.length(+(-2))
+  end
+  newseq
+end
+
+
+func faster(n, seq)
+  newseq= seq
+  myseq = []
+  while(n>0)
+    myseq += newseq*2 + [break]*5
+    newseq = two_times(newseq)
+    n -= 1
+  end
+  myseq
+end
+
