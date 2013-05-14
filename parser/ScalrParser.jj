@@ -50,7 +50,6 @@ SKIP : { " " | "\t" | <"/*" (~["*","/"])* "*/"> }
 TOKEN: {
 	"not" | "volume" | "duration" | "end" | "func" | "main" | "while" | "foreach" |
 	"import" | "track" | "in" |	"if" | "else" | "note" | "pitch" | "length" | "break" |
-	"double" |
 	"->" | "." | "," | "\"" | "(" | ")" | "[" | "]" |
     <CREATE: "="> |
     <ASSIGN: "+=" | "-=" | "*=" | "/=" | "%="> |
@@ -179,14 +178,20 @@ void funcDef(): {
 				e.printStackTrace();
 			}
 		})*)? ")" ("\n")+
-		(stmt = statement() {
-			func.addStatement(stmt);
-		})+
 		(
-			stmt = arithExpr() ("\n")+ {
+			stmt = sequence() ("\n")+ {
 				func.addStatement(stmt);
 			}
-			| stmt = foreachExpr() ("\n")+ {
+			| (stmt = statement() {
+				func.addStatement(stmt);
+			})+
+		)
+		(
+			retName = <ID> ("\n")+ {
+				stmt = new VariableReference(retName.image, SymbolTable.currentFunctionScope);
+				func.addStatement(stmt);
+			}
+			| stmt = sequence() ("\n")+ {
 				func.addStatement(stmt);
 			}
 		)?
