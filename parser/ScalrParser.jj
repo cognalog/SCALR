@@ -423,6 +423,16 @@ Expression unary(): {
 		uo.addOperand(e1);
 		return uo;
 	}
+	| "duration" "(" e1 = arithExpr() ")" {
+		GetOperator geOp = new GetOperator("dur");
+		geOp.addOperand(e1);
+		return geOp;
+	}
+	| "pitch" "(" e1 = arithExpr() ")" {
+		GetOperator geOp = new GetOperator("pit");
+		geOp.addOperand(e1);
+		return geOp;
+	}
 }
 
 Expression variable(): {

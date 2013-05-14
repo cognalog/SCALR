@@ -4,8 +4,11 @@ func hello( y)
   while(z < 5)
   	z++
   	h = y
-  	x += h
+  	if(pitch(y) == pitch(h))
+  		x += h
+  	end
   end
+  y = note.volume(+-1)
   g = y	
   x
 end
