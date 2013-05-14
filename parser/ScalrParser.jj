@@ -62,8 +62,8 @@ TOKEN: {
 	<MINUS: "-"> |
 	<DIV: "/"> |
 	<MULMOD: "*" | "%"> |
-	<LENGTH: "whole" | "half" | "quarter" | "eighth" | "sixteenth" | "thirtysec" | "quarterT" |
-		"eighthT" | "sixteenthT" | "thirtysecT"> |
+	<LENGTH: "whole" | "half" | "quarter" | "eighth" | "sixteenth" | "thirtysec" |
+		"wholeT" | "halfT" | "quarterT" | "eighthT" | "sixteenthT" | "thirtysecT"> |
 	<BOOL: "true" | "false"> |
    	<DEGREE: ["A"-"G"]("b" | "s")?(["0"-"9"] | "10")> |
 	<INT: (("0")+ | ("0")* ["1"-"9"] (["0"-"9"])*)> |
