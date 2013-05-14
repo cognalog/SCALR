@@ -1,0 +1,10 @@
+func seq1 (scale)
+  myseq = []
+  i = 1
+  while(i < 4)
+    degree = i * 2 - 1 /* 1st, 3rd, and 5th degrees of this scale */
+    myseq += note.pitch(scale[degree]).quarter
+    i += 1
+  end
+  myseq
+end
