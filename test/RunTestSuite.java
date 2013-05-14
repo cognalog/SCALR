@@ -6,8 +6,8 @@ public class RunTestSuite {
   public static void main (String[] args) {
     File dir = new File("tests-that-should-succeed");
     testsDir(dir);
-    dir = new File("tests-that-should-raise-exceptions");
-    testsDir(dir);
+    //dir = new File("tests-that-should-raise-exceptions");
+    //testsDir(dir);
   }
 
   public static void testsDir(File dir) {
