@@ -18,11 +18,11 @@ public class VariableReference implements Expression
 	}
 	
 	@Override
-	public Expression getValue(Expression... expressions)
+	public Expression getValue()
 	{
 		// Evaluate the expression and store the result back in the symbol table
 		Expression expr = SymbolTable.getMember(func, ID);
-		Expression expr2 = expr.getValue(expressions);
+		Expression expr2 = expr.getValue();
 		// Put it back to the table
 		try {
 			SymbolTable.addReference(func, ID, expr2);

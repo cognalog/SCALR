@@ -1,12 +1,4 @@
-import hello
-import halves
-
-main
-	x = [note]
-	y = note.pitch(Gs9)
-	sc = hello(y)
-	hc = hello(y)
+id = [note.half.quarter.length("1/2")]
+while(true and (5 != 6))
+	id += note
 end
-
-track -> [sc, x]
-track -> [x, sc]

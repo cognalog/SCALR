@@ -66,22 +66,24 @@ public class NoteOps implements Expression
 	}
 	
 	@Override
-	public Expression getValue(Expression... expressions)
+	public Expression getValue()
 	{
 		if (note.getType() == ExpressionType.NOTE) {
-			Note n = (Note) note.getValue(expressions);
+			Note n = (Note) note.getValue();
 			if (type.equals("pit")) {
 				if (mod != null) {
-					ScalrNum sn = (ScalrNum) num.getValue(expressions);
-					if (mod.equals("+"))
+					ScalrNum sn = (ScalrNum) num.getValue();
+					if (mod == null)
+						n.setPitch(Degree.values()[sn.getNum()]);
+					else if (mod.equals("+"))
 						n.modPitch(sn.getNum());
 					else if (mod.equals("-"))
 						n.modPitch(-sn.getNum());
 					return n;
 				}
 				else if (scale != null) {
-					Scale s = (Scale) scale.getValue(expressions);
-					ScalrNum sn = (ScalrNum) index.getValue(expressions);
+					Scale s = (Scale) scale.getValue();
+					ScalrNum sn = (ScalrNum) index.getValue();
 					return n.setPitch(s.getDegree(sn.getNum()));
 				}
 				else
@@ -91,8 +93,10 @@ public class NoteOps implements Expression
 				if (len != null)
 					return n.setLength(len);
 				else {
-					ScalrNum sn = (ScalrNum) num.getValue(expressions);
-					if (mod.equals("+"))
+					ScalrNum sn = (ScalrNum) num.getValue();
+					if (mod == null)
+						n.setLength(Length.values()[sn.getNum()]);
+					else if (mod.equals("+"))
 						n.modLength(sn.getNum());
 					else if (mod.equals("-"))
 						n.modLength(-sn.getNum());
@@ -103,7 +107,7 @@ public class NoteOps implements Expression
 				if (num.getType() != ExpressionType.NUMBER)
 					return null;
 				
-				ScalrNum sn = (ScalrNum) num.getValue(expressions);
+				ScalrNum sn = (ScalrNum) num.getValue();
 				if (mod != null) {
 					if (mod.equals("+"))
 						n.modVolume(sn.getNum());

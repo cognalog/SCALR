@@ -34,20 +34,20 @@ public class UnaryOperator implements Expression
 	}
 	
 	@Override
-	public Expression getValue(Expression... expressions)
+	public Expression getValue()
 	{
 		if (expr.getType() != ExpressionType.NUMBER)
 			return null;
 		else {
 			if (operator.equals("-")) {
-				ScalrNum num = (ScalrNum) expr.getValue(expressions);
+				ScalrNum num = (ScalrNum) expr.getValue();
 				return new ScalrNum(-num.getNum());
 			}
 			// These two functions are a little more interesting, as they only make sense on a
 			// variable in the symbol table. We have to modify those variables, and not make a copy
 			// of them
 			else if (operator.equals("--")) {
-				ScalrNum num = (ScalrNum) expr.getValue(expressions);
+				ScalrNum num = (ScalrNum) expr.getValue();
 				num.setValue(num.getNum() - 1);
 				// Put the modified variable back
 				try {
@@ -60,7 +60,7 @@ public class UnaryOperator implements Expression
 				return new ScalrNum(num.getNum() + 1);
 			}
 			else {
-				ScalrNum num = (ScalrNum) expr.getValue(expressions);
+				ScalrNum num = (ScalrNum) expr.getValue();
 				num.setValue(num.getNum() + 1);
 				// Put the modified variable back
 				try {

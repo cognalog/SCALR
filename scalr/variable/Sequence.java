@@ -87,11 +87,11 @@ public class Sequence implements Variable
 	 * The getValue() method of a sequence evaluates all the expressions within the sequence.
 	 */
 	@Override
-	public Expression getValue(Expression... expressions)
+	public Expression getValue()
 	{
 		for (int i = 0; i < notes.size(); i++) {
 			Expression expr = notes.get(i);
-			Expression result = expr.getValue(expressions);
+			Expression result = expr.getValue();
 			if (result.getType() == ExpressionType.NOTE)
 				notes.set(i, result);
 			else if (result.getType() == ExpressionType.SEQUENCE) {

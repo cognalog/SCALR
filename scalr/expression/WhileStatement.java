@@ -45,7 +45,7 @@ public class WhileStatement implements Expression
 	 * requires a value returned.
 	 */
 	@Override
-	public Expression getValue(Expression... expressions)
+	public Expression getValue()
 	{
 		// Get the function symbol table
 		HashMap<String, Expression> symTab =
@@ -68,11 +68,11 @@ public class WhileStatement implements Expression
 		}
 		
 		// Evaluate this while loop as long as this condition is true
-		while (((ScalrBoolean) cond.getValue(expressions)).getBool()) {
+		while (((ScalrBoolean) cond.getValue()).getBool()) {
 			// Just evaluate all the expressions.
 			for (Expression e : statements) {
 				System.out.println("While: " + e.getClass());
-				e.getValue(expressions);
+				e.getValue();
 			}
 		}
 		

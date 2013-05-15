@@ -77,7 +77,7 @@ public class Scale implements Variable
 	 * The getValue() method of a sequence evaluates all the expressions within the sequence.
 	 */
 	@Override
-	public Expression getValue(Expression... expressions)
+	public Expression getValue()
 	{
 		return this;
 	}

@@ -35,7 +35,7 @@ public class AssignmentOperator implements Expression
 	}
 	
 	@Override
-	public Expression getValue(Expression... expressions)
+	public Expression getValue()
 	{
 		// Get the variable from the SymbolTable
 		Expression lval = SymbolTable.getMember(func, var);
@@ -46,7 +46,7 @@ public class AssignmentOperator implements Expression
 				BinaryOperator bo = new BinaryOperator("+");
 				bo.addOperand(lval);
 				bo.addOperand(rval);
-				Expression result = bo.getValue(expressions);
+				Expression result = bo.getValue();
 				// If the new type isn't the same as the old type, this will throw an error (Type
 				// checking!).
 				try {
@@ -65,7 +65,7 @@ public class AssignmentOperator implements Expression
 				BinaryOperator bo = new BinaryOperator("*");
 				bo.addOperand(lval);
 				bo.addOperand(rval);
-				Expression result = bo.getValue(expressions);
+				Expression result = bo.getValue();
 				// If the new type isn't the same as the old type, this will throw an error (Type
 				// checking!).
 				try {
@@ -83,7 +83,7 @@ public class AssignmentOperator implements Expression
 				BinaryOperator bo = new BinaryOperator("-");
 				bo.addOperand(lval);
 				bo.addOperand(rval);
-				Expression result = bo.getValue(expressions);
+				Expression result = bo.getValue();
 				// If the new type isn't the same as the old type, this will throw an error (Type
 				// checking!).
 				try {
@@ -101,7 +101,7 @@ public class AssignmentOperator implements Expression
 				BinaryOperator bo = new BinaryOperator("%");
 				bo.addOperand(lval);
 				bo.addOperand(rval);
-				Expression result = bo.getValue(expressions);
+				Expression result = bo.getValue();
 				// If the new type isn't the same as the old type, this will throw an error (Type
 				// checking!).
 				try {
@@ -119,7 +119,7 @@ public class AssignmentOperator implements Expression
 				BinaryOperator bo = new BinaryOperator("/");
 				bo.addOperand(lval);
 				bo.addOperand(rval);
-				Expression result = bo.getValue(expressions);
+				Expression result = bo.getValue();
 				// If the new type isn't the same as the old type, this will throw an error (Type
 				// checking!).
 				try {
@@ -137,7 +137,7 @@ public class AssignmentOperator implements Expression
 				BinaryOperator bo = new BinaryOperator("%");
 				bo.addOperand(lval);
 				bo.addOperand(rval);
-				Expression result = bo.getValue(expressions);
+				Expression result = bo.getValue();
 				// If the new type isn't the same as the old type, this will throw an error (Type
 				// checking!).
 				try {

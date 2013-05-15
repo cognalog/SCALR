@@ -35,7 +35,7 @@ public class ScalrBoolean implements Variable
 	}
 	
 	@Override
-	public Expression getValue(Expression... expressions)
+	public Expression getValue()
 	{
 		return this;
 	}
@@ -50,7 +50,7 @@ public class ScalrBoolean implements Variable
 	 * Returns this number. It could be positive or negative. In the case it is negative, this will
 	 * include a minus in front of the number. Note that this method isn't specified in Expression,
 	 * so you'll have to cast your variable to a ScalrBoolean, which it should already be an
-	 * instance of as a result of BinaryOperator.getValue(expressions) or the relevant Expression operator.
+	 * instance of as a result of BinaryOperator.getValue() or the relevant Expression operator.
 	 */
 	@Override
 	public String toString()

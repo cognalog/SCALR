@@ -118,11 +118,10 @@ public class IfElseStatement implements Expression
 	/**
 	 * Evaluates the first if/else if that is true. If none are, then it evaluates the given else
 	 * (if it exists). Like a {@link WhileStatement}, an {@link IfElseStatement} is returns nothing
-	 * from its getValue method, thus it is inappropriate to use this class in another expression
-	 * that requires a return.
+	 * from its getValue()
 	 */
 	@Override
-	public Expression getValue(Expression... expressions)
+	public Expression getValue()
 	{
 		// Get the function symbol table
 		HashMap<String, Expression> symTab =
@@ -148,9 +147,9 @@ public class IfElseStatement implements Expression
 		for (Expression check : checks) {
 			if (check != null) {
 				// Execute if its true
-				if (((ScalrBoolean) check.getValue(expressions)).getBool()) {
+				if (((ScalrBoolean) check.getValue()).getBool()) {
 					for (Expression stmt : statements.get(blockIndex))
-						stmt.getValue(expressions);
+						stmt.getValue();
 					break;
 				}
 				// Go on to the next if/else if/else otherwise
@@ -159,7 +158,7 @@ public class IfElseStatement implements Expression
 			else {
 				// Just execute all the statements.
 				for (Expression stmt : statements.get(blockIndex))
-					stmt.getValue(expressions);
+					stmt.getValue();
 			}
 			blockIndex++;
 		}

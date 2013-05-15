@@ -273,7 +273,7 @@ public class Note implements Variable
 	}
 	
 	@Override
-	public Expression getValue(Expression... expressions)
+	public Expression getValue()
 	{
 		return this;
 	}

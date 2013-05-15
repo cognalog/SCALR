@@ -47,7 +47,7 @@ public class ForEachStatement implements Expression
 	 * not be done, though the backend can handle it.
 	 */
 	@Override
-	public Expression getValue(Expression... expressions)
+	public Expression getValue()
 	{
 		// Get the function symbol table
 		HashMap<String, Expression> symTab =
@@ -70,9 +70,8 @@ public class ForEachStatement implements Expression
 		}
 		
 		// At this point, we should be able to evaluate the sequence
-		Sequence seq = (Sequence) sequence.getValue(expressions);
-		// Iterate through the sequence (note, the getValue of a sequence automatically evaluates
-		// all the notes)
+		Sequence seq = (Sequence) sequence.getValue();
+		// Iterate through the sequence (note, the getValue()
 		ArrayList<Expression> notes = seq.getSequence();
 		for (int i = 0; i < notes.size(); i++) {
 			Note n = (Note) notes.get(i);
@@ -86,10 +85,10 @@ public class ForEachStatement implements Expression
 			}
 			// Execute the statements
 			for (Expression expr : stmts)
-				expr.getValue(expressions);
+				expr.getValue();
 			// Add the (modified?) note back
 			Expression e = SymbolTable.getMember(SymbolTable.currentFunctionScope, noteName);
-			notes.set(i, e.getValue(expressions));
+			notes.set(i, e.getValue());
 		}
 		
 		// Remove any keys that were added to the current function by this while loop.

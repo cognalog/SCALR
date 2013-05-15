@@ -31,10 +31,10 @@ public class CreationOperator implements Expression
 	}
 	
 	@Override
-	public Expression getValue(Expression... expressions)
+	public Expression getValue()
 	{
 		// Compute the rval
-		Variable inter = (Variable) rval.getValue(expressions);
+		Variable inter = (Variable) rval.getValue();
 		Expression result = inter.getCopy();
 		try {
 			SymbolTable.addReference(func, var, result);

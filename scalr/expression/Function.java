@@ -18,7 +18,7 @@ public class Function implements Expression
 	private String	             id;
 	private ArrayList<String>	 parameterName;
 	public ArrayList<Expression>	statements;
-	private Expression[]	     expressions;
+	private Expression[]	     parameterValues;
 	
 	public Function(String name) throws FunctionExistsError
 	{
@@ -37,7 +37,7 @@ public class Function implements Expression
 	
 	public void addValues(Expression... expressions)
 	{
-		this.expressions = expressions;
+		this.parameterValues = expressions;
 	}
 	
 	public void addStatement(Expression expr)
@@ -57,13 +57,13 @@ public class Function implements Expression
 	}
 	
 	@Override
-	public Expression getValue(Expression... exprs)
+	public Expression getValue()
 	{
 		// Change the current function scope to us
 		String prevScope = SymbolTable.currentFunctionScope;
 		SymbolTable.currentFunctionScope = id;
 		// Checking to make sure we got the proper number of arguments
-		if (expressions.length != parameterName.size()) {
+		if (parameterValues.length != parameterName.size()) {
 			System.err.println("Incorrect number of arguments for function: " + id + parameterName
 			        + ".");
 			StackTraceElement[] stack = Thread.currentThread().getStackTrace();
@@ -91,11 +91,11 @@ public class Function implements Expression
 			values.add(entry.getValue());
 		}
 		// Add the expressions to the symbol table
-		for (int i = 0; i < expressions.length; i++) {
+		for (int i = 0; i < parameterValues.length; i++) {
 			try {
-				Expression copy = ((Variable) expressions[i].getValue(expressions)).getCopy();
+				Expression copy = ((Variable) parameterValues[i].getValue()).getCopy();
 				SymbolTable.addReference(id, parameterName.get(i), copy);
-				expressions[i] = copy;
+				parameterValues[i] = copy;
 			}
 			catch (TypeError e) {
 				e.printStackTrace();
@@ -106,19 +106,18 @@ public class Function implements Expression
 		// Execute the stataments
 		for (int i = 0; i < statements.size() - 1; i++) {
 			System.out.println("Function " + id + ": " + statements.get(i).getClass());
-			statements.get(i).getValue(expressions);
+			statements.get(i).getValue();
 		}
 		Expression lastExpr = statements.get(statements.size() - 1);
 		System.out.println("Return: " + lastExpr.getClass());
 		Expression expr = null;
 		if (lastExpr.getType() == ExpressionType.SEQUENCE || id.equals("main"))
-			expr = lastExpr.getValue(expressions);
+			expr = lastExpr.getValue();
 		else if (lastExpr.getType() == ExpressionType.NOTE)
-			expr = new Sequence(lastExpr.getValue(expressions));
+			expr = new Sequence(lastExpr.getValue());
 		else {
 			SymbolTable.currentFunctionScope = prevScope;
-			System.err.println("Last line: " + lastExpr.getValue(expressions)
-			        + " is not of type sequence.");
+			System.err.println("Last line: " + lastExpr.getValue() + " is not of type sequence.");
 			System.exit(1);
 		}
 		

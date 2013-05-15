@@ -24,7 +24,7 @@ public class GetOperator implements Expression
 	}
 	
 	@Override
-	public Expression getValue(Expression... expressions)
+	public Expression getValue()
 	{
 		// Type Checking
 		if (operator.equals("dur")
@@ -44,23 +44,23 @@ public class GetOperator implements Expression
 		}
 		if (operator.equals("dur")) {
 			if (operand.getType() == ExpressionType.SEQUENCE) {
-				Sequence seq = (Sequence) operand.getValue(expressions);
+				Sequence seq = (Sequence) operand.getValue();
 				return new ScalrNum(seq.getSequence().size());
 			}
 			else if (operand.getType() == ExpressionType.NOTE) {
-				Note note = (Note) operand.getValue(expressions);
+				Note note = (Note) operand.getValue();
 				return new ScalrNum(note.length.ordinal());
 			}
 		}
 		else if (operator.equals("pit")) {
 			if (operand.getType() == ExpressionType.NOTE) {
-				Note note = (Note) operand.getValue(expressions);
+				Note note = (Note) operand.getValue();
 				return new ScalrNum(note.pitch.ordinal());
 			}
 		}
 		else if (operator.equals("vol")) {
 			if (operand.getType() == ExpressionType.NOTE) {
-				Note note = (Note) operand.getValue(expressions);
+				Note note = (Note) operand.getValue();
 				return new ScalrNum(note.volume);
 			}
 		}
