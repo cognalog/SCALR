@@ -2,11 +2,8 @@
 package scalr.expression;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
-import scalr.Exceptions.TypeError;
 import scalr.variable.Note;
 import scalr.variable.Sequence;
 import scalr.variable.SymbolTable;
@@ -49,61 +46,50 @@ public class ForEachStatement implements Expression
 	@Override
 	public Expression getValue()
 	{
-		// Get the function symbol table
-		HashMap<String, Expression> symTab =
-		        SymbolTable.reference.get(SymbolTable.currentFunctionScope);
-		// Get the reference type table
-		HashMap<String, ExpressionType> refTab =
-		        SymbolTable.referenceType.get(SymbolTable.currentFunctionScope);
-		ArrayList<Map.Entry<String, ExpressionType>> refTabEntries =
-		        new ArrayList<Map.Entry<String, ExpressionType>>(refTab.entrySet());
-		
-		// Get the current variables in this function scope
-		HashSet<String> prevVar = new HashSet<String>(symTab.keySet());
-		// Get the keys and values in the reference table
-		ArrayList<String> keys = new ArrayList<String>(refTabEntries.size());
-		ArrayList<ExpressionType> values = new ArrayList<ExpressionType>(refTabEntries.size());
-		// Populate them
-		for (Map.Entry<String, ExpressionType> entry : refTabEntries) {
-			keys.add(entry.getKey());
-			values.add(entry.getValue());
-		}
+		// To satisfy scoping, it serves to remove keys that were added by the evaluation of this
+		// foreach statement. Thus, let us mark the keys that were present before evaluation:
+		HashSet<String> prevVar = new HashSet<String>(SymbolTable.currentSymbolTable.keySet());
 		
 		// At this point, we should be able to evaluate the sequence
 		Sequence seq = (Sequence) sequence.getValue();
 		// Iterate through the sequence (note, the getValue()
 		ArrayList<Expression> notes = seq.getSequence();
 		for (int i = 0; i < notes.size(); i++) {
-			Note n = (Note) notes.get(i);
-			// Add the current note to the symbol table as this note value
-			try {
-				SymbolTable.addReference(SymbolTable.currentFunctionScope, noteName, n);
-			}
-			catch (TypeError e1) {
-				e1.printStackTrace();
-				System.exit(1);
-			}
+			boolean shouldBreak = false;
+			Note n = ((Note) notes.get(i)).getCopy();
+			// Add the current note to the symbol table under this name
+			SymbolTable.addVar(noteName, n);
 			// Execute the statements
-			for (Expression expr : stmts)
-				expr.getValue();
+			for (Expression expr : stmts) {
+				Expression ret = expr.getValue();
+				if (ret != null) {
+					ExpressionType type = ret.getType();
+					if (type == ExpressionType.CANCEL) {
+						shouldBreak = true;
+						break;
+					}
+					else if (type == ExpressionType.RETURN) {
+						// Add the note back before returning
+						Expression e = SymbolTable.getVar(noteName);
+						notes.set(i, e.getValue());
+						return ret;
+					}
+				}
+			}
 			// Add the (modified?) note back
-			Expression e = SymbolTable.getMember(SymbolTable.currentFunctionScope, noteName);
+			Expression e = SymbolTable.getVar(noteName);
 			notes.set(i, e.getValue());
-		}
-		
-		// Remove any keys that were added to the current function by this while loop.
-		ArrayList<String> currVar = new ArrayList<String>(symTab.keySet());
-		for (String var : currVar)
-			if (!prevVar.contains(var))
-				symTab.remove(var);
-		// Change the references back to normal
-		refTabEntries = new ArrayList<Map.Entry<String, ExpressionType>>(refTab.entrySet());
-		for (Map.Entry<String, ExpressionType> entry : refTabEntries) {
-			int index = keys.indexOf(entry.getKey());
-			if (index != -1)
-				entry.setValue(values.get(index));
-			else
-				refTab.remove(entry.getKey());
+			
+			if (shouldBreak)
+				break;
+			
+			// Remove any keys that were added to the current function by this iteration of the
+			// forloop.
+			ArrayList<String> currVar =
+			        new ArrayList<String>(SymbolTable.currentSymbolTable.keySet());
+			for (String var : currVar)
+				if (!prevVar.contains(var))
+					SymbolTable.currentSymbolTable.remove(var);
 		}
 		return seq;
 	}

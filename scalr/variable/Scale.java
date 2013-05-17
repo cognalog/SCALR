@@ -97,12 +97,12 @@ public class Scale implements Variable
 		// Append each note to the string
 		// for(int i = 0; i < theNotes.size(); i++)
 		for (Degree n : degrees) {
-			result += n + ",";
+			result += n + ", ";
 			
 		}
 		// remove the last bar (if there is a note)
 		if (degrees.size() > 0)
-			result = result.substring(0, result.length() - 1);
+			result = result.substring(0, result.length() - 2);
 		// And it closes with a bracket
 		return result + "}";
 	}

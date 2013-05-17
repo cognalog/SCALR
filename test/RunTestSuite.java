@@ -1,4 +1,8 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 public class RunTestSuite {
   static String end = "\033[0m\n";
   static  String green = "\033[92m";

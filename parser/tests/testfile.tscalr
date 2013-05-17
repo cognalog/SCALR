@@ -1,4 +1,9 @@
-id = [note.half.quarter.length("1/2")]
-while(true and (5 != 6))
-	id += note
+id = [note.half.quarter.length("1/2"), break]
+z = 1
+foreach(n) in id
+	id += n
+	if (z == 1)
+		id += break
+	end
 end
+id *= 2

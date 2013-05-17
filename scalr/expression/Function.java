@@ -3,11 +3,10 @@ package scalr.expression;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 
-import scalr.Exceptions.FunctionExistsError;
-import scalr.Exceptions.TypeError;
+import scalr.Exceptions.IllegalReturnException;
+import scalr.Exceptions.IllegalStatementException;
+import scalr.Exceptions.TypeException;
 import scalr.variable.Sequence;
 import scalr.variable.SymbolTable;
 import scalr.variable.Variable;
@@ -15,23 +14,24 @@ import scalr.variable.Variable;
 public class Function implements Expression
 {
 	/** The name of the function */
-	private String	             id;
-	private ArrayList<String>	 parameterName;
-	public ArrayList<Expression>	statements;
-	private Expression[]	     parameterValues;
+	private String	                   id;
+	private ArrayList<String>	       parameterName;
+	public ArrayList<Expression>	   statements;
+	private Expression[]	           parameterValues;
+	public HashMap<String, Expression>	symbolTable;
 	
-	public Function(String name) throws FunctionExistsError
+	public Function(String name)
 	{
 		id = name;
-		SymbolTable.addFunc(name);
 		parameterName = new ArrayList<String>();
 		statements = new ArrayList<Expression>();
+		symbolTable = new HashMap<String, Expression>();
 	}
 	
-	public void addParameter(String name) throws TypeError
+	public void addParameter(String name)
 	{
 		if (parameterName.contains(name))
-			throw new TypeError(name);
+			throw new TypeException(name);
 		parameterName.add(name);
 	}
 	
@@ -59,84 +59,69 @@ public class Function implements Expression
 	@Override
 	public Expression getValue()
 	{
-		// Change the current function scope to us
-		String prevScope = SymbolTable.currentFunctionScope;
-		SymbolTable.currentFunctionScope = id;
 		// Checking to make sure we got the proper number of arguments
 		if (parameterValues.length != parameterName.size()) {
-			System.err.println("Incorrect number of arguments for function: " + id + parameterName
-			        + ".");
-			StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-			for (StackTraceElement elem : stack)
-				System.err.println(elem);
+			Function.printStackTrace("Incorrect number of arguments for function: " + id
+			        + parameterName + ".");
 			System.exit(1);
 		}
-		// Get the function symbol table
-		HashMap<String, Expression> symTab =
-		        SymbolTable.reference.get(SymbolTable.currentFunctionScope);
-		// Get the reference type table
-		HashMap<String, ExpressionType> refTab =
-		        SymbolTable.referenceType.get(SymbolTable.currentFunctionScope);
-		ArrayList<Map.Entry<String, ExpressionType>> refTabEntries =
-		        new ArrayList<Map.Entry<String, ExpressionType>>(refTab.entrySet());
+		// Add the parameters to our symbol table
+		// Evaluate the parameters in the scope of the previous function
+		for (int i = 0; i < parameterValues.length; i++)
+			symbolTable.put(parameterName.get(i),
+			        ((Variable) parameterValues[i].getValue()).getCopy());
 		
-		// Get the current variables in this function scope
-		HashSet<String> prevVar = new HashSet<String>(symTab.keySet());
-		// Get the keys and values in the reference table
-		ArrayList<String> keys = new ArrayList<String>(refTabEntries.size());
-		ArrayList<ExpressionType> values = new ArrayList<ExpressionType>(refTabEntries.size());
-		// Populate them
-		for (Map.Entry<String, ExpressionType> entry : refTabEntries) {
-			keys.add(entry.getKey());
-			values.add(entry.getValue());
-		}
-		// Add the expressions to the symbol table
-		for (int i = 0; i < parameterValues.length; i++) {
-			try {
-				Expression copy = ((Variable) parameterValues[i].getValue()).getCopy();
-				SymbolTable.addReference(id, parameterName.get(i), copy);
-				parameterValues[i] = copy;
-			}
-			catch (TypeError e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
-		}
+		// Mark the old symbol table
+		HashMap<String, Expression> parentTable = SymbolTable.currentSymbolTable;
+		// Change the current symbol table to us
+		SymbolTable.currentSymbolTable = symbolTable;
+		// Push our selves onto the stack
+		SymbolTable.runtimeStack.push(this);
 		
 		// Execute the stataments
 		for (int i = 0; i < statements.size() - 1; i++) {
 			System.out.println("Function " + id + ": " + statements.get(i).getClass());
-			statements.get(i).getValue();
+			Expression expr = statements.get(i).getValue();
+			if (expr != null) {
+				if (expr.getType() == ExpressionType.RETURN) {
+					// Restore the old symbol table
+					SymbolTable.currentSymbolTable = parentTable;
+					// Remove our selves from the stack
+					SymbolTable.runtimeStack.pop();
+					return ((ControlOperation) expr).getReturn();
+				}
+				else if (expr.getType() == ExpressionType.CANCEL)
+					throw new IllegalStatementException(expr.getClass().toString());
+			}
 		}
-		Expression lastExpr = statements.get(statements.size() - 1);
+		// Checking to make sure the return is appropriate
+		Expression lastExpr = statements.get(statements.size() - 1).getValue();
+		if (lastExpr == null)
+			throw new IllegalReturnException(statements.get(statements.size() - 1).getClass()
+			        .toString());
 		System.out.println("Return: " + lastExpr.getClass());
-		Expression expr = null;
-		if (lastExpr.getType() == ExpressionType.SEQUENCE || id.equals("main"))
-			expr = lastExpr.getValue();
-		else if (lastExpr.getType() == ExpressionType.NOTE)
-			expr = new Sequence(lastExpr.getValue());
-		else {
-			SymbolTable.currentFunctionScope = prevScope;
-			System.err.println("Last line: " + lastExpr.getValue() + " is not of type sequence.");
-			System.exit(1);
-		}
+		if (lastExpr.getType() == ExpressionType.NOTE)
+			lastExpr = new Sequence(lastExpr);
+		else if (lastExpr.getType() == ExpressionType.CANCEL)
+			throw new IllegalStatementException(lastExpr.getClass().toString());
+		else if (lastExpr.getType() == ExpressionType.RETURN)
+			lastExpr = ((ControlOperation) lastExpr).getReturn().getValue();
+		else if (lastExpr.getType() != ExpressionType.SEQUENCE)
+			throw new IllegalReturnException(lastExpr.toString());
 		
-		// Remove any keys that were added to the current function by this while loop.
-		ArrayList<String> currVar = new ArrayList<String>(symTab.keySet());
-		for (String var : currVar)
-			if (!prevVar.contains(var))
-				symTab.remove(var);
-		// Change the references back to normal
-		refTabEntries = new ArrayList<Map.Entry<String, ExpressionType>>(refTab.entrySet());
-		for (Map.Entry<String, ExpressionType> entry : refTabEntries) {
-			int index = keys.indexOf(entry.getKey());
-			if (index != -1)
-				entry.setValue(values.get(index));
-			else
-				refTab.remove(entry.getKey());
-		}
-		SymbolTable.currentFunctionScope = prevScope;
-		return expr;
+		// Restore the old symbol table
+		SymbolTable.currentSymbolTable = parentTable;
+		// Remove our selves from the stack
+		SymbolTable.runtimeStack.pop();
+		return lastExpr;
+	}
+	
+	public Function getCopy()
+	{
+		Function func = new Function(id);
+		func.parameterName = new ArrayList<String>(parameterName);
+		func.statements = new ArrayList<Expression>(statements);
+		return func;
 	}
 	
 	@Override
@@ -145,9 +130,17 @@ public class Function implements Expression
 		return ExpressionType.SEQUENCE;
 	}
 	
+	public static void printStackTrace(String message)
+	{
+		System.err.println(message);
+		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+		for (int i = 2; i < stack.length; i++)
+			System.err.println("\t" + stack[i]);
+	}
+	
 	@Override
 	public String toString()
 	{
-		return id + " " + parameterName;
+		return "(Func: " + id + " " + parameterName + ")";
 	}
 }

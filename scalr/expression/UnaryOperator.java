@@ -1,7 +1,6 @@
 
 package scalr.expression;
 
-import scalr.Exceptions.TypeError;
 import scalr.variable.ScalrNum;
 import scalr.variable.SymbolTable;
 
@@ -10,7 +9,6 @@ public class UnaryOperator implements Expression
 	String	       operator;
 	Expression	   expr;
 	private String	var;
-	private String	func;
 	
 	// This class is only valid for integers
 	public UnaryOperator(String op)
@@ -26,11 +24,6 @@ public class UnaryOperator implements Expression
 	public void addVar(String name)
 	{
 		var = name;
-	}
-	
-	public void addFunc(String name)
-	{
-		func = name;
 	}
 	
 	@Override
@@ -50,26 +43,14 @@ public class UnaryOperator implements Expression
 				ScalrNum num = (ScalrNum) expr.getValue();
 				num.setValue(num.getNum() - 1);
 				// Put the modified variable back
-				try {
-					SymbolTable.addReference(func, var, num);
-				}
-				catch (TypeError e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
+				SymbolTable.addVar(var, num);
 				return new ScalrNum(num.getNum() + 1);
 			}
 			else {
 				ScalrNum num = (ScalrNum) expr.getValue();
 				num.setValue(num.getNum() + 1);
 				// Put the modified variable back
-				try {
-					SymbolTable.addReference(func, var, num);
-				}
-				catch (TypeError e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
+				SymbolTable.addVar(var, num);
 				return new ScalrNum(num.getNum() - 1);
 			}
 		}

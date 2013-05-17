@@ -2,11 +2,9 @@
 package scalr.expression;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
-import scalr.Exceptions.TypeError;
+import scalr.Exceptions.TypeException;
 import scalr.variable.ScalrBoolean;
 import scalr.variable.SymbolTable;
 
@@ -20,7 +18,7 @@ public class WhileStatement implements Expression
 	 * generates it, since we already know what it is
 	 * @param expr
 	 *            The expression to check
-	 * @throws TypeError
+	 * @throws TypeException
 	 *             Thrown in case the given expression isn't of type boolean.
 	 */
 	public WhileStatement(Expression expr)
@@ -47,48 +45,39 @@ public class WhileStatement implements Expression
 	@Override
 	public Expression getValue()
 	{
-		// Get the function symbol table
-		HashMap<String, Expression> symTab =
-		        SymbolTable.reference.get(SymbolTable.currentFunctionScope);
-		// Get the reference type table
-		HashMap<String, ExpressionType> refTab =
-		        SymbolTable.referenceType.get(SymbolTable.currentFunctionScope);
-		ArrayList<Map.Entry<String, ExpressionType>> refTabEntries =
-		        new ArrayList<Map.Entry<String, ExpressionType>>(refTab.entrySet());
-		
 		// Get the current variables in this function scope
-		HashSet<String> prevVar = new HashSet<String>(symTab.keySet());
-		// Get the keys and values in the reference table
-		ArrayList<String> keys = new ArrayList<String>(refTabEntries.size());
-		ArrayList<ExpressionType> values = new ArrayList<ExpressionType>(refTabEntries.size());
-		// Populate them
-		for (Map.Entry<String, ExpressionType> entry : refTabEntries) {
-			keys.add(entry.getKey());
-			values.add(entry.getValue());
-		}
+		HashSet<String> prevVar = new HashSet<String>(SymbolTable.currentSymbolTable.keySet());
 		
 		// Evaluate this while loop as long as this condition is true
 		while (((ScalrBoolean) cond.getValue()).getBool()) {
+			boolean shouldBreak = false;
 			// Just evaluate all the expressions.
 			for (Expression e : statements) {
 				System.out.println("While: " + e.getClass());
-				e.getValue();
+				// Evaluate it only once, but we need to check its type more than once.
+				Expression ret = e.getValue();
+				if (ret != null) {
+					ExpressionType type = ret.getType();
+					if (type == ExpressionType.CANCEL) {
+						shouldBreak = true;
+						break;
+					}
+					else if (type == ExpressionType.RETURN)
+						return ret;
+					// The symbol table will be destructed when the function returns, so we don't
+					// need to worry about cleaning it in this case.
+				}
 			}
-		}
-		
-		// Remove any keys that were added to the current function by this while loop.
-		ArrayList<String> currVar = new ArrayList<String>(symTab.keySet());
-		for (String var : currVar)
-			if (!prevVar.contains(var))
-				symTab.remove(var);
-		// Change the references back to normal
-		refTabEntries = new ArrayList<Map.Entry<String, ExpressionType>>(refTab.entrySet());
-		for (Map.Entry<String, ExpressionType> entry : refTabEntries) {
-			int index = keys.indexOf(entry.getKey());
-			if (index != -1)
-				entry.setValue(values.get(index));
-			else
-				refTab.remove(entry.getKey());
+			if (shouldBreak)
+				break;
+			
+			// Remove any keys that were added to the current function by this while loop. Must also
+			// remember that variables do not persist after a loop is completed
+			ArrayList<String> currVar =
+			        new ArrayList<String>(SymbolTable.currentSymbolTable.keySet());
+			for (String var : currVar)
+				if (!prevVar.contains(var))
+					SymbolTable.currentSymbolTable.remove(var);
 		}
 		return null;
 	}

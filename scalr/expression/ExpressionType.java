@@ -7,5 +7,5 @@ package scalr.expression;
  * @author mark
  */
 public enum ExpressionType {
-	BOOLEAN, NUMBER, NOTE, SEQUENCE, SCALE;
+	BOOLEAN, NUMBER, NOTE, SEQUENCE, SCALE, RETURN, CANCEL;
 }

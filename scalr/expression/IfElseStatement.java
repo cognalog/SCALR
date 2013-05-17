@@ -2,9 +2,7 @@
 package scalr.expression;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 import scalr.variable.ScalrBoolean;
 import scalr.variable.SymbolTable;
@@ -123,33 +121,42 @@ public class IfElseStatement implements Expression
 	@Override
 	public Expression getValue()
 	{
-		// Get the function symbol table
-		HashMap<String, Expression> symTab =
-		        SymbolTable.reference.get(SymbolTable.currentFunctionScope);
-		// Get the reference type table
-		HashMap<String, ExpressionType> refTab =
-		        SymbolTable.referenceType.get(SymbolTable.currentFunctionScope);
-		ArrayList<Map.Entry<String, ExpressionType>> refTabEntries =
-		        new ArrayList<Map.Entry<String, ExpressionType>>(refTab.entrySet());
-		
 		// Get the current variables in this function scope
-		HashSet<String> prevVar = new HashSet<String>(symTab.keySet());
-		// Get the keys and values in the reference table
-		ArrayList<String> keys = new ArrayList<String>(refTabEntries.size());
-		ArrayList<ExpressionType> values = new ArrayList<ExpressionType>(refTabEntries.size());
-		// Populate them
-		for (Map.Entry<String, ExpressionType> entry : refTabEntries) {
-			keys.add(entry.getKey());
-			values.add(entry.getValue());
-		}
+		HashSet<String> prevVar = new HashSet<String>(SymbolTable.currentSymbolTable.keySet());
 		
 		int blockIndex = 0;
 		for (Expression check : checks) {
 			if (check != null) {
 				// Execute if its true
 				if (((ScalrBoolean) check.getValue()).getBool()) {
-					for (Expression stmt : statements.get(blockIndex))
-						stmt.getValue();
+					for (Expression stmt : statements.get(blockIndex)) {
+						Expression expr = stmt.getValue();
+						if (expr != null) {
+							ExpressionType type = expr.getType();
+							if (type == ExpressionType.CANCEL) {
+								// We're telling some outside loop to break. In that case, let's
+								// return
+								// the cancel (but we should clean up first).
+								// Remove any keys that were added to the current function by this
+								// while
+								// loop.
+								ArrayList<String> currVar =
+								        new ArrayList<String>(
+								                SymbolTable.currentSymbolTable.keySet());
+								for (String var : currVar)
+									if (!prevVar.contains(var))
+										SymbolTable.currentSymbolTable.remove(var);
+								// Return the cancel
+								return expr;
+							}
+							else if (type == ExpressionType.RETURN) {
+								// The outside function will catch this return and cleanup, so we
+								// just
+								// need to return the return object.
+								return expr;
+							}
+						}
+					}
 					break;
 				}
 				// Go on to the next if/else if/else otherwise
@@ -157,26 +164,39 @@ public class IfElseStatement implements Expression
 			// Here, we have reached an else (no pun intended)
 			else {
 				// Just execute all the statements.
-				for (Expression stmt : statements.get(blockIndex))
-					stmt.getValue();
+				for (Expression stmt : statements.get(blockIndex)) {
+					Expression expr = stmt.getValue();
+					if (expr != null) {
+						ExpressionType type = expr.getType();
+						if (type == ExpressionType.CANCEL) {
+							// We're telling some outside loop to break. In that case, let's return
+							// the cancel (but we should clean up first).
+							// Remove any keys that were added to the current function by this while
+							// loop.
+							ArrayList<String> currVar =
+							        new ArrayList<String>(SymbolTable.currentSymbolTable.keySet());
+							for (String var : currVar)
+								if (!prevVar.contains(var))
+									SymbolTable.currentSymbolTable.remove(var);
+							// Return the cancel
+							return expr;
+						}
+						else if (type == ExpressionType.RETURN) {
+							// The outside function will catch this return and cleanup, so we just
+							// need to return the return object.
+							return expr;
+						}
+					}
+				}
 			}
 			blockIndex++;
 		}
 		
 		// Remove any keys that were added to the current function by this while loop.
-		ArrayList<String> currVar = new ArrayList<String>(symTab.keySet());
+		ArrayList<String> currVar = new ArrayList<String>(SymbolTable.currentSymbolTable.keySet());
 		for (String var : currVar)
 			if (!prevVar.contains(var))
-				symTab.remove(var);
-		// Change the references back to normal
-		refTabEntries = new ArrayList<Map.Entry<String, ExpressionType>>(refTab.entrySet());
-		for (Map.Entry<String, ExpressionType> entry : refTabEntries) {
-			int index = keys.indexOf(entry.getKey());
-			if (index != -1)
-				entry.setValue(values.get(index));
-			else
-				refTab.remove(entry.getKey());
-		}
+				SymbolTable.currentSymbolTable.remove(var);
 		return null;
 	}
 	

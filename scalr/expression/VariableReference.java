@@ -1,49 +1,39 @@
 
 package scalr.expression;
 
-import scalr.Exceptions.TypeError;
 import scalr.variable.SymbolTable;
 
 public class VariableReference implements Expression
 {
 	/** The string representing the name of this variable in the symbol table */
-	String	ID;
-	/** The string representing the name of the function that his variable belongs to. */
-	String	func;
+	String	varName;
 	
-	public VariableReference(String ID, String func)
+	public VariableReference(String ID)
 	{
-		this.ID = ID;
-		this.func = func;
+		this.varName = ID;
 	}
 	
 	@Override
 	public Expression getValue()
 	{
-		// Evaluate the expression and store the result back in the symbol table
-		Expression expr = SymbolTable.getMember(func, ID);
+		// Evaluate the expression
+		Expression expr = SymbolTable.getVar(varName);
 		Expression expr2 = expr.getValue();
 		// Put it back to the table
-		try {
-			SymbolTable.addReference(func, ID, expr2);
-		}
-		catch (TypeError e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+		SymbolTable.addVar(varName, expr2);
 		return expr2;
 	}
 	
 	@Override
 	public ExpressionType getType()
 	{
-		return SymbolTable.getMemberType(func, ID);
+		return SymbolTable.getVar(varName).getType();
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "ID: " + ID + " | Type: " + getType();
+		return "(VarRef - ID: " + varName + " | Type: " + getType() + ")";
 	}
 	
 }

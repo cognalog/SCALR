@@ -32,13 +32,15 @@ public class ScalrParserTest {
 				text += in.nextLine() + "\n";
 			text += "\n";
 			ScalrParserTest parser = new ScalrParserTest(new StringReader(text));
-			SymbolTable.addFunc("main");
-			ArrayList<Expression> function = new ArrayList<Expression>();
-			function.add(parser.statement());
-			function.add(parser.statement());
-			for(Expression e: function)
+			Function mainFunc = new Function("main");
+			SymbolTable.addFunc(mainFunc);
+			SymbolTable.currentSymbolTable = mainFunc.symbolTable;
+			mainFunc.addStatement(parser.statement());
+			mainFunc.addStatement(parser.statement());
+			mainFunc.addStatement(parser.statement());
+			mainFunc.addStatement(parser.statement());
+			for(Expression e: mainFunc.statements)
 				System.out.println(e.getValue());
-			System.out.println(SymbolTable.reference);
 			in.close();
 		} catch (Throwable e) {
 			// Catching Throwable is ugly but JavaCC throws Error objects!
@@ -55,7 +57,7 @@ SKIP : { " " | "\t" | <"/*" (~["*","/"])* "*/"> | <"//" (~["\r","\n"])* ("\r")? 
 TOKEN: {
 	"volume" | "duration" | "end" | "func" | "main" | "while" | "foreach" |
 	"import" | "track" | "in" | "if" | "else" | "note" | "pitch" | "length" |
-	"break" | "rest" |
+	"break" | "rest" | "cancel" | "return" |
 	"->" | "." | "," | "\"" | "(" | ")" | "[" | "]" |
 	<CREATE: "="> |
 	<ASSIGN: "+=" | "-=" | "*=" | "/=" | "%="> |
@@ -84,7 +86,16 @@ Expression statement(): {
 	| expr = whileExpr() { return expr; }
 	| expr = foreachExpr() { return expr; }
 	| expr = ifElseExpr() { return expr; }
+	| expr = controlExpr() { return expr; }
 	| expr = sequence() { return expr; }
+}
+
+Expression controlExpr(): {
+	Expression expr;
+} {
+	"cancel" { return new ControlOperation("cancel"); }
+	| "return" { ControlOperation co = new ControlOperation("return"); }
+		(expr = boolExpr() { co.addReturn(expr); }) { return co; }
 }
 
 Expression ifElseExpr(): {
@@ -114,7 +125,7 @@ Expression foreachExpr(): {
 	"foreach" "(" noteName = <ID> {
 		forLoop = new ForEachStatement(noteName.image);
 	} ")" "in" seqName = <ID> {
-		VariableReference seq = new VariableReference(seqName.image, SymbolTable.currentFunctionScope);
+		VariableReference seq = new VariableReference(seqName.image);
 		forLoop.addSequence(seq);
 	}
 		(stmt = statement() { forLoop.addStatement(stmt); })+
@@ -140,7 +151,6 @@ Expression idExpr(): {
 	name = <ID> (
 		<CREATE> expr = boolExpr() {
 			CreationOperator co = new CreationOperator(name.image);
-			co.addFunc(SymbolTable.currentFunctionScope);
 			co.addOperand(expr);
 			return co;
 		}
@@ -148,19 +158,17 @@ Expression idExpr(): {
 			AssignmentOperator ao = new AssignmentOperator(assignOp.image);
 			ao.addOperand(expr);
 			ao.setVar(name.image);
-			ao.setFunc(SymbolTable.currentFunctionScope);
 			return ao;
 		}
-		| "." { expr = new VariableReference(name.image, SymbolTable.currentFunctionScope); }
+		| "." { expr = new VariableReference(name.image); }
 			expr = noteOps(expr) ("." expr = noteOps(expr))* {
 				return expr;
 		}
 		| postOp = <POST> {
-			expr = new VariableReference(name.image, SymbolTable.currentFunctionScope);
+			expr = new VariableReference(name.image);
 			UnaryOperator uo = new UnaryOperator(postOp.image);
 			uo.addOperand(expr);
 			uo.addVar(name.image);
-			uo.addFunc(SymbolTable.currentFunctionScope);
 			return uo;
 		}
 	)
@@ -174,12 +182,7 @@ Expression funcCall(String name): {
 } {
 	"(" (arg = boolExpr() { arguments.add(arg); }
 		("," arg = boolExpr() { arguments.add(arg); })*)? ")" {
-		try {
-			f = SymbolTable.getFuncRef(name);
-		} catch(FunctionDoesNotExistError e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+		f = SymbolTable.getFunc(name);
 		f.addValues(arguments.toArray(new Expression[arguments.size()]));
 		return f; 
 	}
@@ -334,13 +337,12 @@ Expression atomID(): {
 	Token op;
 	Token id;
 } {
-	id = <ID> { e = new VariableReference(id.image, SymbolTable.currentFunctionScope); }
+	id = <ID> { e = new VariableReference(id.image); }
 	(
 		op = <POST> {
 			UnaryOperator uo = new UnaryOperator(op.image);
 			uo.addOperand(e);
 			uo.addVar(id.image);
-			uo.addFunc(SymbolTable.currentFunctionScope);
 			e = uo;
 		}
 		| ("." e = noteOps(e))+
@@ -374,7 +376,7 @@ Expression noteID(): {
 	Expression n;
 	Token name;
 } {
-	name = <ID> { n = new VariableReference(name.image, SymbolTable.currentFunctionScope); } 
+	name = <ID> { n = new VariableReference(name.image); } 
 	("." n = noteOps(n))* { return n; }
 }
 
@@ -417,7 +419,7 @@ Expression pitch(Expression n): {
 		NoteOps no = new NoteOps("pit");
 		no.addOperand(n);
 		no.addIndex(modNum);
-		no.addScale(new VariableReference(scale.image, SymbolTable.currentFunctionScope));
+		no.addScale(new VariableReference(scale.image));
 		return no;
 	}
 	| "rest" {

@@ -1,7 +1,6 @@
 
 package scalr.expression;
 
-import scalr.Exceptions.TypeError;
 import scalr.variable.SymbolTable;
 
 // It may be better to implement the entire getType() method using boolean matrices,
@@ -11,7 +10,7 @@ public class AssignmentOperator implements Expression
 {
 	
 	private String	   operator;
-	private String	   var, func;
+	private String	   var;
 	private Expression	rval;
 	
 	public AssignmentOperator(String type)
@@ -29,16 +28,11 @@ public class AssignmentOperator implements Expression
 		var = name;
 	}
 	
-	public void setFunc(String name)
-	{
-		func = name;
-	}
-	
 	@Override
 	public Expression getValue()
 	{
-		// Get the variable from the SymbolTable
-		Expression lval = SymbolTable.getMember(func, var);
+		// Get the variable from the current SymbolTable
+		Expression lval = SymbolTable.getVar(var);
 		if (operator.equals("+=")) {
 			if ((lval.getType() == ExpressionType.NUMBER && rval.getType() == ExpressionType.NUMBER)
 			        || (lval.getType() == ExpressionType.SEQUENCE && rval.getType() == ExpressionType.NOTE)
@@ -47,15 +41,7 @@ public class AssignmentOperator implements Expression
 				bo.addOperand(lval);
 				bo.addOperand(rval);
 				Expression result = bo.getValue();
-				// If the new type isn't the same as the old type, this will throw an error (Type
-				// checking!).
-				try {
-					SymbolTable.addReference(func, var, result);
-				}
-				catch (TypeError e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
+				SymbolTable.addVar(var, result);
 				return result;
 			}
 		}
@@ -68,13 +54,7 @@ public class AssignmentOperator implements Expression
 				Expression result = bo.getValue();
 				// If the new type isn't the same as the old type, this will throw an error (Type
 				// checking!).
-				try {
-					SymbolTable.addReference(func, var, result);
-				}
-				catch (TypeError e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
+				SymbolTable.addVar(var, result);
 				return result;
 			}
 		}
@@ -84,15 +64,7 @@ public class AssignmentOperator implements Expression
 				bo.addOperand(lval);
 				bo.addOperand(rval);
 				Expression result = bo.getValue();
-				// If the new type isn't the same as the old type, this will throw an error (Type
-				// checking!).
-				try {
-					SymbolTable.addReference(func, var, result);
-				}
-				catch (TypeError e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
+				SymbolTable.addVar(var, result);
 				return result;
 			}
 		}
@@ -102,15 +74,7 @@ public class AssignmentOperator implements Expression
 				bo.addOperand(lval);
 				bo.addOperand(rval);
 				Expression result = bo.getValue();
-				// If the new type isn't the same as the old type, this will throw an error (Type
-				// checking!).
-				try {
-					SymbolTable.addReference(func, var, result);
-				}
-				catch (TypeError e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
+				SymbolTable.addVar(var, result);
 				return result;
 			}
 		}
@@ -120,15 +84,7 @@ public class AssignmentOperator implements Expression
 				bo.addOperand(lval);
 				bo.addOperand(rval);
 				Expression result = bo.getValue();
-				// If the new type isn't the same as the old type, this will throw an error (Type
-				// checking!).
-				try {
-					SymbolTable.addReference(func, var, result);
-				}
-				catch (TypeError e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
+				SymbolTable.addVar(var, result);
 				return result;
 			}
 		}
@@ -138,15 +94,7 @@ public class AssignmentOperator implements Expression
 				bo.addOperand(lval);
 				bo.addOperand(rval);
 				Expression result = bo.getValue();
-				// If the new type isn't the same as the old type, this will throw an error (Type
-				// checking!).
-				try {
-					SymbolTable.addReference(func, var, result);
-				}
-				catch (TypeError e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
+				SymbolTable.addVar(var, result);
 				return result;
 			}
 		}
@@ -163,7 +111,7 @@ public class AssignmentOperator implements Expression
 	public ExpressionType getType()
 	{
 		// Get the variable from the SymbolTable
-		Expression expr = SymbolTable.getMember(func, var);
+		Expression expr = SymbolTable.getVar(var);
 		// += is valid for numbers and sequences (and by extension, notes)
 		if (operator.equals("+=")) {
 			// Compare their types

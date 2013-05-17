@@ -2,12 +2,13 @@
 package scalr.variable;
 
 import java.util.HashMap;
+import java.util.Stack;
 
-import scalr.Exceptions.FunctionDoesNotExistError;
+import scalr.Exceptions.FunctionDoesNotExistException;
 import scalr.Exceptions.FunctionExistsError;
-import scalr.Exceptions.TypeError;
+import scalr.Exceptions.NullReferenceException;
+import scalr.Exceptions.TypeException;
 import scalr.expression.Expression;
-import scalr.expression.ExpressionType;
 import scalr.expression.Function;
 
 /**
@@ -17,103 +18,66 @@ import scalr.expression.Function;
  */
 public final class SymbolTable
 {
-	public static String	                                             currentFunctionScope	=
-	                                                                                                  "";
-	public static final HashMap<String, Function>	                     functionReferences	  =
-	                                                                                                  new HashMap<String, Function>();
-	public static final HashMap<String, HashMap<String, Expression>>	 reference	          =
-	                                                                                                  new HashMap<String, HashMap<String, Expression>>();
-	public static final HashMap<String, HashMap<String, ExpressionType>>	referenceType	  =
-	                                                                                                  new HashMap<String, HashMap<String, ExpressionType>>();
+	public static final HashMap<String, Function>	functionReferences	=
+	                                                                           new HashMap<String, Function>();
+	public static HashMap<String, Expression>	  currentSymbolTable;
+	public static Stack<Function>	              runtimeStack	       = new Stack<Function>();
 	
 	private SymbolTable() throws AssertionError
 	{
 		throw new AssertionError();
 	}
 	
-	public static void addFunc(String func) throws FunctionExistsError
+	public static void addFunc(Function f) throws FunctionExistsError
 	{
-		System.out.println("Adding function " + func);
-		if (reference.containsKey(func))
-			throw new FunctionExistsError(func);
-		HashMap<String, Expression> funcTable = new HashMap<String, Expression>();
-		HashMap<String, ExpressionType> typeTable = new HashMap<String, ExpressionType>();
-		currentFunctionScope = func;
-		reference.put(func, funcTable);
-		referenceType.put(func, typeTable);
-	}
-	
-	public static void addFuncRef(Function f)
-	{
+		System.out.println("Adding function " + f.getName());
+		if (functionReferences.containsKey(f.getName()))
+			throw new FunctionExistsError(f.getName());
 		functionReferences.put(f.getName(), f);
 	}
 	
-	public static Function getFuncRef(String id) throws FunctionDoesNotExistError
+	public static Function getFunc(String id)
 	{
 		if (!functionReferences.containsKey(id))
-			throw new FunctionDoesNotExistError(id);
-		
-		return (Function) functionReferences.get(id);
+			throw new FunctionDoesNotExistException(id);
+		return functionReferences.get(id).getCopy();
+	}
+	
+	public static boolean removeFunc(String id)
+	{
+		Function f = functionReferences.remove(id);
+		if (f == null)
+			return false;
+		return true;
 	}
 	
 	/**
 	 * Adds the given {@linkplain Variable} with the given {@linkplain String} ID to the symbol
 	 * table.
-	 * @param id
 	 * @param var
+	 * @param value
 	 * @return True if this variable doesn't exist in this table. in the table and the replacement
 	 *         variable is of the same type, false
 	 */
-	public static boolean addReference(String func, String id, Expression var) throws TypeError
+	public static boolean addVar(String var, Expression value)
 	{
-		HashMap<String, Expression> locRef = reference.get(func);
-		HashMap<String, ExpressionType> locRefType = referenceType.get(func);
-		if (!locRef.containsKey(id)) {
-			locRef.put(id, var);
-			locRefType.put(id, var.getType());
-			return true;
-		}
-		else {
-			Expression existingVar = locRef.get(id);
-			if (existingVar.getType() != var.getType())
-				throw new TypeError(id);
-			locRef.remove(id);
-			locRef.put(id, var);
-			locRefType.put(id, var.getType());
+		if (currentSymbolTable.containsKey(var)) {
+			Expression prevValue = currentSymbolTable.get(var);
+			if (prevValue.getType() != value.getType())
+				throw new TypeException(var);
+			currentSymbolTable.put(var, value);
 			return false;
 		}
-	}
-	
-	public static boolean addTypeReference(String func, String id, ExpressionType type)
-	{
-		HashMap<String, ExpressionType> locRefType = referenceType.get(func);
-		locRefType.put(id, type);
-		return true;
-	}
-	
-	public static Expression getMember(String func, String id)
-	{
-		HashMap<String, Expression> selfie = reference.get(func);
-		
-		return (Expression) selfie.get(id);
-		
-	}
-	
-	public static ExpressionType getMemberType(String func, String id)
-	{
-		HashMap<String, ExpressionType> funcTypeRef = referenceType.get(func);
-		return funcTypeRef.get(id);
-	}
-	
-	public static boolean memberExists(String func, String id)
-	{
-		boolean out = false;
-		if (reference.containsKey(func)) {
-			HashMap<String, Expression> temp = reference.get(func);
-			if (temp.containsKey(id)) {
-				out = true;
-			}
+		else {
+			currentSymbolTable.put(var, value);
+			return true;
 		}
-		return out;
+	}
+	
+	public static Expression getVar(String var)
+	{
+		if (!currentSymbolTable.containsKey(var))
+			throw new NullReferenceException(var);
+		return currentSymbolTable.get(var);
 	}
 }
