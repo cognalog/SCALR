@@ -16,8 +16,12 @@ import scalr.Exceptions.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import org.javacc.parser.ParseException;
+import org.javacc.parser.Token;
+
 public class ScalrParserTest {
 	public static File tscalrFile;
+	public static int nestingLevel;
 	public static void main(String[] args) throws Exception {
 		Scanner in = null;
 		try {
@@ -32,15 +36,14 @@ public class ScalrParserTest {
 				text += in.nextLine() + "\n";
 			text += "\n";
 			ScalrParserTest parser = new ScalrParserTest(new StringReader(text));
-			Function mainFunc = new Function("main");
-			SymbolTable.addFunc(mainFunc);
-			SymbolTable.currentSymbolTable = mainFunc.symbolTable;
-			mainFunc.addStatement(parser.statement());
-			mainFunc.addStatement(parser.statement());
-			mainFunc.addStatement(parser.statement());
-			mainFunc.addStatement(parser.statement());
-			for(Expression e: mainFunc.statements)
-				System.out.println(e.getValue());
+//			Function mainFunc = new Function("main");
+//			SymbolTable.addFunc(mainFunc);
+//			SymbolTable.currentSymbolTable = mainFunc.symbolTable;
+			parser.fscalr();
+//			mainFunc.addStatement(parser.statement());
+//			for(Expression e: mainFunc.statements)
+//				System.out.println(e.getValue());
+			System.out.println(SymbolTable.functionReferences);
 			in.close();
 		} catch (Throwable e) {
 			// Catching Throwable is ugly but JavaCC throws Error objects!
@@ -53,7 +56,7 @@ public class ScalrParserTest {
 }
 PARSER_END(ScalrParserTest)
 
-SKIP : { " " | "\t" | <"/*" (~["*","/"])* "*/"> | <"//" (~["\r","\n"])* ("\r")? "\n">| "\r" | "\n" }
+SKIP : { " " | "\t" | <"//" (~["\n"])* "\n"> | "\r" | "\n" }
 TOKEN: {
 	"volume" | "duration" | "end" | "func" | "main" | "while" | "foreach" |
 	"import" | "track" | "in" | "if" | "else" | "note" | "pitch" | "length" |
@@ -79,6 +82,64 @@ TOKEN: {
 	<ID: (["a"-"z"] | "_" | ["A" - "Z"]) (["A"-"Z"] | ["a"-"z"] | <INT> | "_")*>
 }
 
+//When a /* is seen in the DEFAULT state, skip it and switch to the IN_COMMENT state
+MORE : { "/*": IN_COMMENT }   
+//When any other character is seen in the IN_COMMENT state, skip it.
+<IN_COMMENT> MORE : { <~[]> }   
+//When a */ is seen in the IN_COMMENT state, skip it and switch back to the DEFAULT state
+<IN_COMMENT> SKIP : { "*/": DEFAULT }
+
+void fscalr(): {}
+{
+	(
+		try {
+			funcDef()
+		} catch (EmptyFunctionBodyError e) {
+			
+		}
+	)+
+}
+
+void trackExpr(): {
+	Sequence superSequence = new Sequence();
+} {
+	"track" "->" "[" trackSeq(superSequence) ("," trackSeq(superSequence))* "]" {
+		System.out.print(superSequence);
+	}
+}
+
+void trackSeq(Sequence superSequence): {
+	Expression seq;
+} {
+	seq = boolExpr() { superSequence.addSequence((Sequence) seq.getValue()); }
+}
+
+void funcDef() throws EmptyFunctionBodyError: {
+	Function func = null;
+	Token funcName;
+	Token param;
+	Token retName;
+	Expression stmt;
+} {
+	"func" { nestingLevel++; } funcName = <ID> {
+		try {
+			func = new Function(funcName.image);
+			SymbolTable.addFunc(func);
+		} catch (FunctionExistsError e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+	} "(" (param = <ID> { func.addParameter(param.image); }
+		("," param = <ID> { func.addParameter(param.image); })*)? ")"
+			(stmt = statement() { func.addStatement(stmt); })*
+			(stmt = atom() { func.addStatement(stmt); })?
+	"end" {
+		nestingLevel--;
+		if (func.statements.size() == 0)
+			throw new EmptyFunctionBodyError(func.toString());
+	}
+}
+
 Expression statement(): {
 	Expression expr;
 } {
@@ -87,7 +148,6 @@ Expression statement(): {
 	| expr = foreachExpr() { return expr; }
 	| expr = ifElseExpr() { return expr; }
 	| expr = controlExpr() { return expr; }
-	| expr = sequence() { return expr; }
 }
 
 Expression controlExpr(): {
@@ -103,7 +163,7 @@ Expression ifElseExpr(): {
 	Expression cond;
 	Expression stmt;
 } {
-	"if" "(" cond = boolExpr() { ifElse = new IfElseStatement(cond); } ")"
+	"if" { nestingLevel++; } "(" cond = boolExpr() { ifElse = new IfElseStatement(cond); } ")"
 		(stmt = statement() { ifElse.addStatement(stmt); })*
 	(
 		"else" "if" "(" cond = boolExpr() { ifElse.addElIf(cond); } ")"
@@ -113,7 +173,7 @@ Expression ifElseExpr(): {
 		"else" { ifElse.addEl(); }
 			(stmt = statement() { ifElse.addStatement(stmt); })*
 	)?
-	"end" { return ifElse; }
+	"end" { nestingLevel--; return ifElse; }
 }
 
 Expression foreachExpr(): {
@@ -122,14 +182,14 @@ Expression foreachExpr(): {
 	Token seqName;
 	Expression stmt;
 } {
-	"foreach" "(" noteName = <ID> {
+	"foreach" { nestingLevel++; } "(" noteName = <ID> {
 		forLoop = new ForEachStatement(noteName.image);
 	} ")" "in" seqName = <ID> {
 		VariableReference seq = new VariableReference(seqName.image);
 		forLoop.addSequence(seq);
 	}
 		(stmt = statement() { forLoop.addStatement(stmt); })+
-	"end" {	return forLoop;	}
+	"end" {	nestingLevel--; return forLoop;	}
 }
 
 Expression whileExpr(): {
@@ -137,9 +197,9 @@ Expression whileExpr(): {
 	Expression cond;
 	Expression stmt;
 } {
-	"while" "(" cond = boolExpr() { whileLoop = new WhileStatement(cond); } ")"
+	"while" { nestingLevel++; } "(" cond = boolExpr() { whileLoop = new WhileStatement(cond); } ")"
 		(stmt = statement() { whileLoop.addStatement(stmt);	})+
-	"end" { return whileLoop; }
+	"end" { nestingLevel--; return whileLoop; }
 }
 
 Expression idExpr(): {
@@ -178,13 +238,12 @@ Expression funcCall(String name): {
 	Token funcArg;
 	Expression arg;
 	ArrayList<Expression> arguments = new ArrayList<Expression>();
-	Function f = null;
+	FunctionReference fr = new FunctionReference(name);
 } {
 	"(" (arg = boolExpr() { arguments.add(arg); }
 		("," arg = boolExpr() { arguments.add(arg); })*)? ")" {
-		f = SymbolTable.getFunc(name);
-		f.addValues(arguments.toArray(new Expression[arguments.size()]));
-		return f; 
+			fr.addValues(arguments.toArray(new Expression[arguments.size()]));
+			return fr; 
 	}
 }
 

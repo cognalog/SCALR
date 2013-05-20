@@ -39,7 +39,7 @@ public class Sequence implements Variable
 	public void addSequence(Sequence seq)
 	{
 		for (Expression n : seq.notes)
-			notes.add(n);
+			notes.add(((Note) n.getValue()).getCopy());
 	}
 	
 	public ArrayList<Expression> getSequence()
