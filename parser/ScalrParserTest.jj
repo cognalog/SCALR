@@ -3,16 +3,19 @@ options
 	LOOKAHEAD = 3;
 	STATIC = false;
 	FORCE_LA_CHECK = true;
+	USER_CHAR_STREAM = true;
 }
 
 PARSER_BEGIN(ScalrParserTest)
 package parser;
-import java.io.*;
 
 import scalr.Degree;
 import scalr.variable.*;
 import scalr.expression.*;
 import scalr.Exceptions.*;
+
+import java.io.*;
+
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -36,11 +39,11 @@ public class ScalrParserTest {
 			while (in.hasNextLine())
 				text += in.nextLine() + "\n";
 			text += "\n";
-			ScalrParserTest parser = new ScalrParserTest(new StringReader(text));
+			ScalrParserTest parser = new ScalrParserTest(new BackupCharStream(new StringReader(text)));
 //			Function mainFunc = new Function("main");
 //			SymbolTable.addFunc(mainFunc);
 //			SymbolTable.currentSymbolTable = mainFunc.symbolTable;
-			parser.fscalr();
+			parser.importExpr();
 //			mainFunc.addStatement(parser.statement());
 //			for(Expression e: mainFunc.statements)
 //				System.out.println(e.getValue());
@@ -57,12 +60,17 @@ public class ScalrParserTest {
 }
 PARSER_END(ScalrParserTest)
 
+TOKEN_MGR_DECLS : {
+	// Required by SetState
+	void backup(int n) { input_stream.backup(n); }
+}
+
 SKIP : { " " | "\t" | <"//" (~["\n"])* "\n"> | "\r" | "\n" }
 TOKEN: {
 	"volume" | "duration" | "end" | "func" | "main" | "while" | "foreach" |
-	"import" | "track" | "in" | "if" | "else" | "note" | "pitch" | "length" |
-	"break" | "rest" | "cancel" | "return" |
-	"->" | "." | "," | "\"" | "(" | ")" | "[" | "]" |
+	"track" | "in" | "if" | "else" | "note" | "pitch" | "length" |
+	"break" | "rest" | "cancel" | "return" | "import" |
+	"->" | "." | "," | "(" | ")" | "[" | "]" | "{" | "}" |
 	<CREATE: "="> |
 	<ASSIGN: "+=" | "-=" | "*=" | "/=" | "%="> |
 	<NRELN: "<" | ">" | ">=" | "<="> |
@@ -84,11 +92,54 @@ TOKEN: {
 }
 
 //When a /* is seen in the DEFAULT state, skip it and switch to the IN_COMMENT state
-MORE : { "/*": IN_COMMENT }   
+MORE : { "/*": IN_COMMENT }
 //When any other character is seen in the IN_COMMENT state, skip it.
-<IN_COMMENT> MORE : { <~[]> }   
+<IN_COMMENT> MORE : { <~[]> }
 //When a */ is seen in the IN_COMMENT state, skip it and switch back to the DEFAULT state
 <IN_COMMENT> SKIP : { "*/": DEFAULT }
+// Import Lexical States
+<IN_IMPORT> MORE : { <~["\""]> }
+<IN_IMPORT> TOKEN : { "\"": DEFAULT }
+
+void importExpr(): {
+	File fscalrFile;
+	String name = "";
+	Token tok;
+} {
+	"import" "\"" { SetState(IN_IMPORT); } {
+		// The name starts with a "/" or "\", so it is an absolute path
+		if (name.startsWith(System.getProperty("file.separator"))) {
+			// This file has an extension, so don't include .fscalr
+			if (Pattern.matches("^.*\\.\\w+$", name))
+				fscalrFile = new File(name);
+			else
+				fscalrFile = new File(name + ".fscalr");
+		}
+		else {
+			if (Pattern.matches("^.*\\.\\w+$", name))
+				fscalrFile = new File(tscalrFile.getParent(), name);
+			else
+				fscalrFile = new File(tscalrFile.getParent(), name + ".fscalr");
+		}
+		// Read in the file
+		try {
+			Scanner in = new Scanner(fscalrFile);
+			String text = "";
+			while (in.hasNextLine())
+				text += in.nextLine() + "\n";
+			// Print out the file
+			System.out.println("**************");
+			System.out.println(text.trim());
+			System.out.println("**************");
+			ScalrParserTest fscalrParser = new ScalrParserTest(new BackupCharStream(new StringReader(text)));
+			fscalrParser.fscalr();
+		} catch (Exception e) {
+			System.err.println("Syntax check failed: ");
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+}
 
 void fscalr(): {
 	boolean endOfFile;
@@ -110,6 +161,7 @@ void fscalr(): {
 JAVACODE
 boolean badToken()
 {
+	System.out.println("bad token");
 	Token t;
 	do {
 		t = getNextToken();
@@ -560,5 +612,48 @@ Expression lenTok(Expression n): {
 		no.addOperand(n);
 		no.addLength(len.image);
 		return no;
+	}
+}
+
+JAVACODE
+//JavaCC hack for doing lexical state transitions syntactically
+private void SetState(int state) {
+	if (state != token_source.curLexState) {
+		Token root = new Token(), last=root;
+		root.next = null;
+		
+		// First, we build a list of tokens to push back, in backwards order
+		while (token.next != null) {
+			Token t = token;
+			// Find the token whose token.next is the last in the chain
+			while (t.next != null && t.next.next != null)
+				t = t.next;
+			
+			// put it at the end of the new chain
+			last.next = t.next;
+			last = t.next;
+			
+			// If there are special tokens, these go before the regular tokens,
+			// so we want to push them back onto the input stream in the order
+			// we find them along the specialToken chain.
+			
+			if (t.next.specialToken != null) {
+				Token tt=t.next.specialToken;
+				while (tt != null) {
+					last.next = tt;
+					last = tt;
+					tt.next = null;
+					tt = tt.specialToken;
+				}
+			}
+			t.next = null;
+		};
+		
+		while (root.next != null) {
+			token_source.backup(root.next.image.length());
+			root.next = root.next.next;
+		}
+		jj_ntk = -1;
+		token_source.SwitchTo(state);
 	}
 }

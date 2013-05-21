@@ -1,6 +1,7 @@
 
 package scalr.Exceptions;
 
+
 public class IllegalStatementException extends RuntimeException
 {
 	private static final long	serialVersionUID	= 6339629682125241131L;
