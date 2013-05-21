@@ -22,6 +22,7 @@ import org.javacc.parser.Token;
 public class ScalrParserTest {
 	public static File tscalrFile;
 	public static int nestingLevel;
+	public static String currentFunc;
 	public static void main(String[] args) throws Exception {
 		Scanner in = null;
 		try {
@@ -89,15 +90,38 @@ MORE : { "/*": IN_COMMENT }
 //When a */ is seen in the IN_COMMENT state, skip it and switch back to the DEFAULT state
 <IN_COMMENT> SKIP : { "*/": DEFAULT }
 
-void fscalr(): {}
-{
+void fscalr(): {
+	boolean endOfFile;
+} {
 	(
 		try {
 			funcDef()
+			| endOfFile = badToken() { if (endOfFile) return; }
 		} catch (EmptyFunctionBodyError e) {
-			
+			SymbolTable.functionReferences.remove(currentFunc);
+			System.err.println(e);
+		} catch (ParseException e) {
+			SymbolTable.functionReferences.remove(currentFunc);
+			System.err.println(e);
 		}
 	)+
+}
+
+JAVACODE
+boolean badToken()
+{
+	Token t;
+	do {
+		t = getNextToken();
+		System.out.println(t);
+		if (t.kind == EOF)
+			return true;
+	} while (!t.image.equals("end"));
+	if (--nestingLevel == 0) {
+		System.out.println(nestingLevel);
+		return true;
+	}
+	return false;
 }
 
 void trackExpr(): {
@@ -123,6 +147,7 @@ void funcDef() throws EmptyFunctionBodyError: {
 } {
 	"func" { nestingLevel++; } funcName = <ID> {
 		try {
+			currentFunc = funcName.image;
 			func = new Function(funcName.image);
 			SymbolTable.addFunc(func);
 		} catch (FunctionExistsError e) {

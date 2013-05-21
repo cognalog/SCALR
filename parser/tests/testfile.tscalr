@@ -4,8 +4,6 @@ func test(id)
 	// I wonder if comments work
 	id(id)
 end
+end
 func test2()
-	x = 5
-	z = [ note ]
-	z *= x
 end
