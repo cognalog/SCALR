@@ -25,6 +25,7 @@
 *.DS_Store
 *output.mid
 *.classpath
+*.CharStream
 
 # A file I often create that contains scratch work not interesting to anyone
 scalr/misc/scratch.java
