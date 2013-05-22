@@ -26,7 +26,6 @@ public class ScalrParserTest {
 	public static File tscalrFile;
 	public static int nestingLevel;
 	public static String currentFunc;
-	public static String importName = "";
 	public static void main(String[] args) throws Exception {
 		Scanner in = null;
 		try {
@@ -99,24 +98,27 @@ MORE : { "/*": IN_COMMENT }
 //When a */ is seen in the IN_COMMENT state, skip it and switch back to the DEFAULT state
 <IN_COMMENT> SKIP : { "*/": DEFAULT }
 // Import Lexical States
-<IN_IMPORT> MORE : { <~["\""]> { ScalrParserTest.importName += image.toString(); } }
-<IN_IMPORT> TOKEN : { "\"" { ScalrParserTest.importName += image.toString(); System.out.println(image); }: DEFAULT }
+<IN_IMPORT> MORE : { <~["\""]> }
+<IN_IMPORT> TOKEN : { "\"": DEFAULT }
 
 void importExpr(): {
 	File fscalrFile;
-	String name = "";
 	Token tok;
 } {
-	"import" "\"" { SetState(IN_IMPORT); } {
-		System.out.println(importName);
+	"import" "\"" {
+        SetState(IN_IMPORT);
+        tok = getNextToken();
+        String name = tok.image;
+        name = name.substring(0, name.length() - 1);
 		// The name starts with a "/" or "\", so it is an absolute path
-		if (name.startsWith(System.getProperty("file.separator"))) {
+		if (name.startsWith("\\") || name.startsWith("/")) {
 			// This file has an extension, so don't include .fscalr
 			if (Pattern.matches("^.*\\.\\w+$", name))
 				fscalrFile = new File(name);
 			else
 				fscalrFile = new File(name + ".fscalr");
 		}
+		// Otherwise, it's a relative path
 		else {
 			if (Pattern.matches("^.*\\.\\w+$", name))
 				fscalrFile = new File(tscalrFile.getParent(), name);
@@ -131,7 +133,7 @@ void importExpr(): {
 				text += in.nextLine() + "\n";
 			// Print out the file
 			System.out.println("**************");
-			System.out.println(text.trim());
+			System.out.println(text);
 			System.out.println("**************");
 			ScalrParserTest fscalrParser = new ScalrParserTest(new BackupCharStream(new StringReader(text)));
 			fscalrParser.fscalr();
@@ -173,7 +175,7 @@ boolean badToken()
 	} while (!t.image.equals("end"));
 	if (--nestingLevel == 0) {
 		System.out.println(nestingLevel);
-		return true;
+		return false;
 	}
 	return false;
 }
@@ -322,7 +324,7 @@ Expression funcCall(String name): {
 	"(" (arg = boolExpr() { arguments.add(arg); }
 		("," arg = boolExpr() { arguments.add(arg); })*)? ")" {
 			fr.addValues(arguments.toArray(new Expression[arguments.size()]));
-			return fr; 
+			return fr;
 	}
 }
 
@@ -375,7 +377,7 @@ Expression boolFactor(): {
 	Token bool;
 } {
 	bool = <BOOL> { return new ScalrBoolean(Boolean.parseBoolean(bool.image)); }
-	| e1 = lowRelTerm() { return e1; } 
+	| e1 = lowRelTerm() { return e1; }
 }
 
 Expression lowRelTerm(): {
@@ -514,7 +516,7 @@ Expression noteID(): {
 	Expression n;
 	Token name;
 } {
-	name = <ID> { n = new VariableReference(name.image); } 
+	name = <ID> { n = new VariableReference(name.image); }
 	("." n = noteOps(n))* { return n; }
 }
 
@@ -605,7 +607,7 @@ Expression length(Expression n): {
 		return no;
 	}
 }
-	
+
 Expression lenTok(Expression n): {
 	Token len;
 } {
@@ -623,22 +625,23 @@ private void SetState(int state) {
 	if (state != token_source.curLexState) {
 		Token root = new Token(), last=root;
 		root.next = null;
-		
+
 		// First, we build a list of tokens to push back, in backwards order
 		while (token.next != null) {
+            System.out.println(token);
 			Token t = token;
 			// Find the token whose token.next is the last in the chain
 			while (t.next != null && t.next.next != null)
 				t = t.next;
-			
+
 			// put it at the end of the new chain
 			last.next = t.next;
 			last = t.next;
-			
+
 			// If there are special tokens, these go before the regular tokens,
 			// so we want to push them back onto the input stream in the order
 			// we find them along the specialToken chain.
-			
+
 			if (t.next.specialToken != null) {
 				Token tt=t.next.specialToken;
 				while (tt != null) {
@@ -650,8 +653,9 @@ private void SetState(int state) {
 			}
 			t.next = null;
 		};
-		
+
 		while (root.next != null) {
+			System.out.println(root);
 			token_source.backup(root.next.image.length());
 			root.next = root.next.next;
 		}
