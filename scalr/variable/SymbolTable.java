@@ -22,12 +22,12 @@ public final class SymbolTable
 	                                                                           new HashMap<String, Function>();
 	public static HashMap<String, Expression>	  currentSymbolTable;
 	public static Stack<Function>	              runtimeStack	       = new Stack<Function>();
-	
+
 	private SymbolTable() throws AssertionError
 	{
 		throw new AssertionError();
 	}
-	
+
 	public static void addFunc(Function f) throws FunctionExistsError
 	{
 		System.out.println("Adding function " + f.getName());
@@ -35,22 +35,20 @@ public final class SymbolTable
 			throw new FunctionExistsError(f.getName());
 		functionReferences.put(f.getName(), f);
 	}
-	
+
 	public static Function getFunc(String id)
 	{
 		if (!functionReferences.containsKey(id))
 			throw new FunctionDoesNotExistException(id);
 		return functionReferences.get(id).getCopy();
 	}
-	
+
 	public static boolean removeFunc(String id)
 	{
 		Function f = functionReferences.remove(id);
-		if (f == null)
-			return false;
-		return true;
+		return f != null;
 	}
-	
+
 	/**
 	 * Adds the given {@linkplain Variable} with the given {@linkplain String} ID to the symbol
 	 * table.
@@ -73,7 +71,7 @@ public final class SymbolTable
 			return true;
 		}
 	}
-	
+
 	public static Expression getVar(String var)
 	{
 		if (!currentSymbolTable.containsKey(var))

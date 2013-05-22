@@ -1,11 +1,9 @@
 import "testfile.fscalr"
+import "testfile.fscalr"
 
-func test(id)
-	/* I* wonder if all comments work
-	 * this is now a multiline comment*/
-	// I wonder if comments work
-	id(id)
+main
+	x = 5
+	z = note
 end
-end
-func test2()
-end
+
+track -> [ [z] ]

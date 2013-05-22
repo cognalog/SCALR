@@ -43,11 +43,10 @@ public class ScalrParserTest {
 //			Function mainFunc = new Function("main");
 //			SymbolTable.addFunc(mainFunc);
 //			SymbolTable.currentSymbolTable = mainFunc.symbolTable;
-			parser.importExpr();
+			parser.tscalr();
 //			mainFunc.addStatement(parser.statement());
 //			for(Expression e: mainFunc.statements)
 //				System.out.println(e.getValue());
-			System.out.println(SymbolTable.functionReferences);
 			in.close();
 		} catch (Throwable e) {
 			// Catching Throwable is ugly but JavaCC throws Error objects!
@@ -100,6 +99,21 @@ MORE : { "/*": IN_COMMENT }
 // Import Lexical States
 <IN_IMPORT> MORE : { <~["\""]> }
 <IN_IMPORT> TOKEN : { "\"": DEFAULT }
+
+void tscalr(): {
+	Expression stmt;
+} {
+	(importExpr())+
+
+	"main" {
+		HashMap<String, Expression> mainTable = new HashMap<String, Expression>();
+		SymbolTable.currentSymbolTable = mainTable;
+	}
+		(stmt = statement() { if (stmt != null) stmt.getValue(); })+
+	"end" { System.out.println("Below are the tracks:"); }
+
+	(trackExpr())+
+}
 
 void importExpr(): {
 	File fscalrFile;
@@ -158,6 +172,10 @@ void fscalr(): {
 		} catch (ParseException e) {
 			SymbolTable.functionReferences.remove(currentFunc);
 			System.err.println(e);
+		} catch (FunctionExistsError e) {
+			System.err.println(e);
+			if (badToken())
+				return;
 		}
 	)+
 }
@@ -169,12 +187,10 @@ boolean badToken()
 	Token t;
 	do {
 		t = getNextToken();
-		System.out.println(t);
 		if (t.kind == EOF)
 			return true;
 	} while (!t.image.equals("end"));
 	if (--nestingLevel == 0) {
-		System.out.println(nestingLevel);
 		return false;
 	}
 	return false;
@@ -194,7 +210,7 @@ void trackSeq(Sequence superSequence): {
 	seq = boolExpr() { superSequence.addSequence((Sequence) seq.getValue()); }
 }
 
-void funcDef() throws EmptyFunctionBodyError: {
+void funcDef() throws EmptyFunctionBodyError, FunctionExistsError: {
 	Function func = null;
 	Token funcName;
 	Token param;
@@ -202,14 +218,9 @@ void funcDef() throws EmptyFunctionBodyError: {
 	Expression stmt;
 } {
 	"func" { nestingLevel++; } funcName = <ID> {
-		try {
-			currentFunc = funcName.image;
-			func = new Function(funcName.image);
-			SymbolTable.addFunc(func);
-		} catch (FunctionExistsError e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+		currentFunc = funcName.image;
+		func = new Function(funcName.image);
+		SymbolTable.addFunc(func);
 	} "(" (param = <ID> { func.addParameter(param.image); }
 		("," param = <ID> { func.addParameter(param.image); })*)? ")"
 			(stmt = statement() { func.addStatement(stmt); })*
@@ -224,11 +235,16 @@ void funcDef() throws EmptyFunctionBodyError: {
 Expression statement(): {
 	Expression expr;
 } {
-	expr = idExpr() { return expr; }
-	| expr = whileExpr() { return expr; }
-	| expr = foreachExpr() { return expr; }
-	| expr = ifElseExpr() { return expr; }
-	| expr = controlExpr() { return expr; }
+	try {
+		expr = idExpr() { return expr; }
+		| expr = whileExpr() { return expr; }
+		| expr = foreachExpr() { return expr; }
+		| expr = ifElseExpr() { return expr; }
+		| expr = controlExpr() { return expr; }
+	} catch (ParseException e) {
+		e.printStackTrace();
+		return null;
+	}
 }
 
 Expression controlExpr(): {
@@ -628,7 +644,6 @@ private void SetState(int state) {
 
 		// First, we build a list of tokens to push back, in backwards order
 		while (token.next != null) {
-            System.out.println(token);
 			Token t = token;
 			// Find the token whose token.next is the last in the chain
 			while (t.next != null && t.next.next != null)
@@ -655,7 +670,6 @@ private void SetState(int state) {
 		};
 
 		while (root.next != null) {
-			System.out.println(root);
 			token_source.backup(root.next.image.length());
 			root.next = root.next.next;
 		}
