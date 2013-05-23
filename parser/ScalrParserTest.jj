@@ -268,8 +268,8 @@ Expression ifElseExpr(): {
 	"if" { nestingLevel++; } "(" cond = boolExpr() { ifElse = new IfElseStatement(cond); } ")"
 		(stmt = statement() { ifElse.addStatement(stmt); })*
 	(
-		LOOKAHEAD(2)
-		"else" "if" "(" cond = boolExpr() { ifElse.addElIf(cond); } ")"
+		LOOKAHEAD({ getToken(2).kind == IFTOK })
+		"else" <IFTOK: "if"> "(" cond = boolExpr() { ifElse.addElIf(cond); } ")"
 			(stmt = statement() { ifElse.addStatement(stmt); })*
 	)*
 	(
