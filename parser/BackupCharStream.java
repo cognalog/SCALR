@@ -116,10 +116,8 @@ public final class BackupCharStream implements CharStream
 				// it's an ugly hack, but we want to pass this exception
 				// through the JavaCC parser, since it has a bad
 				// exception handling
-				System.out.println("here");
 				throw e;
 			}
-			System.out.println("here");
 			throw e;
 		}
 	}

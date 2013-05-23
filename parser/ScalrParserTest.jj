@@ -1,8 +1,6 @@
 options
 {
-	LOOKAHEAD = 3;
 	STATIC = false;
-	FORCE_LA_CHECK = true;
 	USER_CHAR_STREAM = true;
 }
 
@@ -97,8 +95,8 @@ MORE : { "/*": IN_COMMENT }
 //When a */ is seen in the IN_COMMENT state, skip it and switch back to the DEFAULT state
 <IN_COMMENT> SKIP : { "*/": DEFAULT }
 // Import Lexical States
-<IN_IMPORT> MORE : { <~["\""]> }
-<IN_IMPORT> TOKEN : { "\"": DEFAULT }
+<IN_IMPORT> MORE : { <~[]> }
+<IN_IMPORT> TOKEN : { <IMPEND: "import" | "main">: DEFAULT }
 
 void tscalr(): {
 	Expression stmt;
@@ -119,11 +117,21 @@ void importExpr(): {
 	File fscalrFile;
 	Token tok;
 } {
-	"import" "\"" {
+	"import" {
         SetState(IN_IMPORT);
         tok = getNextToken();
         String name = tok.image;
-        name = name.substring(0, name.length() - 1);
+        if (name.endsWith("main")) {
+        	token_source.backup(4);
+        	name = name.substring(0, name.length() - 4);
+        }
+        else if (name.endsWith("import")) {
+        	token_source.backup(6);
+        	name = name.substring(0, name.length() - 6);
+        }
+        // Remove all whitespace
+        name = name.replaceAll("\\s", "");
+        System.out.println(name);
 		// The name starts with a "/" or "\", so it is an absolute path
 		if (name.startsWith("\\") || name.startsWith("/")) {
 			// This file has an extension, so don't include .fscalr
@@ -223,7 +231,9 @@ void funcDef() throws EmptyFunctionBodyError, FunctionExistsError: {
 		SymbolTable.addFunc(func);
 	} "(" (param = <ID> { func.addParameter(param.image); }
 		("," param = <ID> { func.addParameter(param.image); })*)? ")"
-			(stmt = statement() { func.addStatement(stmt); })*
+			(LOOKAHEAD(2)
+				stmt = statement() { func.addStatement(stmt); }
+			)*
 			(stmt = atom() { func.addStatement(stmt); })?
 	"end" {
 		nestingLevel--;
@@ -235,16 +245,11 @@ void funcDef() throws EmptyFunctionBodyError, FunctionExistsError: {
 Expression statement(): {
 	Expression expr;
 } {
-	try {
-		expr = idExpr() { return expr; }
-		| expr = whileExpr() { return expr; }
-		| expr = foreachExpr() { return expr; }
-		| expr = ifElseExpr() { return expr; }
-		| expr = controlExpr() { return expr; }
-	} catch (ParseException e) {
-		e.printStackTrace();
-		return null;
-	}
+	expr = idExpr() { return expr; }
+	| expr = whileExpr() { return expr; }
+	| expr = foreachExpr() { return expr; }
+	| expr = ifElseExpr() { return expr; }
+	| expr = controlExpr() { return expr; }
 }
 
 Expression controlExpr(): {
@@ -263,6 +268,7 @@ Expression ifElseExpr(): {
 	"if" { nestingLevel++; } "(" cond = boolExpr() { ifElse = new IfElseStatement(cond); } ")"
 		(stmt = statement() { ifElse.addStatement(stmt); })*
 	(
+		LOOKAHEAD(2)
 		"else" "if" "(" cond = boolExpr() { ifElse.addElIf(cond); } ")"
 			(stmt = statement() { ifElse.addStatement(stmt); })*
 	)*
@@ -552,34 +558,32 @@ Expression noteOps(Expression n): {}
 }
 
 Expression pitch(Expression n): {
+	NoteOps no = new NoteOps("pit");
 	Token mod = null;
 	Token deg;
 	Token scale;
 	Expression modNum;
 } {
 	deg = <DEGREE> {
-		NoteOps no = new NoteOps("pit");
 		no.addOperand(n);
 		no.addPitch(deg.image);
 		return no;
 	}
-	| (mod = <PLUS>)? modNum = boolExpr() {
-		NoteOps no = new NoteOps("pit");
+	| LOOKAHEAD({ getToken(2).kind != OPBR })
+	(mod = <PLUS>)? modNum = boolExpr() {
 		no.addOperand(n);
 		no.addNum(modNum);
 		if (mod != null)
 			no.addMod(mod.image);
 		return no;
 	}
-	| scale = <ID> "[" modNum = boolExpr() "]" {
-		NoteOps no = new NoteOps("pit");
+	| scale = <ID> <OPBR: "["> modNum = boolExpr() "]" {
 		no.addOperand(n);
 		no.addIndex(modNum);
 		no.addScale(new VariableReference(scale.image));
 		return no;
 	}
 	| "rest" {
-		NoteOps no = new NoteOps("pit");
 		no.addOperand(n);
 		no.addPitch("br");
 		return no;
@@ -601,12 +605,12 @@ Expression volume(Expression n): {
 }
 
 Expression length(Expression n): {
+	NoteOps no = new NoteOps("len");
 	Expression num;
 	Token mod = null;
 	Token numer, denom = null;
 } {
 	(mod = <PLUS>)? num = boolExpr() {
-		NoteOps no = new NoteOps("len");
 		no.addOperand(n);
 		no.addNum(num);
 		if (mod != null)
@@ -614,7 +618,6 @@ Expression length(Expression n): {
 		return no;
 	}
 	| "\"" numer = <INT> (<DIV> denom = <INT>)? "\"" {
-		NoteOps no = new NoteOps("len");
 		no.addOperand(n);
 		if (denom != null)
 			no.addLength(numer.image + "/" + denom.image);
