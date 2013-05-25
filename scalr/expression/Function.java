@@ -19,7 +19,7 @@ public class Function implements Expression
 	public ArrayList<Expression>	   statements;
 	private Expression[]	           parameterValues;
 	public HashMap<String, Expression>	symbolTable;
-	
+
 	public Function(String name)
 	{
 		id = name;
@@ -27,35 +27,35 @@ public class Function implements Expression
 		statements = new ArrayList<Expression>();
 		symbolTable = new HashMap<String, Expression>();
 	}
-	
+
 	public void addParameter(String name)
 	{
 		if (parameterName.contains(name))
 			throw new TypeException(name);
 		parameterName.add(name);
 	}
-	
+
 	public void addValues(Expression... expressions)
 	{
 		this.parameterValues = expressions;
 	}
-	
+
 	public void addStatement(Expression expr)
 	{
 		if (expr != null)
 			statements.add(expr);
 	}
-	
+
 	public boolean hasParameter(String paramName)
 	{
 		return parameterName.contains(paramName);
 	}
-	
+
 	public String getName()
 	{
 		return id;
 	}
-	
+
 	@Override
 	public Expression getValue()
 	{
@@ -70,17 +70,16 @@ public class Function implements Expression
 		for (int i = 0; i < parameterValues.length; i++)
 			symbolTable.put(parameterName.get(i),
 			        ((Variable) parameterValues[i].getValue()).getCopy());
-		
+
 		// Mark the old symbol table
 		HashMap<String, Expression> parentTable = SymbolTable.currentSymbolTable;
 		// Change the current symbol table to us
 		SymbolTable.currentSymbolTable = symbolTable;
 		// Push our selves onto the stack
 		SymbolTable.runtimeStack.push(this);
-		
+
 		// Execute the stataments
 		for (int i = 0; i < statements.size() - 1; i++) {
-			System.out.println("Function " + id + ": " + statements.get(i).getClass());
 			Expression expr = statements.get(i).getValue();
 			if (expr != null) {
 				if (expr.getType() == ExpressionType.RETURN) {
@@ -99,7 +98,6 @@ public class Function implements Expression
 		if (lastExpr == null)
 			throw new IllegalReturnException(statements.get(statements.size() - 1).getClass()
 			        .toString());
-		System.out.println("Return: " + lastExpr.getClass());
 		if (lastExpr.getType() == ExpressionType.NOTE)
 			lastExpr = new Sequence(lastExpr);
 		else if (lastExpr.getType() == ExpressionType.CANCEL)
@@ -108,14 +106,14 @@ public class Function implements Expression
 			lastExpr = ((ControlOperation) lastExpr).getReturn().getValue();
 		else if (lastExpr.getType() != ExpressionType.SEQUENCE)
 			throw new IllegalReturnException(lastExpr.toString());
-		
+
 		// Restore the old symbol table
 		SymbolTable.currentSymbolTable = parentTable;
 		// Remove our selves from the stack
 		SymbolTable.runtimeStack.pop();
 		return lastExpr;
 	}
-	
+
 	public Function getCopy()
 	{
 		Function func = new Function(id);
@@ -123,13 +121,13 @@ public class Function implements Expression
 		func.statements = new ArrayList<Expression>(statements);
 		return func;
 	}
-	
+
 	@Override
 	public ExpressionType getType()
 	{
 		return ExpressionType.SEQUENCE;
 	}
-	
+
 	public static void printStackTrace(String message)
 	{
 		System.err.println(message);
@@ -137,7 +135,7 @@ public class Function implements Expression
 		for (int i = 2; i < stack.length; i++)
 			System.err.println("\t" + stack[i]);
 	}
-	
+
 	@Override
 	public String toString()
 	{
