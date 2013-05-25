@@ -2,6 +2,7 @@ options
 {
 	STATIC = false;
 	USER_CHAR_STREAM = true;
+	DEBUG_PARSER = true;
 }
 
 PARSER_BEGIN(ScalrParser)
