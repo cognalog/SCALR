@@ -1,9 +1,9 @@
-import "testfile.fscalr"
-import "testfile.fscalr"
+import testfile.fscalr
+import testfile
 
 main
-	x = 5
-	z = note
+	x = 0
+	z = testfunc([], 1)
 end
 
-track -> [ [z] ]
+track -> [ z ]

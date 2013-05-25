@@ -63,7 +63,7 @@ SKIP : { " " | "\t" | <"//" (~["\n"])* "\n"> | "\r" | "\n" }
 TOKEN: {
 	"volume" | "duration" | "end" | "func" | "main" | "while" | "foreach" |
 	"track" | "in" | "if" | "else" | "note" | "pitch" | "length" |
-	"break" | "rest" | "cancel" | "return" | "import" |
+	"break" | "rest" | "cancel" | "return" | "import" | "print" |
 	"->" | "." | "," | "(" | ")" | "[" | "]" | "{" | "}" |
 	<CREATE: "="> |
 	<ASSIGN: "+=" | "-=" | "*=" | "/=" | "%="> |
@@ -247,6 +247,13 @@ Expression statement(): {
 	| expr = foreachExpr() { return expr; }
 	| expr = ifElseExpr() { return expr; }
 	| expr = controlExpr() { return expr; }
+	| expr = printExpr() { return expr; }
+}
+
+Expression printExpr(): {
+	Expression tok;
+} {
+	"print" "(" tok = boolExpr() ")" { return new PrintStatement(tok); }
 }
 
 Expression controlExpr(): {
@@ -572,6 +579,8 @@ Expression pitch(Expression n): {
 		no.addNum(modNum);
 		if (mod != null)
 			no.addMod(mod.image);
+		else
+			System.out.println("Not modding a pitch");
 		return no;
 	}
 	| scale = <ID> <OPBR: "["> modNum = boolExpr() "]" {

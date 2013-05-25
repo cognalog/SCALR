@@ -17,32 +17,32 @@ public class NoteOps implements Expression
 	private Length	   len;
 	private Expression	index;
 	private Expression	scale;
-	
+
 	public NoteOps(String type)
 	{
 		this.type = type;
 	}
-	
+
 	public void addOperand(Expression expr)
 	{
 		note = expr;
 	}
-	
+
 	public void addMod(String s)
 	{
 		mod = s;
 	}
-	
+
 	public void addNum(Expression expr)
 	{
 		num = expr;
 	}
-	
+
 	public void addPitch(String pit)
 	{
 		deg = Degree.valueOf(pit);
 	}
-	
+
 	public void addLength(String len)
 	{
 		for (Length l : Length.values()) {
@@ -54,17 +54,17 @@ public class NoteOps implements Expression
 		// If we didn't return, then we could have the actual length
 		this.len = Length.valueOf(len);
 	}
-	
+
 	public void addIndex(Expression expr)
 	{
 		index = expr;
 	}
-	
+
 	public void addScale(Expression expr)
 	{
 		scale = expr;
 	}
-	
+
 	@Override
 	public Expression getValue()
 	{
@@ -73,13 +73,16 @@ public class NoteOps implements Expression
 			if (type.equals("pit")) {
 				if (mod != null) {
 					ScalrNum sn = (ScalrNum) num.getValue();
-					if (mod == null)
-						n.setPitch(Degree.values()[sn.getNum()]);
-					else if (mod.equals("+"))
+					if (mod.equals("+"))
 						n.modPitch(sn.getNum());
 					else if (mod.equals("-"))
 						n.modPitch(-sn.getNum());
 					return n;
+				}
+				else if (num != null) {
+					ScalrNum sn = (ScalrNum) num.getValue();
+					System.out.println("sn = " + sn);
+					return n.setPitch(Degree.values()[sn.getNum()]);
 				}
 				else if (scale != null) {
 					Scale s = (Scale) scale.getValue();
@@ -106,7 +109,7 @@ public class NoteOps implements Expression
 			else if (type.equals("vol")) {
 				if (num.getType() != ExpressionType.NUMBER)
 					return null;
-				
+
 				ScalrNum sn = (ScalrNum) num.getValue();
 				if (mod != null) {
 					if (mod.equals("+"))
@@ -121,7 +124,7 @@ public class NoteOps implements Expression
 		}
 		return null;
 	}
-	
+
 	@Override
 	public ExpressionType getType()
 	{
@@ -129,7 +132,7 @@ public class NoteOps implements Expression
 			return ExpressionType.NOTE;
 		return null;
 	}
-	
+
 	@Override
 	public String toString()
 	{

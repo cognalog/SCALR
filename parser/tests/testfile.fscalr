@@ -1,8 +1,12 @@
 func wholenotewithpitch(pit, y)
 	[note.whole.pitch(+pit)]
 end
-func testfunc()
-	x = []
-	y = wholenotewithpitch()
+func testfunc(x, n)
+	if (n < 3)
+		n++
+		x += testfunc(x, n)
+	end
+	print(n)
+	x += [note.pitch(+n)]
 	x
 end
