@@ -2,6 +2,7 @@
 package scalr.variable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import scalr.Degree;
 import scalr.expression.Expression;
@@ -9,57 +10,22 @@ import scalr.expression.ExpressionType;
 
 public class Scale implements Variable
 {
-	ArrayList<Degree>	degrees;
+	private ArrayList<Degree>	degrees;
 
 	public Scale(Degree... degrees)
 	{
 		this.degrees = new ArrayList<Degree>(degrees.length + 10);
-		for (Degree n : degrees)
-			this.degrees.add(n);
+		Collections.addAll(this.degrees, degrees);
 	}
 
 	public Degree getDegree(int index)
 	{
-		return (Degree) degrees.get(index - 1);
-	}
-
-	public void extend(int ext)
-	{
-		ArrayList<Degree> extendedDegrees = new ArrayList<Degree>(degrees.size() * ext + 10);
-		for (int i = 0; i < ext; i++)
-			for (Degree n : degrees)
-				extendedDegrees.add(n);
-		this.degrees = extendedDegrees;
-	}
-
-	public void addScale(Scale sca)
-	{
-		for (Degree n : sca.degrees)
-			degrees.add(n);
+		return degrees.get(index - 1);
 	}
 
 	public void addDegreeToEnd(Degree e)
 	{
 		degrees.add(e);
-	}
-
-	public void addDegreeToStart(Degree e)
-	{
-		if (degrees.size() > 0)
-			degrees.add(0, e);
-		else
-			degrees.add(e);
-	}
-
-	public void deleteLeftmost()
-	{
-		degrees.remove(0);
-	}
-
-	public void deleteRightmost()
-	{
-		int t = degrees.size() - 1;
-		degrees.remove(t);
 	}
 
 	@Override

@@ -18,7 +18,7 @@ public class Function implements Expression
 	private ArrayList<String>	       parameterName;
 	public ArrayList<Expression>	   statements;
 	private Expression[]	           parameterValues;
-	public HashMap<String, Expression>	symbolTable;
+	private HashMap<String, Expression>	symbolTable;
 
 	public Function(String name)
 	{
@@ -44,11 +44,6 @@ public class Function implements Expression
 	{
 		if (expr != null)
 			statements.add(expr);
-	}
-
-	public boolean hasParameter(String paramName)
-	{
-		return parameterName.contains(paramName);
 	}
 
 	public String getName()

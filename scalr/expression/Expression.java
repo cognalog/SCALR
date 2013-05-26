@@ -11,18 +11,15 @@ import scalr.variable.Variable;
  * <li>A type</li>
  * </ul>
  * To represent these things, an {@linkplain Expression} has three fields: an
- * {@linkplain ExpressionOperator}, {@linkplain Expression} as children, and an
+ * Operator, {@linkplain Expression} as children, and an
  * {@linkplain ExpressionType} types that these expressions represent. The type of the expression is
  * determined by its operator if it has one, or its variable.
+ *
  * @author mark
  */
 public interface Expression
 {
-	/**
-	 * A field that indicates the function that this expression belongs to.
-	 */
-	public String	owner	= null;
-	
+
 	/**
 	 * Evaluates this expression and returns a variable that is the result of its operations. The
 	 * resulting {@linkplain Expression} should not have an operator: it should have a single child
@@ -30,7 +27,7 @@ public interface Expression
 	 * @return The variable representing the result of this expression.
 	 */
 	public Expression getValue();
-	
+
 	/**
 	 * Returns the {@linkplain ExpressionType} of this {@linkplain Expression}. If this returns
 	 * null, then it should be assumed that the {@linkplain Expression} is simply a

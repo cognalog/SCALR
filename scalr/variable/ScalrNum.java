@@ -34,6 +34,7 @@ public class ScalrNum implements Variable
 		return this.clone();
 	}
 
+	@Override
 	public ScalrNum clone()
 	{
 		return new ScalrNum(val);

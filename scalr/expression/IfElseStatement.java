@@ -13,18 +13,18 @@ public class IfElseStatement implements Expression
 	 * This list represents the condition of an if or else if. In the case of an else, it contains a
 	 * null expression.
 	 */
-	ArrayList<Expression>	         checks	       = new ArrayList<Expression>();
+	private ArrayList<Expression>	         checks	       = new ArrayList<Expression>();
 	/**
 	 * This list represents the list of statements of an if or else if. It is the same size as
 	 * checks.
 	 */
-	ArrayList<ArrayList<Expression>>	statements	= new ArrayList<ArrayList<Expression>>();
+	private ArrayList<ArrayList<Expression>>	statements	= new ArrayList<ArrayList<Expression>>();
 	/**
 	 * Although we can simply check to see if the last elements of checks is null, it is much
 	 * quicker and clearer to simply use a boolean
 	 */
 	private boolean	                 elseAdded	   = false;
-	
+
 	/**
 	 * Constructs a set of if/else if/else statements. The constructor takes an
 	 * {@linkplain Expression} that represents the if check condition for a block, and also prepares
@@ -49,7 +49,7 @@ public class IfElseStatement implements Expression
 			System.exit(1);
 		}
 	}
-	
+
 	/**
 	 * Functions similarly to the constructor of this class. Adds an else if to this block whose
 	 * check condition is <code>expr</code>.
@@ -77,7 +77,7 @@ public class IfElseStatement implements Expression
 			System.exit(1);
 		}
 	}
-	
+
 	/**
 	 * As you know, elses don't have a check expression. They are executed when all else fails. As
 	 * such, once an else has been added, no other else(s | ifs) can be added.
@@ -99,7 +99,7 @@ public class IfElseStatement implements Expression
 			System.exit(1);
 		}
 	}
-	
+
 	/**
 	 * Adds a statement belonging to the latest if/else if/else added to this object. This class
 	 * automatically assigns it to the right one (it's nothing special, really).
@@ -112,7 +112,7 @@ public class IfElseStatement implements Expression
 		if (expr != null)
 			statements.get(statements.size() - 1).add(expr);
 	}
-	
+
 	/**
 	 * Evaluates the first if/else if that is true. If none are, then it evaluates the given else
 	 * (if it exists). Like a {@link WhileStatement}, an {@link IfElseStatement} is returns nothing
@@ -123,7 +123,7 @@ public class IfElseStatement implements Expression
 	{
 		// Get the current variables in this function scope
 		HashSet<String> prevVar = new HashSet<String>(SymbolTable.currentSymbolTable.keySet());
-		
+
 		int blockIndex = 0;
 		for (Expression check : checks) {
 			if (check != null) {
@@ -191,7 +191,7 @@ public class IfElseStatement implements Expression
 			}
 			blockIndex++;
 		}
-		
+
 		// Remove any keys that were added to the current function by this while loop.
 		ArrayList<String> currVar = new ArrayList<String>(SymbolTable.currentSymbolTable.keySet());
 		for (String var : currVar)
@@ -199,7 +199,7 @@ public class IfElseStatement implements Expression
 				SymbolTable.currentSymbolTable.remove(var);
 		return null;
 	}
-	
+
 	/**
 	 * Like a {@linkplain WhileStatement}, an {@link IfElseStatement} is type-less.
 	 */
@@ -208,5 +208,5 @@ public class IfElseStatement implements Expression
 	{
 		return null;
 	}
-	
+
 }

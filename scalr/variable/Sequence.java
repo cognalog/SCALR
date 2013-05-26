@@ -2,6 +2,7 @@
 package scalr.variable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import scalr.expression.Expression;
 import scalr.expression.ExpressionType;
@@ -9,7 +10,7 @@ import scalr.expression.Function;
 
 public class Sequence implements Variable
 {
-	ArrayList<Expression>	notes;
+	private ArrayList<Expression>	notes;
 
 	public Sequence()
 	{
@@ -19,18 +20,12 @@ public class Sequence implements Variable
 	public Sequence(Expression... notes)
 	{
 		this.notes = new ArrayList<Expression>(notes.length + 10);
-		for (Expression n : notes)
-			this.notes.add(n);
+		Collections.addAll(this.notes, notes);
 	}
 
-	public Sequence(ArrayList<Expression> noteList)
+	private Sequence(ArrayList<Expression> noteList)
 	{
 		notes = noteList;
-	}
-
-	public Note getNote(String index)
-	{
-		return (Note) notes.get(Integer.parseInt(index)).getValue();
 	}
 
 	public void extend(int ext)
@@ -56,25 +51,6 @@ public class Sequence implements Variable
 	public void addNoteToEnd(Expression e)
 	{
 		notes.add(e);
-	}
-
-	public void addNoteToStart(Expression e)
-	{
-		if (notes.size() > 0)
-			notes.add(0, e);
-		else
-			notes.add(e);
-	}
-
-	public void deleteLeftmost()
-	{
-		notes.remove(0);
-	}
-
-	public void deleteRightmost()
-	{
-		int t = notes.size() - 1;
-		notes.remove(t);
 	}
 
 	@Override
@@ -129,24 +105,4 @@ public class Sequence implements Variable
 		return result + "]";
 	}
 
-	public String flattenedToString()
-	{
-		// A track opens with a bracket
-		String result = "[";
-		// Append each note to the string
-		// for(int i = 0; i < theNotes.size(); i++)
-		for (Expression n : notes) {
-			String temp = n.getValue().toString();
-			if (n.getType() == ExpressionType.SEQUENCE) {
-				temp = temp.substring(1, temp.length() - 1);
-			}
-			result += temp + "|";
-
-		}
-		// remove the last bar (if there is a note)
-		if (notes.size() > 0)
-			result = result.substring(0, result.length() - 1);
-		// And it closes with a bracket
-		return result + "]";
-	}
 }

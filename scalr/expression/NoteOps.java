@@ -9,8 +9,8 @@ import scalr.variable.ScalrNum;
 
 public class NoteOps implements Expression
 {
-	Expression	       note;
-	String	           type;
+	private Expression	       note;
+	private String	           type;
 	private Expression	num;
 	private String	   mod;
 	private Degree	   deg;

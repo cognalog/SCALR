@@ -29,6 +29,7 @@ public class ScalrBoolean implements Variable
 		return this.clone();
 	}
 
+	@Override
 	public ScalrBoolean clone()
 	{
 		return new ScalrBoolean(val);

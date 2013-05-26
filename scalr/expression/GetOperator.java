@@ -7,22 +7,18 @@ import scalr.variable.Sequence;
 
 public class GetOperator implements Expression
 {
-	Expression	   operand;
+	private Expression	   operand;
 	private String	operator;
-	
-	/**
-	 * This class returns the length of a note, or the number of notes in a sequence.
-	 */
-	public GetOperator(String operator)
+
+	public GetOperator(String op)
 	{
-		this.operator = operator;
+		operator = op;
 	}
-	
 	public void addOperand(Expression expr)
 	{
 		operand = expr;
 	}
-	
+
 	@Override
 	public Expression getValue()
 	{
@@ -67,7 +63,7 @@ public class GetOperator implements Expression
 		// Someone used this function inappropriately.
 		return null;
 	}
-	
+
 	@Override
 	public ExpressionType getType()
 	{
@@ -86,5 +82,5 @@ public class GetOperator implements Expression
 		}
 		return null;
 	}
-	
+
 }

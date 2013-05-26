@@ -39,7 +39,7 @@ public class Note implements Variable
 	 * @param l
 	 *            - The {@linkplain Length} of this note.
 	 */
-	public Note(Degree d, int v, Length l)
+	private Note(Degree d, int v, Length l)
 	{
 		pitch = d;
 		volume = Math.max(Math.min(v, 127), 0);
@@ -80,7 +80,7 @@ public class Note implements Variable
 		}
 
 		// If we're here, then that means that they're setting the pitch
-		Degree pitch = null;
+		Degree pitch;
 		try {
 			// Capitalize the pitch
 			// If the second character is a letter, set it to lower case

@@ -7,22 +7,21 @@ import scalr.variable.Sequence;
 
 public class BinaryOperator implements Expression
 {
-	ExpressionType	exprType;
-	Expression	   expr1;
-	Expression	   expr2;
-	String	       operator;
-	
+	private ExpressionType	exprType;
+	private Expression	   expr1;
+	private Expression	   expr2;
+	private String	       operator;
+
 	/**
 	 * As defined in section 7.5 of our LRM, the plus operator is defined for numbers, sequences
 	 * (and by extension, notes).
-	 * @param expr1
-	 * @param expr2
+	 * @param operator
 	 */
 	public BinaryOperator(String operator)
 	{
 		this.operator = operator;
 	}
-	
+
 	public void addOperand(Expression expr)
 	{
 		if (expr1 == null)
@@ -30,7 +29,7 @@ public class BinaryOperator implements Expression
 		else if (expr2 == null)
 			expr2 = expr;
 	}
-	
+
 	/**
 	 * This implements the semantic actions of sections 7.4 and 7.5. The getType() method was
 	 * written first, and this it shows the pattern that this method will follow.
@@ -48,27 +47,27 @@ public class BinaryOperator implements Expression
 			}
 			// They're both sequences (or notes)
 			else if (expr1.getType() == ExpressionType.SEQUENCE) {
-				Sequence s = (Sequence) ((Sequence) expr1.getValue()).getCopy();
+				Sequence s = (Sequence) expr1.getValue();
 				if (expr2.getType() == ExpressionType.NOTE) {
-					Note n = (Note) ((Note) expr2.getValue()).getCopy();
+					Note n = ((Note) expr2.getValue()).getCopy();
 					s.addNoteToEnd(n);
 					return s;
 				}
 				else if (expr2.getType() == ExpressionType.SEQUENCE) {
-					Sequence s2 = (Sequence) ((Sequence) expr2.getValue()).getCopy();
+					Sequence s2 = (Sequence) expr2.getValue();
 					s.addSequence(s2);
 					return s;
 				}
 			}
 			else if (expr2.getType() == ExpressionType.SEQUENCE) {
-				Sequence s = (Sequence) ((Sequence) expr2.getValue()).getCopy();
+				Sequence s = (Sequence) expr2.getValue();
 				if (expr1.getType() == ExpressionType.NOTE) {
-					Note n = (Note) ((Note) expr1.getValue()).getCopy();
+					Note n = ((Note) expr1.getValue()).getCopy();
 					s.addNoteToEnd(n);
 					return s;
 				}
 				else if (expr1.getType() == ExpressionType.SEQUENCE) {
-					Sequence s2 = (Sequence) ((Sequence) expr1.getValue()).getCopy();
+					Sequence s2 = (Sequence) expr1.getValue();
 					s.addSequence(s2);
 					return s;
 				}
@@ -77,7 +76,7 @@ public class BinaryOperator implements Expression
 			        && expr2.getType() == ExpressionType.NOTE) {
 				Note n1 = (Note) expr1.getValue();
 				Note n2 = (Note) expr2.getValue();
-				return new Sequence(n1.getCopy(), n2.getCopy());
+				return new Sequence(n1, n2);
 			}
 		}
 		else if (operator.equals("-")) {
@@ -100,14 +99,14 @@ public class BinaryOperator implements Expression
 			// One is a number and the other is a sequence
 			else if (expr1.getType() == ExpressionType.SEQUENCE
 			        && expr2.getType() == ExpressionType.NUMBER) {
-				Sequence s = (Sequence) ((Sequence) expr1.getValue()).getCopy();
+				Sequence s = (Sequence) expr1.getValue();
 				ScalrNum num = (ScalrNum) expr2.getValue();
 				s.extend(num.getNum());
 				return s;
 			}
 			else if (expr1.getType() == ExpressionType.NUMBER
 			        && expr2.getType() == ExpressionType.SEQUENCE) {
-				Sequence s = (Sequence) ((Sequence) expr2.getValue()).getCopy();
+				Sequence s = (Sequence) expr2.getValue();
 				ScalrNum num = (ScalrNum) expr1.getValue();
 				s.extend(num.getNum());
 				return s;
@@ -135,7 +134,7 @@ public class BinaryOperator implements Expression
 		// error
 		return null;
 	}
-	
+
 	/**
 	 * The type of the expression depends on the operation as well as the operands. What follows is
 	 * a case by case listing of 7.4 and 7.5
@@ -177,7 +176,7 @@ public class BinaryOperator implements Expression
 		// error
 		return null;
 	}
-	
+
 	@Override
 	public String toString()
 	{

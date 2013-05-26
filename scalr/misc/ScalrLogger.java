@@ -1,9 +1,9 @@
 package scalr.misc;
 
 
-public class ScalrLogger
+class ScalrLogger
 {
-  int mode = 0;
+  private int mode = 0;
   public ScalrLogger()
   {
 

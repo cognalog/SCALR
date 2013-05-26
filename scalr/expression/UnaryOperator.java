@@ -6,26 +6,26 @@ import scalr.variable.SymbolTable;
 
 public class UnaryOperator implements Expression
 {
-	String	       operator;
-	Expression	   expr;
+	private String	       operator;
+	private Expression	   expr;
 	private String	var;
-	
+
 	// This class is only valid for integers
 	public UnaryOperator(String op)
 	{
 		operator = op;
 	}
-	
+
 	public void addOperand(Expression expr)
 	{
 		this.expr = expr;
 	}
-	
+
 	public void addVar(String name)
 	{
 		var = name;
 	}
-	
+
 	@Override
 	public Expression getValue()
 	{
@@ -55,13 +55,13 @@ public class UnaryOperator implements Expression
 			}
 		}
 	}
-	
+
 	@Override
 	public ExpressionType getType()
 	{
 		return ExpressionType.NUMBER;
 	}
-	
+
 	@Override
 	public String toString()
 	{

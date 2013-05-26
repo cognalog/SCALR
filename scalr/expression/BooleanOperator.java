@@ -6,20 +6,18 @@ import scalr.variable.ScalrNum;
 
 public class BooleanOperator implements Expression
 {
-	Expression	expr1;
-	Expression	expr2;
-	String	   operator;
-	
+	private Expression	expr1;
+	private Expression	expr2;
+	private String	   operator;
+
 	/**
 	 * As defined in section 7.7 of our LRM, the boolean operators are defined ONLY for numbers.
-	 * @param expr1
-	 * @param expr2
 	 */
 	public BooleanOperator(String operator)
 	{
 		this.operator = operator;
 	}
-	
+
 	public void addOperand(Expression expr)
 	{
 		if (expr1 == null)
@@ -27,7 +25,7 @@ public class BooleanOperator implements Expression
 		else if (expr2 == null)
 			expr2 = expr;
 	}
-	
+
 	/**
 	 * This implements the semantic actions of sections 7.7 and 7.7. The getType() method was
 	 * written first, and this it shows the pattern that this method will follow.
@@ -41,6 +39,7 @@ public class BooleanOperator implements Expression
 			else
 				return new ScalrBoolean(!((ScalrBoolean) expr1.getValue()).getBool());
 		}
+		assert expr2 != null;
 		if (expr1.getType() == ExpressionType.NUMBER && expr2.getType() == ExpressionType.NUMBER) {
 			ScalrNum num1 = (ScalrNum) expr1.getValue();
 			ScalrNum num2 = (ScalrNum) expr2.getValue();
@@ -57,24 +56,26 @@ public class BooleanOperator implements Expression
 			else if (operator.equals("=="))
 				return new ScalrBoolean(num1.getNum() == num2.getNum());
 		}
-		else if (expr1.getType() == ExpressionType.BOOLEAN
-		        && expr2.getType() == ExpressionType.BOOLEAN) {
-			ScalrBoolean bool1 = (ScalrBoolean) expr1.getValue();
-			ScalrBoolean bool2 = (ScalrBoolean) expr2.getValue();
-			if (operator.equals("=="))
-				return new ScalrBoolean(bool1.getBool() == bool2.getBool());
-			else if (operator.equals("or"))
-				return new ScalrBoolean(bool1.getBool() || bool2.getBool());
-			else if (operator.equals("and"))
-				return new ScalrBoolean(bool1.getBool() && bool2.getBool());
-			else if (operator.equals("!="))
-				return new ScalrBoolean(bool1.getBool() != bool2.getBool());
+		else {
+			if (expr1.getType() == ExpressionType.BOOLEAN
+			        && expr2.getType() == ExpressionType.BOOLEAN) {
+				ScalrBoolean bool1 = (ScalrBoolean) expr1.getValue();
+				ScalrBoolean bool2 = (ScalrBoolean) expr2.getValue();
+				if (operator.equals("=="))
+					return new ScalrBoolean(bool1.getBool() == bool2.getBool());
+				else if (operator.equals("or"))
+					return new ScalrBoolean(bool1.getBool() || bool2.getBool());
+				else if (operator.equals("and"))
+					return new ScalrBoolean(bool1.getBool() && bool2.getBool());
+				else if (operator.equals("!="))
+					return new ScalrBoolean(bool1.getBool() != bool2.getBool());
+			}
 		}
 		// This should never be reached, but hopefully screws over some invalid syntax and causes an
 		// error
 		return null;
 	}
-	
+
 	/**
 	 * The type of the expression depends on the operation as well as the operands. What follows is
 	 * a case by case listing of 7.4 and 7.5
@@ -84,6 +85,7 @@ public class BooleanOperator implements Expression
 	{
 		if (expr2 == null && expr1.getType() == ExpressionType.BOOLEAN)
 			return ExpressionType.BOOLEAN;
+		assert expr2 != null;
 		if (expr1.getType() == ExpressionType.NUMBER && expr2.getType() == ExpressionType.NUMBER)
 			return ExpressionType.BOOLEAN;
 		else if (expr1.getType() == ExpressionType.BOOLEAN
@@ -91,7 +93,7 @@ public class BooleanOperator implements Expression
 			return ExpressionType.BOOLEAN;
 		return null;
 	}
-	
+
 	@Override
 	public String toString()
 	{

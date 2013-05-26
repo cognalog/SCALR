@@ -10,9 +10,9 @@ import scalr.variable.SymbolTable;
 
 public class WhileStatement implements Expression
 {
-	Expression	          cond;
-	ArrayList<Expression>	statements	= new ArrayList<Expression>();
-	
+	private Expression	          cond;
+	private ArrayList<Expression>	statements	= new ArrayList<Expression>();
+
 	/**
 	 * For convenience, a WhileStatement is initialized using the expression condition that
 	 * generates it, since we already know what it is
@@ -25,7 +25,7 @@ public class WhileStatement implements Expression
 	{
 		cond = expr;
 	}
-	
+
 	/**
 	 * Adds a statement to the list of statements under this while loop.
 	 * @param expr
@@ -37,7 +37,7 @@ public class WhileStatement implements Expression
 		if (expr != null)
 			statements.add(expr);
 	}
-	
+
 	/**
 	 * While statements return nothing. It is improper to use them in another expression that
 	 * requires a value returned.
@@ -47,7 +47,7 @@ public class WhileStatement implements Expression
 	{
 		// Get the current variables in this function scope
 		HashSet<String> prevVar = new HashSet<String>(SymbolTable.currentSymbolTable.keySet());
-		
+
 		// Evaluate this while loop as long as this condition is true
 		while (((ScalrBoolean) cond.getValue()).getBool()) {
 			boolean shouldBreak = false;
@@ -70,7 +70,7 @@ public class WhileStatement implements Expression
 			}
 			if (shouldBreak)
 				break;
-			
+
 			// Remove any keys that were added to the current function by this while loop. Must also
 			// remember that variables do not persist after a loop is completed
 			ArrayList<String> currVar =
@@ -81,7 +81,7 @@ public class WhileStatement implements Expression
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Like wise, this has no ExpressionType
 	 */
@@ -90,5 +90,5 @@ public class WhileStatement implements Expression
 	{
 		return null;
 	}
-	
+
 }
