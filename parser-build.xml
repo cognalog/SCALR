@@ -1,0 +1,36 @@
+<project name="ScalrParserTest" basedir ="./src/parser" default="main">
+    <property name="javacc" location="../javacc/javacc.bat"/>
+    <property name="jjfile" location="ScalrParser.jj"/>
+
+    <target name="main">
+        <exec executable="cmd">
+            <arg value="/c"/>
+            <arg value="${javacc}"/>
+            <arg value="${jjfile}"/>
+        </exec>
+    </target>
+
+    <property name="srcdir" location="../"/>
+    <property name="blddir" location="../../out/jar"/>
+    <property name="cp" value="../"/>
+
+    <property name="scalr" value="ScalrParser.jar"/>
+
+    <target name="clean">
+        <delete file="${blddir}/${scalr}"/>
+        <delete dir="${blddir}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${blddir}"/>
+        <javac classpath="${cp}" srcdir="${srcdir}" destdir="${blddir}"/>
+    </target>
+
+    <target name="jar" depends="compile">
+        <jar destfile="${scalr}" basedir="${blddir}">
+            <manifest>
+                <attribute name="Main-Class" value="parser.ScalrParser"/>
+            </manifest>
+        </jar>
+    </target>
+</project>
