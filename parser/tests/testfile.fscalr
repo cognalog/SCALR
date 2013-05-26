@@ -9,6 +9,6 @@ func testfunc(x, n)
 	print(n)
 	print(note)
 	print(x)
-	x += [note.pitch(+n)]
+	x += note.pitch(+n)
 	x
 end

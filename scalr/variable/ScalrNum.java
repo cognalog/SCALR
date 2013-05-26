@@ -7,50 +7,50 @@ import scalr.expression.ExpressionType;
 public class ScalrNum implements Variable
 {
 	private int	val;
-	
+
 	public ScalrNum(int i)
 	{
 		val = i;
 	}
-	
+
 	public void setValue(int i)
 	{
 		val = i;
 	}
-	
+
 	public int getNum()
 	{
 		return val;
 	}
-	
+
 	public void modValue(int i)
 	{
 		val += i;
 	}
-	
+
 	@Override
 	public Variable getCopy()
 	{
 		return this.clone();
 	}
-	
+
 	public ScalrNum clone()
 	{
 		return new ScalrNum(val);
 	}
-	
+
 	@Override
 	public Expression getValue()
 	{
-		return this;
+		return this.getCopy();
 	}
-	
+
 	@Override
 	public ExpressionType getType()
 	{
 		return ExpressionType.NUMBER;
 	}
-	
+
 	/**
 	 * Returns this number. It could be positive or negative. In the case it is negative, this will
 	 * include a minus in front of the number. Note that this method isn't specified in Expression,

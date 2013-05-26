@@ -14,13 +14,13 @@ public class Note implements Variable
 	public Degree	          pitch;
 	public int	              volume;
 	public Length	          length;
-	
+
 	/**
 	 * The default note. By itself, it is mutable, but whenever a new note is generated, we simple
 	 * construct a new note using the copy constructor.
 	 */
 	private static final Note	note	= new Note(Degree.C3, 100, Length.quarter);
-	
+
 	/**
 	 * @return
 	 */
@@ -28,7 +28,7 @@ public class Note implements Variable
 	{
 		return note.getCopy();
 	}
-	
+
 	/**
 	 * Constructs a new note with the specified parameters.
 	 * @param d
@@ -45,26 +45,26 @@ public class Note implements Variable
 		volume = Math.max(Math.min(v, 127), 0);
 		length = l;
 	}
-	
+
 	public Note volume(String vol) throws IllegalArgumentException
 	{
 		// Remove all whitespaces
 		vol = vol.replaceAll("\\s", "");
-		
+
 		// Determine if they're modding the volume or setting it
 		if (Pattern.matches("^[\\+\\-]\\d+$", vol))
 			return modVolume(Integer.parseInt(vol));
-		
+
 		// If we're here, then they're setting the volume
 		// Number pattern
 		if (Pattern.matches("^\\d+$", vol))
 			return setVolume(Integer.parseInt(vol));
-		
+
 		// Otherwise, they gave an illegal argument
 		throw new IllegalArgumentException("The argument, " + vol
 		        + ", does not indicate modding a volume or setting a volume.");
 	}
-	
+
 	public Note pitch(String pit) throws IllegalArgumentException
 	{
 		System.out.println(pit);
@@ -78,7 +78,7 @@ public class Note implements Variable
 				pit = pit.substring(1);
 			return modPitch(Integer.parseInt(pit));
 		}
-		
+
 		// If we're here, then that means that they're setting the pitch
 		Degree pitch = null;
 		try {
@@ -99,7 +99,7 @@ public class Note implements Variable
 		}
 		return setPitch(pitch);
 	}
-	
+
 	/**
 	 * Modifies the length of this note in accordance with
 	 * @param len
@@ -117,7 +117,7 @@ public class Note implements Variable
 		if (modMatch.matches())
 			// Yes, parseInt does work for "+5"
 			return modLength(Integer.parseInt(len));
-		
+
 		// If we're here, then we have two more possibilities: they're setting the length via one of
 		// the words in Length or they're setting it by the value. Since checking if they're setting
 		// via a number is straightforward, let's do that first.
@@ -146,7 +146,7 @@ public class Note implements Variable
 			        + " is not a valid length fraction. These are valid length fractions: "
 			        + properLength + ".");
 		}
-		
+
 		// The last possibility, the given string is a word that refers to length. We're case
 		// insensitive.
 		try {
@@ -166,7 +166,7 @@ public class Note implements Variable
 			        + " or mod value. These are valid length names: " + properName + ".");
 		}
 	}
-	
+
 	/**
 	 * Unconditionally sets the {@linkplain Length} of this {@linkplain Note} to newLength and
 	 * returns a reference to this same note.
@@ -179,7 +179,7 @@ public class Note implements Variable
 		length = newLength;
 		return this;
 	}
-	
+
 	/**
 	 * Unconditionally sets the {@linkplain Degree} of this {@linkplain Note} to newPitch and
 	 * returns a reference to this same note.
@@ -192,7 +192,7 @@ public class Note implements Variable
 		pitch = newPitch;
 		return this;
 	}
-	
+
 	/**
 	 * Unconditionally sets the {@linkplain Integer} of this {@linkplain Note} to newVolume and
 	 * returns a reference to this same note.
@@ -205,11 +205,11 @@ public class Note implements Variable
 		volume = Math.max(Math.min(newVolume, 127), 0);
 		return this;
 	}
-	
+
 	public Note modPitch(int modVal)
 	{
 		Degree[] degrees = Degree.values();
-		if (modVal + pitch.ordinal() > degrees.length)
+		if (modVal + pitch.ordinal() > (degrees.length - 1))
 			pitch = degrees[degrees.length - 1];
 		else if (modVal + pitch.ordinal() < 0)
 			pitch = degrees[0];
@@ -217,7 +217,7 @@ public class Note implements Variable
 			pitch = degrees[pitch.ordinal() + modVal];
 		return this;
 	}
-	
+
 	public Note modVolume(int modVal)
 	{
 		if (volume + modVal > 127)
@@ -228,7 +228,7 @@ public class Note implements Variable
 			volume += modVal;
 		return this;
 	}
-	
+
 	public Note modLength(int modVal)
 	{
 		Length[] lengths = Length.values();
@@ -240,13 +240,13 @@ public class Note implements Variable
 			length = lengths[length.ordinal() + modVal];
 		return this;
 	}
-	
+
 	@Override
 	public Note getCopy()
 	{
 		return new Note(pitch, volume, length);
 	}
-	
+
 	public static Note getBreak(String... length)
 	{
 		Note n = new Note(Degree.br, 100, Length.quarter);
@@ -254,13 +254,13 @@ public class Note implements Variable
 			n.length(length[0]);
 		return n;
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return pitch.getMidi() + "," + fractionToDouble(length.duration) + "," + volume;
 	}
-	
+
 	private String fractionToDouble(String duration)
 	{
 		if (duration.equals("1")) {
@@ -271,13 +271,13 @@ public class Note implements Variable
 		double temp = (4.0 * (Integer.parseInt(frac[0]) / Double.parseDouble(frac[1])));
 		return String.format("%.5f", temp);
 	}
-	
+
 	@Override
 	public Expression getValue()
 	{
-		return this;
+		return this.getCopy();
 	}
-	
+
 	@Override
 	public ExpressionType getType()
 	{
