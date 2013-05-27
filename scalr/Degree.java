@@ -1,6 +1,14 @@
 
 package scalr;
 
+import scalr.variable.Note;
+
+/**
+ * The collection of valid notes for each {@linkplain Note}s. All valid MIDI notes are specified here (starting from
+ * 0, not -5) along with their actual midi value. In addition, a special {@linkplain Degree}, br,
+ * represents a musical break. Its associated MIDI value of 200 means that MIDI won't actually produce a sound when
+ * it is played.
+ */
 public enum Degree {
 	C0(0), Cs0(1), Db0(1), D0(2), Ds0(3), Eb0(3), E0(4), F0(5), Fs0(6), Gb0(6), G0(7), Gs0(8), Ab0(
 	        8), A0(9), As0(10), Bb0(10), B0(11), C1(12), Cs1(13), Db1(13), D1(14), Ds1(15),
@@ -21,12 +29,19 @@ public enum Degree {
 	        121), D10(122), Ds10(123), Eb10(123), E10(124), F10(125), Fs10(126), Gb10(126),
 	G10(127), br(200);
 	private final int	value;
-	
+
 	private Degree(int value)
 	{
 		this.value = value;
 	}
-	
+
+	/**
+	 * Returns the MIDI pitch that this {@linkplain Degree} represents. Note that this number and the ordinal are not
+	 * necessarily the same, and is not the same for any {@linkplain Degree} higher than <code>Cs0</code>.
+	 *
+	 * @return An <code>int</code> corresponding to the MIDI pitch of this {@linkplain Degree}. Guaranteed to be a
+	 * Natural Number.
+	 */
 	public int getMidi()
 	{
 		return value;

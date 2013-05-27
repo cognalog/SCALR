@@ -9,20 +9,35 @@ import scalr.Length;
 import scalr.expression.Expression;
 import scalr.expression.ExpressionType;
 
+/**
+ * A {@linkplain Variable} that represents the musical concept of a note. Every {@linkplain Note} has three things:
+ * <ul>
+ *     <li>A {@linkplain Degree} representing the pitch of the note.</li>
+ *     <li>An <code>int</code> representing the loudness of a note.</li>
+ *     <li>A {@linkplain Length} representing the duration of a note.</li>
+ * </ul>
+ * The methods supplied here encapsulate some of the code required to modify the state of a note.
+ */
 public class Note implements Variable
 {
+	/** The {@linkplain Degree} of the {@linkplain Note}. */
 	public Degree	          pitch;
+	/** The volume  of the {@linkplain Note}, represented as an int ranging from 0 to 127.. */
 	public int	              volume;
+	/** The {@linkplain Length} of the {@linkplain Note}. */
 	public Length	          length;
 
 	/**
-	 * The default note. By itself, it is mutable, but whenever a new note is generated, we simple
+	 * The default note. By itself, it is mutable, but whenever a new note is needed, we simply
 	 * construct a new note using the copy constructor.
 	 */
 	private static final Note	note	= new Note(Degree.C3, 100, Length.quarter);
 
 	/**
-	 * @return
+	 * The default {@linkplain Note}. This is a convenience method for retrieving a {@linkplain Note} that has the
+	 * parameters of the default note as specified by the LRM.
+	 *
+	 * @return A {@linkplain Note} representing the default note (Pitch = C3, Length = Quarter Note, Loudness = 100).
 	 */
 	public static Note note()
 	{
@@ -30,7 +45,8 @@ public class Note implements Variable
 	}
 
 	/**
-	 * Constructs a new note with the specified parameters.
+	 * Constructs a new note with the specified parameters. This constructor is never invoked by some other class,
+	 * as all modifications are based from the default note.
 	 * @param d
 	 *            - The {@linkplain Degree} (pitch) of the note.
 	 * @param v
@@ -46,6 +62,7 @@ public class Note implements Variable
 		length = l;
 	}
 
+	@Deprecated
 	public Note volume(String vol) throws IllegalArgumentException
 	{
 		// Remove all whitespaces
@@ -65,6 +82,7 @@ public class Note implements Variable
 		        + ", does not indicate modding a volume or setting a volume.");
 	}
 
+	@Deprecated
 	public Note pitch(String pit) throws IllegalArgumentException
 	{
 		System.out.println(pit);
@@ -100,12 +118,7 @@ public class Note implements Variable
 		return setPitch(pitch);
 	}
 
-	/**
-	 * Modifies the length of this note in accordance with
-	 * @param len
-	 * @return
-	 * @throws IllegalArgumentException
-	 */
+	@Deprecated
 	public Note length(String len) throws IllegalArgumentException
 	{
 		// Remove all whitespace
@@ -168,11 +181,12 @@ public class Note implements Variable
 	}
 
 	/**
-	 * Unconditionally sets the {@linkplain Length} of this {@linkplain Note} to newLength and
-	 * returns a reference to this same note.
+	 * Unconditionally sets the {@linkplain Length} of this {@linkplain Note} to the specified length and
+	 * returns a reference to this same {@linkplain Note}.
 	 * @param newLength
-	 *            - The {@linkplain Length} to set the note to.
-	 * @return This {@linkplain Note} with length = newLength
+	 *            - The {@linkplain Length} to give this {@linkplain Note}.
+	 *
+	 * @return This {@linkplain Note} with its length set to the value of newLength.
 	 */
 	public Note setLength(Length newLength)
 	{
@@ -181,11 +195,12 @@ public class Note implements Variable
 	}
 
 	/**
-	 * Unconditionally sets the {@linkplain Degree} of this {@linkplain Note} to newPitch and
-	 * returns a reference to this same note.
+	 * Unconditionally sets the {@linkplain Degree} of this {@linkplain Note} to the specified pitch and
+	 * returns a reference to this same {@linkplain Note}.
 	 * @param newPitch
-	 *            - The {@linkplain Degree} to set the note to.
-	 * @return This {@linkplain Note} with pitch = newPitch
+	 *            - The {@linkplain Degree} to set this {@linkplain Note} to.
+	 *
+	 * @return This {@linkplain Note} with pitch its length set to the value of newPitch.
 	 */
 	public Note setPitch(Degree newPitch)
 	{
@@ -194,11 +209,13 @@ public class Note implements Variable
 	}
 
 	/**
-	 * Unconditionally sets the {@linkplain Integer} of this {@linkplain Note} to newVolume and
-	 * returns a reference to this same note.
+	 * Sets the volume of this {@linkplain Note} to the specified volume and returns a reference to this same
+	 * {@linkplain Note}. If the specified volume is less than 0 or greater than 127, it is set to 0 or 127,
+	 * respectively.
 	 * @param newVolume
-	 *            - The {@linkplain Integer} to set the note to.
-	 * @return This {@linkplain Note} with volume = newVolume
+	 *            - An <code>int</code> between 0 and 127, inclusive.
+	 *
+	 * @return This {@linkplain Note} with volume set to newVolume.
 	 */
 	public Note setVolume(int newVolume)
 	{
@@ -206,6 +223,16 @@ public class Note implements Variable
 		return this;
 	}
 
+	/**
+	 * Mods the {@linkplain Degree} of this note by the specified value. If the specified value would cause it to go
+	 * to a pitch lower than the lowest pitch, the pitch of the note stays at the lowest {@linkplain Degree}. If the
+	 * specified value would cause the pitch to exceed the highest note, it is bounded at the highest pitch (Gs10).
+	 * One cannot mod a note to be a break.
+	 * @param modVal
+	 *          - An int representing the value to mod the {@linkplain Degree} of this {@linkplain Note} by. It can
+	 *          be positive or negative.
+	 * @return This {@linkplain Note} with its {@linkplain Degree} changed by an ordinal amount specified by modVal.
+	 */
 	public Note modPitch(int modVal)
 	{
 		Degree[] degrees = Degree.values();
@@ -218,6 +245,16 @@ public class Note implements Variable
 		return this;
 	}
 
+	/**
+	 * Mods the volume of this note by the specified value. If the specified value would cause it to go
+	 * to a volume lower than the lowest volume, the volume of the {@linkplain Note} stays at the lowest
+	 * volume, 0. If the specified value would cause the pitch to exceed the highest note, it is
+	 * bounded at the highest pitch (127).
+	 * @param modVal
+	 *          - An int representing the value to mod the volume of this {@linkplain Note} by. It can
+	 *          be positive or negative.
+	 * @return This {@linkplain Note} with its volume changed by the amount specified by modVal.
+	 */
 	public Note modVolume(int modVal)
 	{
 		if (volume + modVal > 127)
@@ -229,6 +266,16 @@ public class Note implements Variable
 		return this;
 	}
 
+	/**
+	 * Mods the {@linkplain Length} of this note by the specified value. If the specified value would cause it to go
+	 * to a duration lower than the lowest duration, the duration of the note stays at the lowest {@linkplain Length}.
+	 * If the specified value would cause the duration to exceed the highest duration, it is bounded at the
+	 * highest duration (whole note).
+	 * @param modVal
+	 *          - An int representing the value to mod the {@linkplain Length} of this {@linkplain Note} by. It can
+	 *          be positive or negative.
+	 * @return This {@linkplain Note} with its {@linkplain Length} changed by an ordinal amount specified by modVal.
+	 */
 	public Note modLength(int modVal)
 	{
 		Length[] lengths = Length.values();
@@ -241,12 +288,27 @@ public class Note implements Variable
 		return this;
 	}
 
+	/**
+	 * Returns a copy of this {@linkplain Note}. The new {@linkplain Note} is completely identical to this
+	 * {@linkplain Note}/
+	 *
+	 * @return A new {@linkplain Note} with the same pitch, volume, and length as this {@linkplain Note}.
+	 */
 	@Override
 	public Note getCopy()
 	{
 		return new Note(pitch, volume, length);
 	}
 
+	/**
+	 * The sister method to note(). Provides, as a convenience, a variable number of arguments to specify the
+	 * {@linkplain Length} of this break.
+	 * @param length
+	 *          - The {@linkplain Length} to set this break to. It only considers the first argument,
+	 *          so multiple lengths does nothing to this function. Specifying no arguments makes it a {@linkplain
+	 *          Note} of quarter length.
+	 * @return
+	 */
 	public static Note getBreak(String... length)
 	{
 		Note n = new Note(Degree.br, 100, Length.quarter);
@@ -255,12 +317,27 @@ public class Note implements Variable
 		return n;
 	}
 
+	/**
+	 * Constructs a {@linkplain Note} as expected by the input of the midi generator. This method is one of two that
+	 * serves as the output of the compiler.
+	 *
+	 * @return A {@linkplain String} of the form "PITCH,LEGNTH,VOLUME" where PITCH is the MIDI value of the
+	 * {@linkplain Degree}, LENGTH is the double value of the {@linkplain Length} of this note,
+	 * and VOLUME is simply the current integer volume of this note.
+	 */
 	@Override
 	public String toString()
 	{
 		return pitch.getMidi() + "," + fractionToDouble(length.duration) + "," + volume;
 	}
 
+	/**
+	 * Converts a {@linkplain String} representing a fraction to a double. Then, it prints the fraction with 5 digits
+	 * of decimal precision.
+	 * @param duration
+	 *          - The {@linkplain String} representing the fractional value of this Note's {@linkplain Length}.
+	 * @return A string that is simply the evaluation of the fraction.
+	 */
 	private String fractionToDouble(String duration)
 	{
 		if (duration.equals("1")) {
@@ -272,12 +349,23 @@ public class Note implements Variable
 		return String.format("%.5f", temp);
 	}
 
+	/**
+	 * Like all {@linkplain Variable}s, returns a copy of this {@linkplain Variable}'s current state. For a
+	 * {@linkplain Note}, this is a simple call to the getCopy method.
+	 *
+	 * @return A new {@linkplain Note} with the same values as this {@linkplain Note}.
+	 */
 	@Override
 	public Expression getValue()
 	{
 		return this.getCopy();
 	}
 
+	/**
+	 * It's a {@linkplain Note}, what more can I say?
+	 *
+	 * @return Always returns <code>{@link ExpressionType}.NOTE</code>.
+	 */
 	@Override
 	public ExpressionType getType()
 	{

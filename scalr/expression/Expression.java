@@ -4,16 +4,15 @@ package scalr.expression;
 import scalr.variable.Variable;
 
 /**
- * An expression has with it three fundamental things:
- * <ul>
- * <li>An operator</li>
- * <li>Operands</li>
- * <li>A type</li>
- * </ul>
- * To represent these things, an {@linkplain Expression} has three fields: an
- * Operator, {@linkplain Expression} as children, and an
- * {@linkplain ExpressionType} types that these expressions represent. The type of the expression is
- * determined by its operator if it has one, or its variable.
+ * The {@linkplain Expression} represents the fundamental block of the backend. Everything (mostly everything,
+ * seriously) is an {@linkplain Expression}. {@linkplain Expression}s are expected to accomplish whatever task they
+ * represent in the getValue method. This way, all other {@linkplain Expression}s are oblivious to whatever class
+ * the underlying {@linkplain Expression} is. Any information they need to know is given by the getType method,
+ * which mey return null or a member of {@linkplain ExpressionType}.
+ * <br/><br/>
+ * By adopting this approach, the need for a "tree walker" is completely removed, and our compiler becomes a one-pass
+ * compiler that builds the abstract syntax trees of each {@linkplain Function}, and then executes whatever statements
+ * (skipping building a Function) in the main method, which pulls in all the functions as needed.
  *
  * @author mark
  */
@@ -21,20 +20,29 @@ public interface Expression
 {
 
 	/**
-	 * Evaluates this expression and returns a variable that is the result of its operations. The
-	 * resulting {@linkplain Expression} should not have an operator: it should have a single child
-	 * which is the value of this expression.
-	 * @return The variable representing the result of this expression.
+	 * Evaluates this {@linkplain Expression} and returns a {@linkplain Variable} that is the result of its operations.
+	 * All classes implementing Expression are required to either return <code>null</code>,
+	 * or an <code>instanceof</code> {@linkplain Variable}. A value of <code>null</code> indicates that the
+	 * {@linkplain Expression} does not have an associated semantic value, or that some illegal operation as defined
+	 * in the LRM was attempted to be executed.
+	 *
+	 * @return The {@linkplain Variable} representing the actions of this {@linkplain Expression},
+	 * or <code>null</code> or the reasons specified above.
 	 */
 	public Expression getValue();
 
 	/**
-	 * Returns the {@linkplain ExpressionType} of this {@linkplain Expression}. If this returns
-	 * null, then it should be assumed that the {@linkplain Expression} is simply a
-	 * {@linkplain Variable}
-	 * @return The {@linkplain ExpressionType} associated with this {@linkplain Expression}. If this
-	 *         return is null, then this {@linkplain Expression} has a single child which is really
-	 *         a {@linkplain Variable}
+	 * Indicates the type of {@linkplain Expression} this is. This method is useful to know ahead of time whether or
+	 * not evaluating the Expressions will yield a meaningful result. A performance consideration. This method may
+	 * return null, indicating primarily that this {@linkplain Expression} is not to take part in any operator.
+	 * <br/><br/>
+	 * It is not known when the type of an {@linkplain Expression} will be known,
+	 * especially in the case of an {@linkplain Expression} involving some {@linkplain VariableReference},
+	 * so this method should not be used before the getValue() method is invoked, as this information is guaranteed
+	 * to be known at that time.
+	 *
+	 * @return The {@linkplain ExpressionType} indicating what type this {@linkplain Expression} semantically
+	 * evaluates to. Or null, if it does not have an associated type.
 	 */
 	public ExpressionType getType();
 }
