@@ -25,6 +25,10 @@ public interface Expression
 	 * or an <code>instanceof</code> {@linkplain Variable}. A value of <code>null</code> indicates that the
 	 * {@linkplain Expression} does not have an associated semantic value, or that some illegal operation as defined
 	 * in the LRM was attempted to be executed.
+	 * <br/><br/>
+	 * As an additional requirement, the {@linkplain Expression} returned by this class should not be an instance of
+	 * any {@linkplain Expression} underneath it, including itself. That is, for any {@linkplain Expression} that is
+	 * a child of this {@linkplain Expression}, <code>assert this.getValue() != other.getValue()</code> must hold.
 	 *
 	 * @return The {@linkplain Variable} representing the actions of this {@linkplain Expression},
 	 * or <code>null</code> or the reasons specified above.

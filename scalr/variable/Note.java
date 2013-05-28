@@ -118,7 +118,18 @@ public class Note implements Variable
 		return setPitch(pitch);
 	}
 
-	@Deprecated
+	/**
+	 * Parses a {@linkplain String} to determine if the {@linkplain Length} of this {@linkplain Note} should be
+	 * modded or set. A {@linkplain String} of the form (+|-)NUM indicates that it should be modded, a
+	 * {@linkplain String} of the form 1(/NUM)? indicates that it should be set to the {@linkplain Length}
+	 * corresponding to the fraction, or a {@linkplain String} of text, corresponding to one of the {@linkplain
+	 * Length} enums (case-insensitive).
+	 * @param len A {@linkplain String} indicating the value and action to modify the length of this.
+	 *
+	 * @return This same {@linkplain Note} with its modified {@linkplain Length}.
+	 * @throws IllegalArgumentException If <code>len</code> does not indicate an appropriate action,
+	 * or if it tries to set the {@linkplain Length} out of bounds.
+	 */
 	public Note length(String len) throws IllegalArgumentException
 	{
 		// Remove all whitespace
@@ -227,14 +238,18 @@ public class Note implements Variable
 	 * Mods the {@linkplain Degree} of this note by the specified value. If the specified value would cause it to go
 	 * to a pitch lower than the lowest pitch, the pitch of the note stays at the lowest {@linkplain Degree}. If the
 	 * specified value would cause the pitch to exceed the highest note, it is bounded at the highest pitch (Gs10).
-	 * One cannot mod a note to be a break.
+	 * One cannot mod a note to be a break, nor can one mod a note to not be a break (once a break, always a break,
+	 * unless setPitch is used).
 	 * @param modVal
 	 *          - An int representing the value to mod the {@linkplain Degree} of this {@linkplain Note} by. It can
 	 *          be positive or negative.
+	 *
 	 * @return This {@linkplain Note} with its {@linkplain Degree} changed by an ordinal amount specified by modVal.
 	 */
 	public Note modPitch(int modVal)
 	{
+		if (pitch == Degree.br)
+			return this;
 		Degree[] degrees = Degree.values();
 		if (modVal + pitch.ordinal() > (degrees.length - 1))
 			pitch = degrees[degrees.length - 1];
@@ -253,6 +268,7 @@ public class Note implements Variable
 	 * @param modVal
 	 *          - An int representing the value to mod the volume of this {@linkplain Note} by. It can
 	 *          be positive or negative.
+	 *
 	 * @return This {@linkplain Note} with its volume changed by the amount specified by modVal.
 	 */
 	public Note modVolume(int modVal)
@@ -274,6 +290,7 @@ public class Note implements Variable
 	 * @param modVal
 	 *          - An int representing the value to mod the {@linkplain Length} of this {@linkplain Note} by. It can
 	 *          be positive or negative.
+	 *
 	 * @return This {@linkplain Note} with its {@linkplain Length} changed by an ordinal amount specified by modVal.
 	 */
 	public Note modLength(int modVal)
@@ -307,12 +324,14 @@ public class Note implements Variable
 	 *          - The {@linkplain Length} to set this break to. It only considers the first argument,
 	 *          so multiple lengths does nothing to this function. Specifying no arguments makes it a {@linkplain
 	 *          Note} of quarter length.
-	 * @return
+	 *
+	 * @return A {@linkplain Note} representing a break with a duration of the specified {@linkplain Length},
+	 * or a quarter note duration, if none is specified.
 	 */
 	public static Note getBreak(String... length)
 	{
 		Note n = new Note(Degree.br, 100, Length.quarter);
-		if (length.length == 1)
+		if (length.length <= 1)
 			n.length(length[0]);
 		return n;
 	}
@@ -336,6 +355,7 @@ public class Note implements Variable
 	 * of decimal precision.
 	 * @param duration
 	 *          - The {@linkplain String} representing the fractional value of this Note's {@linkplain Length}.
+	 *
 	 * @return A string that is simply the evaluation of the fraction.
 	 */
 	private String fractionToDouble(String duration)
