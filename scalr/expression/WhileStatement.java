@@ -8,18 +8,24 @@ import scalr.Exceptions.TypeException;
 import scalr.variable.ScalrBoolean;
 import scalr.variable.SymbolTable;
 
+/**
+ * The {@linkplain WhileStatement} doesn't actually do anything significant in its getValue() method. The main
+ * technicality of this class (and the {@linkplain ForEachStatement} and {@linkplain IfElseStatement} class) is that
+ * they must ensure that no new variables appear in the current symbol table. Aside from that,
+ * this class simply evaluates a series of {@linkplain Expression}s as long as some {@linkplain Expression} of
+ * <code>{@link ExpressionType}.BOOLEAN</code> is <code>true</code>.
+ */
 public class WhileStatement implements Expression
 {
 	private Expression	          cond;
 	private ArrayList<Expression>	statements	= new ArrayList<Expression>();
 
 	/**
-	 * For convenience, a WhileStatement is initialized using the expression condition that
-	 * generates it, since we already know what it is
+	 * {@linkplain WhileStatement}s are constructed using the {@linkplain Expression} to check,
+	 * since that is the first piece of information seen while parsing. Also, {@linkplain WhileStatement}s,
+	 * at least on the backend, need not have any statements to be executable.
 	 * @param expr
-	 *            The expression to check
-	 * @throws TypeException
-	 *             Thrown in case the given expression isn't of type boolean.
+	 *            The {@linkplain Expression} to check each iteration of this {@linkplain WhileStatement}.
 	 */
 	public WhileStatement(Expression expr)
 	{
@@ -27,7 +33,8 @@ public class WhileStatement implements Expression
 	}
 
 	/**
-	 * Adds a statement to the list of statements under this while loop.
+	 * Adds an {@linkplain Expression} to the list of statements to execute. <code>null</code> statements are not
+	 * permitted.
 	 * @param expr
 	 *            Any {@linkplain ExpressionType} is valid. It is only added if the
 	 *            {@linkplain Expression} is not null.
@@ -39,8 +46,13 @@ public class WhileStatement implements Expression
 	}
 
 	/**
-	 * While statements return nothing. It is improper to use them in another expression that
-	 * requires a value returned.
+	 * Executes each of the statements contained by this {@linkplain WhileStatement} so long as the given {@linkplain
+	 * Expression} is true. It records the variables in the current symbol table before execution,
+	 * and then removes them after each time the statements are executed. It also checks if the user wants to cancel
+	 * out of the loop, or if they are returning a value.
+	 *
+	 * @return <code>null</code> in most cases. An {@linkplain Expression} of type <code>{@link ExpressionType}
+	 * .RETURN</code> if such a statement was encountered while executing.
 	 */
 	@Override
 	public Expression getValue()
@@ -83,7 +95,12 @@ public class WhileStatement implements Expression
 	}
 
 	/**
-	 * Like wise, this has no ExpressionType
+	 * A {@linkplain WhileStatement} has no {@linkplain ExpressionType}, indicated by its return of <code>null</code>
+	 * . In the case it encounters a <code>return</code> statement, it will return an <code>instanceof</code>
+	 * {@linkplain ControlOperation} that is a <code>return</code> {@link Expression},
+	 * so all {@linkplain Expression}s that care about returns should be wary.
+	 *
+	 * @return Always returns <code>null</code>, even if it encounters a <code>return</code> {@linkplain Expression}.
 	 */
 	@Override
 	public ExpressionType getType()
