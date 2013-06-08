@@ -192,8 +192,8 @@ public class NoteOps implements Expression
 	}
 
 	/**
-	 * It modifies a {@linkplain Note}, and thus always returns a {@linkplain Note}.
-	 * @return Returns <code>{@link scalr.expression.ExpressionType}.NOTE</code> if the operand is also of
+	 * {@linkplain NoteOps} modify a {@linkplain Note}, and thus always returns a {@linkplain Note}.
+	 * @return <code>{@link scalr.expression.ExpressionType}.NOTE</code> if the operand is also of
 	 * <code>{@link scalr.expression.ExpressionType}.NOTE</code>. <code>null</code> otherwise.
 	 */
 	@Override

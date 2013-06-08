@@ -60,7 +60,7 @@ public class Scale implements Variable
 	public Variable getCopy()
 	{
 		ArrayList<Degree> copy = new ArrayList<Degree>(degrees.size());
-		Collections.copy(copy, degrees);
+		copy.addAll(degrees);
 		Scale sca = new Scale();
 		sca.degrees = copy;
 		return sca;

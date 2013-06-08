@@ -64,7 +64,7 @@ TOKEN: {
 	"volume" | "duration" | "end" | "func" | "main" | "while" | "foreach" |
 	"track" | "in" | "if" | "else" | "note" | "pitch" | "length" |
 	"break" | "rest" | "cancel" | "return" | "import" | "print" |
-	"->" | "." | "," | "(" | ")" | "[" | "]" | "{" | "}" |
+	"->" | "." | "," | "(" | ")" | "[" | "]" | "{" | "}" | "::" |
 	<CREATE: "="> |
 	<ASSIGN: "+=" | "-=" | "*=" | "/=" | "%="> |
 	<NRELN: "<" | ">" | ">=" | "<="> |
@@ -98,14 +98,14 @@ MORE : { "/*": IN_COMMENT }
 void tscalr(): {
 	Expression stmt;
 } {
-	(importExpr())+
+	(importExpr())*
 
-	"main" {
+	("main" {
 		HashMap<String, Expression> mainTable = new HashMap<String, Expression>();
 		SymbolTable.currentSymbolTable = mainTable;
 	}
 		(stmt = statement() { if (stmt != null) stmt.getValue(); })+
-	"end" { System.out.println("Below are the tracks:"); }
+	"end" { System.out.println("Below are the tracks:"); })?
 
 	(trackExpr())+
 }
@@ -170,7 +170,6 @@ void fscalr(): {
 	(
 		try {
 			funcDef()
-			| endOfFile = badToken() { if (endOfFile) return; }
 		} catch (EmptyFunctionBodyError e) {
 			SymbolTable.functionReferences.remove(currentFunc);
 			System.err.println(e);

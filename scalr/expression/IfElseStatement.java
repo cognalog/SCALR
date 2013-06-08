@@ -7,6 +7,13 @@ import java.util.HashSet;
 import scalr.variable.ScalrBoolean;
 import scalr.variable.SymbolTable;
 
+/**
+ * In keeping with the tradition of adding expressions to expressions, and then evaluating them,
+ * this class provides a simple interface to constructing an AST for an {@linkplain IfElseStatement}. Knowing that
+ * JavaCC parses top-down, we can expect if-else statements to be encountered in a set order, and thus,
+ * we can add statements to the latest if or else or else if, knowing that we're adding these statements to their
+ * correct list.
+ */
 public class IfElseStatement implements Expression
 {
 	/**
@@ -26,12 +33,11 @@ public class IfElseStatement implements Expression
 	private boolean	                 elseAdded	   = false;
 
 	/**
-	 * Constructs a set of if/else if/else statements. The constructor takes an
-	 * {@linkplain Expression} that represents the if check condition for a block, and also prepares
-	 * the class to receive statements for that if expression.
+	 * Constructs an {@linkplain IfElseStatement} using the {@linkplain Expression} used to check the first if. Also
+	 * prepares some data structures to keep track of the corresponding statements and checks.
 	 * @param expr
 	 *            The check {@linkplain Expression} for the if statement. It should be of
-	 *            {@linkplain ExpressionType}.BOOLEAN.
+	 *            <code>{@linkplain ExpressionType}.BOOLEAN</xcode>.
 	 */
 	public IfElseStatement(Expression expr)
 	{
@@ -51,8 +57,8 @@ public class IfElseStatement implements Expression
 	}
 
 	/**
-	 * Functions similarly to the constructor of this class. Adds an else if to this block whose
-	 * check condition is <code>expr</code>.
+	 * Adds the check expression for an else if statement. Also sets up this class to receive statements for that
+	 * else if, so no other action is needed other than to add said statements (or none).
 	 * @param expr
 	 *            The {@linkplain Expression} to check to see if this else if should be executed.
 	 */
@@ -80,7 +86,8 @@ public class IfElseStatement implements Expression
 
 	/**
 	 * As you know, elses don't have a check expression. They are executed when all else fails. As
-	 * such, once an else has been added, no other else(s | ifs) can be added.
+	 * such, once an else has been added, no other else(s | ifs) can be added. Also prepares this class to receive
+	 * the statements for that else.
 	 */
 	public void addEl()
 	{
@@ -102,9 +109,9 @@ public class IfElseStatement implements Expression
 
 	/**
 	 * Adds a statement belonging to the latest if/else if/else added to this object. This class
-	 * automatically assigns it to the right one (it's nothing special, really).
+	 * automatically assigns it to the right one, because it's always the last one...
 	 * @param expr
-	 *            The {@linkplain Expression} to add.
+	 *            The {@linkplain Expression} to add to the latest if/else if/else statement.
 	 */
 	public void addStatement(Expression expr)
 	{
@@ -116,7 +123,7 @@ public class IfElseStatement implements Expression
 	/**
 	 * Evaluates the first if/else if that is true. If none are, then it evaluates the given else
 	 * (if it exists). Like a {@link WhileStatement}, an {@link IfElseStatement} is returns nothing
-	 * from its getValue()
+	 * from its getValue() unless it encounters a return statement.
 	 */
 	@Override
 	public Expression getValue()
@@ -124,6 +131,7 @@ public class IfElseStatement implements Expression
 		// Get the current variables in this function scope
 		HashSet<String> prevVar = new HashSet<String>(SymbolTable.currentSymbolTable.keySet());
 
+		// The index of the current if/else if/else statement block being checked
 		int blockIndex = 0;
 		for (Expression check : checks) {
 			if (check != null) {
@@ -141,15 +149,12 @@ public class IfElseStatement implements Expression
 								// while
 								// loop.
 								ArrayList<String> currVar =
-								        new ArrayList<String>(
-								                SymbolTable.currentSymbolTable.keySet());
+										new ArrayList<String>(SymbolTable.currentSymbolTable.keySet());
 								for (String var : currVar)
-									if (!prevVar.contains(var))
-										SymbolTable.currentSymbolTable.remove(var);
+									if (!prevVar.contains(var)) SymbolTable.currentSymbolTable.remove(var);
 								// Return the cancel
 								return expr;
-							}
-							else if (type == ExpressionType.RETURN) {
+							} else if (type == ExpressionType.RETURN) {
 								// The outside function will catch this return and cleanup, so we
 								// just
 								// need to return the return object.
@@ -173,15 +178,12 @@ public class IfElseStatement implements Expression
 							// the cancel (but we should clean up first).
 							// Remove any keys that were added to the current function by this while
 							// loop.
-							ArrayList<String> currVar =
-							        new ArrayList<String>(SymbolTable.currentSymbolTable.keySet());
+							ArrayList<String> currVar = new ArrayList<String>(SymbolTable.currentSymbolTable.keySet());
 							for (String var : currVar)
-								if (!prevVar.contains(var))
-									SymbolTable.currentSymbolTable.remove(var);
+								if (!prevVar.contains(var)) SymbolTable.currentSymbolTable.remove(var);
 							// Return the cancel
 							return expr;
-						}
-						else if (type == ExpressionType.RETURN) {
+						} else if (type == ExpressionType.RETURN) {
 							// The outside function will catch this return and cleanup, so we just
 							// need to return the return object.
 							return expr;
@@ -195,13 +197,15 @@ public class IfElseStatement implements Expression
 		// Remove any keys that were added to the current function by this while loop.
 		ArrayList<String> currVar = new ArrayList<String>(SymbolTable.currentSymbolTable.keySet());
 		for (String var : currVar)
-			if (!prevVar.contains(var))
-				SymbolTable.currentSymbolTable.remove(var);
+			if (!prevVar.contains(var)) SymbolTable.currentSymbolTable.remove(var);
 		return null;
 	}
 
 	/**
-	 * Like a {@linkplain WhileStatement}, an {@link IfElseStatement} is type-less.
+	 * Like a {@linkplain WhileStatement}, an {@link IfElseStatement} is type-less. That is not to say it cannot
+	 * return a {@linkplain ControlOperation}, but it is to say that it has no inherent type.
+	 *
+	 * @return Always returns <code>null</code>.
 	 */
 	@Override
 	public ExpressionType getType()
