@@ -21,6 +21,15 @@ public class ScalrParser {
 	public static File tscalrFile;
 	public static int nestingLevel;
 	public static String currentFunc;
+	public static HashSet<String> nestingWords = new HashSet<String>();
+	static
+	{
+		nestingWords.add("while");
+		nestingWords.add("foreach");
+		nestingWords.add("if");
+		nestingWords.add("func");
+	}
+	
 	public static void main(String[] args) throws Exception {
 		Scanner in = null;
 		try {
@@ -178,24 +187,36 @@ void fscalr(): {
 			System.err.println(e);
 		} catch (FunctionExistsError e) {
 			System.err.println(e);
-			if (badToken())
+			if (returnToNestingLevel(0))
 				return;
 		}
 	)+
 }
 
 JAVACODE
-boolean badToken()
+boolean returnToNestingLevel(int level)
 {
-	System.out.println("bad token");
-	Token t;
-	do {
-		t = getNextToken();
-		if (t.kind == EOF)
-			return true;
-	} while (!t.image.equals("end"));
-	if (--nestingLevel == 0) {
-		return false;
+	// Our job is to return to the nesting level indicated by level. First, we should check to see if we're
+	// already at or above that level
+	if (level < nestingLevel) {
+		Token currTok = null;
+		// Get the next token, incrementing when appropriate, and decrementing when we see an "end"
+		do {
+			String prevImage = null;
+			if (currTok != null)
+				prevImage = currTok.image;
+			currTok = getNextToken();
+			// A special check for if
+			if (currTok.image.equals("if") && prevImage != null && prevImage.equals("else")) {}
+			else if (nestingWords.contains(currTok.image))
+				nestingLevel++;
+			else if (currTok.image.equals("end"))
+				nestingLevel--;
+			// Check to see if we've reached our level
+			if (nestingLevel == level)
+				return false;
+		} while (currTok.kind != EOF);
+		return true;
 	}
 	return false;
 }
@@ -578,8 +599,6 @@ Expression pitch(Expression n): {
 		no.addNum(modNum);
 		if (mod != null)
 			no.addMod(mod.image);
-		else
-			System.out.println("Not modding a pitch");
 		return no;
 	}
 	| scale = <ID> <OPBR: "["> modNum = boolExpr() "]" {

@@ -5,10 +5,12 @@ func testfunc(x, n)
 	if (n < 3)
 		n++
 		x += testfunc(x, n)
+	else
+		n--
 	end
-	print(n)
+	/* print(n)
 	print(note)
-	print(x)
+	print(x) */
 	x += note.pitch(+n)
 	x
 end

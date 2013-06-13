@@ -1,10 +1,12 @@
-
 package scalr.expression;
+
+import scalr.Exceptions.IllegalReturnException;
+import scalr.variable.Sequence;
 
 public class ControlOperation implements Expression
 {
 
-	private String	   operation;
+	private String		operation;
 	private Expression	ret;
 
 	public ControlOperation(String op)
@@ -20,13 +22,17 @@ public class ControlOperation implements Expression
 	/**
 	 * Returns the {@linkplain Expression} that is part of this <code>{@link scalr.expression.ExpressionType}
 	 * .RETURN</code> statement. It guarantees that the return is a {@linkplain scalr.variable.Sequence}.
-	 *
+	 * 
 	 * @return Always returns an <code>instanceof</code> {@linkplain scalr.variable.Sequence}.
 	 */
 	public Expression getReturn()
 	{
-
-		return ret;
+		Expression value = ret.getValue();
+		if (value.getType() == ExpressionType.SEQUENCE)
+			return value;
+		else if (value.getType() == ExpressionType.NOTE)
+			return new Sequence(value);
+		throw new IllegalReturnException(value.toString());
 	}
 
 	@Override
